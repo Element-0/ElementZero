@@ -1,6 +1,5 @@
 #pragma once
 
-#include <funchook.h>
 #include <Windows.h>
 #include <exception>
 #include <cstdio>
@@ -95,7 +94,7 @@ template <typename TypeString> extern THookRegister THookRegisterTemplate;
 
 #  define _TStaticHook(pclass, iname, sym, ret, ...)                                                                   \
     template <> struct THookTemplate<strsig(#iname)> pclass {                                                          \
-      typedef ret (THookTemplate::*original_type)(__VA_ARGS__);                                                        \
+      typedef ret (*original_type)(__VA_ARGS__);                                                                       \
       static original_type &_original() {                                                                              \
         static original_type storage;                                                                                  \
         return storage;                                                                                                \

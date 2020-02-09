@@ -21,6 +21,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Public", "Public", "{34DE3B
 		Public\typestring.h = Public\typestring.h
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommandSupport", "CommandSupport\CommandSupport.vcxproj", "{3D8A68FC-37C3-4421-9477-8E706E1E4C80}"
+	ProjectSection(ProjectDependencies) = postProject
+		{47A40492-D211-4224-98FC-D9A7CF45F48E} = {47A40492-D211-4224-98FC-D9A7CF45F48E}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -35,6 +40,10 @@ Global
 		{A95D7607-2068-46F3-921A-6F978219A0D6}.Debug|x64.Build.0 = Debug|x64
 		{A95D7607-2068-46F3-921A-6F978219A0D6}.Release|x64.ActiveCfg = Release|x64
 		{A95D7607-2068-46F3-921A-6F978219A0D6}.Release|x64.Build.0 = Release|x64
+		{3D8A68FC-37C3-4421-9477-8E706E1E4C80}.Debug|x64.ActiveCfg = Debug|x64
+		{3D8A68FC-37C3-4421-9477-8E706E1E4C80}.Debug|x64.Build.0 = Debug|x64
+		{3D8A68FC-37C3-4421-9477-8E706E1E4C80}.Release|x64.ActiveCfg = Release|x64
+		{3D8A68FC-37C3-4421-9477-8E706E1E4C80}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

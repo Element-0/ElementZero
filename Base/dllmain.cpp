@@ -44,9 +44,10 @@ static void entry() {
 
   std::error_code ec;
   for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
-    if (next->is_regular_file() && next->path().extension() == "dll") {
+    if (next->is_regular_file() && next->path().extension() == ".dll") {
       auto lib = LoadLibrary(next->path().c_str());
       if (!lib) std::wcout << L"Error: Failed to load mod: " << next->path() << std::endl;
+      std::wcout << L"Loaded mod " << canonical(next->path()) << std::endl;
     }
   }
   if (ec) std::cout << "Warning: Cannot open Mods folder: " << ec.message() << std::endl;
