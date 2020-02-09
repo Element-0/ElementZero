@@ -14,6 +14,7 @@ Run windows version of BDS in linux with Mod support
 2. Build it with Visual Studio 2019 (or use MSBuild manually)
 3. Copy Build/*.dll to BDS folder (only dll files)
 4. Download ChakraCore.dll to BDS folder (see below)
+5. Build funchook.dll (see below)
 5. Run bedrock_server_mod.exe
 
 ## How to get bedrock_server_mod.lib
@@ -27,6 +28,12 @@ Run windows version of BDS in linux with Mod support
 
 0. Download windows build from https://github.com/microsoft/ChakraCore/releases
 1. Extract x64 variant to BDS folder (only dll)
+
+## Hot to build funchook.dll
+
+0. Download and configure the funchook https://github.com/kubo/funchook
+1. Build it with vs2019 release mode
+2. Copy funchook.dll to BDS folder (only dll)
 
 ## LICENSE
 
