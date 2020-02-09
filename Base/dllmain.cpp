@@ -36,8 +36,8 @@ static BOOL ConsoleCtrlHandler(DWORD type) {
 
 static void entry() {
   std::thread::id this_id = std::this_thread::get_id();
-  std::wcout << L"Current thread: " << this_id << std::endl;
-  std::wcout << L"Base mod loaded, setting control ctrl handler..." << std::endl;
+  std::wcout << L"Current thread id: " << this_id << std::endl;
+  std::wcout << L"Base mod loaded, setting up CtrlC handler..." << std::endl;
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 }
 
