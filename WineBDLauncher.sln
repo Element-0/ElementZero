@@ -11,6 +11,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Base", "Base\Base.vcxproj", "{A95D7607-2068-46F3-921A-6F978219A0D6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{47A40492-D211-4224-98FC-D9A7CF45F48E} = {47A40492-D211-4224-98FC-D9A7CF45F48E}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Public", "Public", "{34DE3BA4-5739-49D6-B9B7-5DB98A81FD7C}"
+	ProjectSection(SolutionItems) = preProject
+		Public\hook.h = Public\hook.h
+		Public\typestring.h = Public\typestring.h
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
