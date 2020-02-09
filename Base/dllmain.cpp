@@ -15,7 +15,7 @@ TInstanceHook(
   DedicatedServer,
   void *name) {
   mDedicatedServer = this;
-  std::cout << "hooked: " << (void *) name << std::endl;
+  std::cout << "Server loading..."<< std::endl;
   return original(this, name);
 }
 
@@ -35,10 +35,21 @@ static BOOL ConsoleCtrlHandler(DWORD type) {
 }
 
 static void entry() {
+  using namespace std::filesystem;
+
   std::thread::id this_id = std::this_thread::get_id();
   std::wcout << L"Current thread id: " << this_id << std::endl;
   std::wcout << L"Base mod loaded, setting up CtrlC handler..." << std::endl;
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+
+  std::error_code ec;
+  for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
+    if (next->is_regular_file() && next->path().extension() == "dll") {
+      auto lib = LoadLibrary(next->path().c_str());
+      if (!lib) std::wcout << L"Error: Failed to load mod: " << next->path() << std::endl;
+    }
+  }
+  if (ec) std::cout << "Warning: Cannot open Mods folder: " << ec.message() << std::endl;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
