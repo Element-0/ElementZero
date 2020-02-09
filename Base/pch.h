@@ -10,6 +10,7 @@
 #define PCH_H
 
 #include <iostream>
+#include <thread>
 #include <hook.h>
 // add headers that you want to pre-compile here
 #include "framework.h"

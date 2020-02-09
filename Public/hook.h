@@ -70,7 +70,7 @@ public:
 #  define VA_EXPAND(...) __VA_ARGS__
 
 template <typename TypeString> struct THookTemplate;
-template <typename TypeString> static THookRegister THookRegisterTemplate;
+template <typename TypeString> extern THookRegister THookRegisterTemplate;
 
 #  define _TInstanceHook(class_inh, pclass, iname, sym, ret, ...)                                                      \
     template <> struct THookTemplate<strsig(#iname)> class_inh {                                                       \
