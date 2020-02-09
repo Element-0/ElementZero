@@ -12,7 +12,7 @@ Run windows version of BDS in linux with Mod support
 0. Download bedrock dedicated server binary
 1. Generate bedrock_server_mod.lib (see below)
 2. Build it with Visual Studio 2019 (or use MSBuild manually)
-3. Copy Dist/*.dll to BDS folder (only dll files)
+3. Copy Build/*.dll to BDS folder (only dll files)
 4. Download ChakraCore.dll to BDS folder (see below)
 5. Run bedrock_server_mod.exe
 
