@@ -7,6 +7,17 @@ Run windows version of BDS in linux with Mod support
 
 (Yes, it is also can be run in windows)
 
+## FAQ
+
+Q: Why not use native linux version?<br>
+A: The windows version has noticeable performance improvements, even when running under wine.
+
+Q: Can the Windows version run directly under wine?<br>
+A: No, because Microsoft uses Chakra.dll, which contains a lot of references to private dlls. (It also prevents you from running on systems prior to Windows 10.)
+
+Q: How it is working?<br>
+A: I created a dll that simply forwards all APIs to the open source version of Chakra engine i.e. ChakraCore. And this version can run directly under wine.
+
 ## Build and install
 
 0. Download bedrock dedicated server binary
