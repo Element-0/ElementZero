@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <base.h>
+
 class DedicatedServer {
 public:
   __declspec(dllexport) void asyncStop() { *(((bool *) this) + 48) = true; }
@@ -7,16 +9,16 @@ public:
 
 static DedicatedServer *mDedicatedServer = nullptr;
 
-extern "C" __declspec(dllexport) DedicatedServer *GetDedicatedServer() { return mDedicatedServer; }
+DedicatedServer *GetDedicatedServer() { return mDedicatedServer; }
 
 TInstanceHook(
   int,
   ?start@DedicatedServer@@QEAA?AW4StartResult@1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z,
   DedicatedServer,
-  void *name) {
+  std::string const &uuid) {
   mDedicatedServer = this;
-  std::cout << "Server loading..."<< std::endl;
-  return original(this, name);
+  std::cout << "Server loading (" << uuid << ")..." << std::endl;
+  return original(this, uuid);
 }
 
 static BOOL ConsoleCtrlHandler(DWORD type) {

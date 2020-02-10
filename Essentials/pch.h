@@ -7,7 +7,13 @@
 #ifndef PCH_H
 #define PCH_H
 
-#include <hook.h>
+#include <command.h>
+#include <Command/Command.h>
+#include <Command/CommandRegistry.h>
+#include <Command/CommandPermissionLevel.h>
+#include <Command/CommandFlag.h>
+#include <Command/CommandParameterData.h>
+#include <iostream>
 // add headers that you want to pre-compile here
 #include "framework.h"
 

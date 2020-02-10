@@ -4,8 +4,9 @@
 #include <exception>
 #include <cstdio>
 #include "typestring.h"
+#include "sig.h"
 
-#ifdef IMP_HOOK
+#ifdef MODLOADER_EXPORTS
 #  define HOOKAPI __declspec(dllexport)
 #else
 #  define HOOKAPI __declspec(dllimport)
@@ -68,11 +69,11 @@ public:
 
 #  define VA_EXPAND(...) __VA_ARGS__
 
-template <typename TypeString> struct THookTemplate;
-template <typename TypeString> extern THookRegister THookRegisterTemplate;
+template <std::uint32_t sig> struct THookTemplate;
+template <std::uint32_t sig> extern THookRegister THookRegisterTemplate;
 
 #  define _TInstanceHook(class_inh, pclass, iname, sym, ret, ...)                                                      \
-    template <> struct THookTemplate<strsig(#iname)> class_inh {                                                       \
+    template <> struct THookTemplate<#iname##_sig> class_inh {                                                         \
       typedef ret (THookTemplate::*original_type)(__VA_ARGS__);                                                        \
       static original_type &_original() {                                                                              \
         static original_type storage;                                                                                  \
@@ -84,16 +85,16 @@ template <typename TypeString> extern THookRegister THookRegisterTemplate;
       ret _hook(__VA_ARGS__);                                                                                          \
     };                                                                                                                 \
     template <>                                                                                                        \
-    static THookRegister THookRegisterTemplate<strsig(#iname)>{#sym, &THookTemplate<strsig(#iname)>::_hook,            \
-                                                               (void **) &THookTemplate<strsig(#iname)>::_original()}; \
-    ret THookTemplate<strsig(#iname)>::_hook(__VA_ARGS__)
+    static THookRegister THookRegisterTemplate<#iname##_sig>{#sym, &THookTemplate<#iname##_sig>::_hook,                \
+                                                             (void **) &THookTemplate<#iname##_sig>::_original()};     \
+    ret THookTemplate<#iname##_sig>::_hook(__VA_ARGS__)
 
 #  define _TInstanceDefHook(iname, sym, ret, type, ...)                                                                \
     _TInstanceHook( : public type, type, iname, sym, ret, VA_EXPAND(__VA_ARGS__))
 #  define _TInstanceNoDefHook(iname, sym, ret, ...) _TInstanceHook(, void, iname, sym, ret, VA_EXPAND(__VA_ARGS__))
 
 #  define _TStaticHook(pclass, iname, sym, ret, ...)                                                                   \
-    template <> struct THookTemplate<strsig(#iname)> pclass {                                                          \
+    template <> struct THookTemplate<#iname##_sig> pclass {                                                            \
       typedef ret (*original_type)(__VA_ARGS__);                                                                       \
       static original_type &_original() {                                                                              \
         static original_type storage;                                                                                  \
@@ -105,9 +106,9 @@ template <typename TypeString> extern THookRegister THookRegisterTemplate;
       static ret _hook(__VA_ARGS__);                                                                                   \
     };                                                                                                                 \
     template <>                                                                                                        \
-    static THookRegister THookRegisterTemplate<strsig(#iname)>{#sym, &THookTemplate<strsig(#iname)>::_hook,            \
-                                                               (void **) &THookTemplate<strsig(#iname)>::_original()}; \
-    ret THookTemplate<strsig(#iname)>::_hook(__VA_ARGS__)
+    static THookRegister THookRegisterTemplate<#iname##_sig>{#sym, &THookTemplate<#iname##_sig>::_hook,                \
+                                                             (void **) &THookTemplate<#iname##_sig>::_original()};     \
+    ret THookTemplate<#iname##_sig>::_hook(__VA_ARGS__)
 
 #  define _TStaticDefHook(iname, sym, ret, type, ...)                                                                  \
     _TStaticHook( : public type, iname, sym, ret, VA_EXPAND(__VA_ARGS__))

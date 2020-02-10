@@ -1,5 +1,4 @@
 #include "pch.h"
-#define IMP_HOOK
 #include <hook.h>
 #include "hook_init.h"
 
