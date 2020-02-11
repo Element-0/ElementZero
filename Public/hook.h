@@ -3,10 +3,9 @@
 #include <Windows.h>
 #include <exception>
 #include <cstdio>
-#include "typestring.h"
 #include "sig.h"
 
-#ifdef MODLOADER_EXPORTS
+#ifdef ModLoader_EXPORTS
 #  define HOOKAPI __declspec(dllexport)
 #else
 #  define HOOKAPI __declspec(dllimport)

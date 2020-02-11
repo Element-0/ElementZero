@@ -12,7 +12,7 @@
 
 class Command;
 class CommandOrigin;
-class CommandParameterData;
+struct CommandParameterData;
 class HardNonTerminal;
 
 class CommandRegistry {

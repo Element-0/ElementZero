@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef BASE_EXPORTS
+#ifdef Base_EXPORTS
 #  define BASEAPI __declspec(dllexport)
 #else
 #  define BASEAPI __declspec(dllimport)

@@ -2,6 +2,7 @@
 
 #include "HealthCheck.h"
 #include "hook_init.h"
+#include <filesystem>
 
 void PrintErrorMessage() {
   DWORD errorMessageID = ::GetLastError();
@@ -14,7 +15,15 @@ void PrintErrorMessage() {
   LocalFree(messageBuffer);
 }
 
+static_assert(sizeof(std::string) == 32);
+
 void HealthCheck() {
+  namespace fs = std::filesystem;
+  WCHAR exepath[MAX_PATH];
+  GetModuleFileName(NULL, exepath, MAX_PATH);
+  fs::path xpath = exepath;
+  xpath          = xpath.parent_path();
+  SetCurrentDirectory(xpath.c_str());
   auto lib = GetModuleHandle(nullptr);
   if (!lib) {
     std::wcerr << L"!!! ATTENTION !!!" << std::endl;
@@ -31,7 +40,7 @@ void HealthCheck() {
     exit(1);
     return;
   }
-  std::wcerr << L"HealthCheck " << lib << L" " << fn << std::endl;
+  std::wcerr << L"HealthCheck " << lib << L" " << (void *) fn << std::endl;
 
   auto base = LoadLibrary(L"Base.dll");
   if (!base) {

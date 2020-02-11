@@ -5,7 +5,7 @@
 #include "event.h"
 #include <Core/type_id.h>
 
-#ifdef COMMANDSUPPORT_EXPORTS
+#ifdef CommandSupport_EXPORTS
 #  define COMMANDAPI __declspec(dllexport)
 #else
 #  define COMMANDAPI __declspec(dllimport)
