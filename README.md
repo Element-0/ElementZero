@@ -26,6 +26,7 @@ A: I created a dll that simply forwards all APIs to the open source version of C
 3. Copy Build/*.dll to BDS folder (only dll files)
 4. Download ChakraCore.dll to BDS folder (see below)
 5. Build funchook.dll (see below)
+5. Build yaml-cpp.dll (see below)
 5. Run bedrock_server_mod.exe
 
 ## How to get bedrock_server_mod.lib
@@ -40,11 +41,18 @@ A: I created a dll that simply forwards all APIs to the open source version of C
 0. Download windows build from https://github.com/microsoft/ChakraCore/releases
 1. Extract x64 variant to BDS folder (only dll)
 
-## Hot to build funchook.dll
+## How to build funchook.dll
 
 0. Download and configure the funchook https://github.com/kubo/funchook
 1. Build it with vs2019 release mode
 2. Copy funchook.dll to BDS folder (only dll)
+
+## How to build yaml-cpp.dll
+
+0. Download and configure the yaml-cpp https://github.com/jbeder/yaml-cpp/
+1. Enable shared mode
+2. Build it with vs2019 release mode
+3. Copy yaml-cpp.dll to BDS folder (only dll)
 
 ## LICENSE
 

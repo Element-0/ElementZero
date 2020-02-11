@@ -12,7 +12,12 @@
 #include <iostream>
 #include <filesystem>
 #include <thread>
+#include <fstream>
+#include <iterator>
 #include <hook.h>
+#include <base.h>
+#include <boost/algorithm/string.hpp>
+#include <yaml-cpp/yaml.h>
 // add headers that you want to pre-compile here
 #include "framework.h"
 

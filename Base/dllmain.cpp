@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include <base.h>
-
 class DedicatedServer {
 public:
   __declspec(dllexport) void asyncStop() { *(((bool *) this) + 48) = true; }
@@ -36,6 +34,25 @@ static BOOL ConsoleCtrlHandler(DWORD type) {
   return TRUE;
 }
 
+static YAML::Node readConfig() {
+  constexpr auto config_name = "custom.yaml";
+  try {
+    return YAML::LoadFile(config_name);
+  } catch (YAML::BadFile const &e) {
+    YAML::Emitter out;
+    out.SetIndent(2);
+    out.SetMapFormat(YAML::Flow);
+    out << YAML::BeginMap;
+    out << YAML::Key << "mod_enabled";
+    out << YAML::Value << true;
+    out << YAML::EndMap;
+    std::ofstream{config_name} << out.c_str();
+    return YAML::LoadFile(config_name);
+  }
+}
+
+typedef void (*ApplySettingsType)(YAML::Node const &);
+
 static void entry() {
   using namespace std::filesystem;
 
@@ -43,16 +60,27 @@ static void entry() {
   std::wcout << L"Current thread id: " << this_id << std::endl;
   std::wcout << L"Base mod loaded, setting up CtrlC handler..." << std::endl;
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+  try {
+    const auto cfg = readConfig();
+    if (cfg["mod_enabled"].as<bool>()) {
+      std::error_code ec;
+      for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
+        if (next->is_regular_file() && next->path().extension() == ".dll") {
+          const auto cfgkey = "mod_" + boost::algorithm::to_lower_copy(next->path().stem().string());
+          const auto subcfg = cfg[cfgkey];
+          if (subcfg)
+            if (auto enabled = subcfg["enabled"]; enabled && !enabled.as<bool>()) continue;
 
-  std::error_code ec;
-  for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
-    if (next->is_regular_file() && next->path().extension() == ".dll") {
-      auto lib = LoadLibrary(next->path().c_str());
-      if (!lib) std::wcout << L"Error: Failed to load mod: " << next->path() << std::endl;
-      std::wcout << L"Loaded mod " << canonical(next->path()) << std::endl;
+          auto lib = LoadLibrary(next->path().c_str());
+          if (!lib) std::wcout << L"Error: Failed to load mod: " << next->path() << std::endl;
+          if (subcfg)
+            if (auto fn = (ApplySettingsType) GetProcAddress(lib, "ApplySettings"); fn) fn(subcfg);
+          std::wcout << L"Loaded mod " << canonical(next->path()) << std::endl;
+        }
+      }
+      if (ec) std::cout << "Warning: Cannot open Mods folder: " << ec.message() << std::endl;
     }
-  }
-  if (ec) std::cout << "Warning: Cannot open Mods folder: " << ec.message() << std::endl;
+  } catch (std::exception const &e) { std::wcerr << e.what() << std::endl; }
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {

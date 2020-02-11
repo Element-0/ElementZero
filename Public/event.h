@@ -2,11 +2,12 @@
 
 #include <functional>
 #include <vector>
+#include <boost/core/noncopyable.hpp>
 #include "sig.h"
 
 namespace Mod {
 
-template <std::uint32_t sig, typename... Params> class EventEmitter {
+template <std::uint32_t sig, typename... Params> class EventEmitter : public boost::noncopyable {
 public:
   using CallBackType = std::function<void(Params...)>;
 
@@ -16,13 +17,13 @@ private:
 public:
   void AddListener(sigt<sig>, CallBackType fn) { _vector.emplace_back(fn); }
   void RemoveListener(sigt<sig>, CallBackType fn) {
-    auto it = _vector.find(fn);
+    auto it = std::find(_vector.begin(), _vector.end(), fn);
     if (it != _vector.end()) { _vector.erase(it); }
   }
 
 protected:
   void Emit(sigt<sig>, Params... params) {
-    for (auto &fn : _vector) { fn(std::forward<Params>(params)...); }
+    for (auto &fn : _vector) fn(std::forward<Params>(params)...);
   }
 };
 
