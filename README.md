@@ -23,15 +23,16 @@ A: I created a dll that simply forwards all APIs to the open source version of C
 0. Download bedrock dedicated server binary
 1. Generate bedrock_server_mod.lib (see below)
 2. Build it with Visual Studio 2019 (or use MSBuild manually)
-3. Copy Dist/* to bds folder
+3. Copy Dist/* to bds folder (or use ![symlink](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/))
 4. Run bedrock_server_mod.exe
 
 ## How to get bedrock_server_mod.lib
 
 0. Download and install [EatPdb](https://github.com/CodeHz/EatPdb)
-1. Run `eatpdb -i bedrock_server.exe -o bedrock_server_mod.exe`
-2. Open Visual Studio Developer Console, then run `lib /def:bedrock_server_mod.def /machine:x64`
-3. Copy bedrock_server_mod.lib to $(SolutionDir)Lib\bedrock_server_mod.lib
+1. Copy $(SolutionDir)\eatpdb.yaml to bds folder
+2. Run `eatpdb exec eatpdb.yaml`
+3. Open `x64 Native Tools Command Prompt for VS 2019`, then run `lib /def:bedrock_server_mod.def /machine:x64`
+4. Copy bedrock_server_mod.lib to $(SolutionDir)Lib\bedrock_server_mod.lib
 
 ## LICENSE
 

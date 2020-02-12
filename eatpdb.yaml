@@ -1,0 +1,11 @@
+in: bedrock_server.exe
+out: bedrock_server_mod.exe
+filter: !blacklist
+  - prefix: "_"
+  - prefix: "?__"
+  - prefix: "??_"
+  - prefix: "??@"
+  - prefix: "?$TSS"
+  - regex: "std@@[QU]"
+  - name: atexit
+  - regex: ".*printf$"
