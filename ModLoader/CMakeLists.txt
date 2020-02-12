@@ -11,7 +11,7 @@ ExternalProject_Add (ChakraCore
     INSTALL_COMMAND cmake -E copy_if_different x64_release/ChakraCore.dll <INSTALL_DIR>
 )
 ExternalProject_Get_Property (ChakraCore INSTALL_DIR)
-install(FILES ${INSTALL_DIR}/ChakraCore.dll DESTINATION .)
+install (FILES ${INSTALL_DIR}/ChakraCore.dll DESTINATION .)
 
 ExternalProject_Add (FuncHook
     GIT_REPOSITORY https://github.com/kubo/funchook
@@ -21,10 +21,10 @@ ExternalProject_Add (FuncHook
 
 ExternalProject_Get_Property (FuncHook INSTALL_DIR)
 
-install(FILES ${INSTALL_DIR}/bin/FuncHook.dll DESTINATION .)
+install (FILES ${INSTALL_DIR}/bin/FuncHook.dll DESTINATION .)
 
 add_library (ModLoader SHARED dllmain.cpp HealthCheck.cpp hook_impl.cpp forward.cpp)
-set_target_properties(ModLoader PROPERTIES OUTPUT_NAME "Chakra")
+set_target_properties (ModLoader PROPERTIES OUTPUT_NAME "Chakra")
 add_dependencies (ModLoader ChakraCore FuncHook)
 target_include_directories (ModLoader PRIVATE ${INSTALL_DIR}/include)
 target_link_directories (ModLoader PRIVATE ${INSTALL_DIR}/lib)
