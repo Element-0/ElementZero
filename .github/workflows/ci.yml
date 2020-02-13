@@ -2,6 +2,10 @@ name: CI
 
 on: [push]
 
+env:
+  eatpdb_version: v0.0.3
+  bds_version: 1.14.30.2
+
 jobs:
   build:
 
@@ -41,6 +45,32 @@ jobs:
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
         echo "::set-env name=PATH::$env:PATH"
+        
+    - name: Download BDS
+      run: |
+        wget -O D:/bds.zip https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip
+        mkdir BDS
+        cd BDS
+        unzip D:/bds.zip
+      shell: bash
+    
+    - name: Install EatPdb
+      run: |
+        wget -O D:/eatpdb.zip https://github.com/codehz/EatPdb/releases/download/${{ env.eatpdb_version }}/win-x64.zip
+        mkdir D:/eatpdb
+        cd D:/eatpdb
+        unzip D:/eatpdb.zip
+      shell: bash
+        
+    - name: Build bedrock_server_mod.lib
+      run: |
+        mkdir Lib Dist
+        cd BDS
+        D:/eatpdb/eatpdb exec ../eatpdb.yaml
+        lib /def:bedrock_server_mod.def /machine:x64
+        cp bedrock_server_mod.lib ../Lib
+        cp bedrock_server_mod.exe ../Dist
+      shell: bash
       
     - name: Build
       run: |
