@@ -1,5 +1,5 @@
 # WineBDLauncher
-![status](https://img.shields.io/badge/status-WIP-red?style=for-the-badge)
+![status](https://img.shields.io/github/workflow/status/codehz/wine-bdlauncher/CI?style=for-the-badge)
 ![platform](https://img.shields.io/badge/platform-win--x64%20%7C%20wine--linux--x64-green?style=for-the-badge)
 <a href="https://t.me/wine_bdlauncher">![Telegram](https://img.shields.io/badge/telegram-wine_bdlauncher-%232CA5E0?style=for-the-badge&logo=Telegram)</a><br>
 
@@ -23,7 +23,7 @@ A: I created a dll that simply forwards all APIs to the open source version of C
 0. Download bedrock dedicated server binary
 1. Generate bedrock_server_mod.lib (see below)
 2. Build it with Visual Studio 2019 (or use MSBuild manually)
-3. Copy Dist/* to bds folder (or use ![symlink](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/))
+3. Copy Dist/* to bds folder (or use [symlink](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/))
 4. Run bedrock_server_mod.exe
 
 ## How to get bedrock_server_mod.lib
