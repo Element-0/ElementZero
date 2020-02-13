@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 env:
-  eatpdb_version: v0.0.3
+  eatpdb_version: v0.0.4
   bds_version: 1.14.30.2
 
 jobs:
@@ -45,8 +45,16 @@ jobs:
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
         echo "::set-env name=PATH::$env:PATH"
+
+    - name: Cache lib artifacts
+      uses: actions/cache@v1
+      id: libcache
+      with:
+        path: ${{ github.workspace }}/Lib
+        key: lib-${{ hashFiles(join(github.workspace, "/eatpdb.yaml")) }}-${{ env.eatpdb_version }}-${{ env.bds_version }}
         
     - name: Download BDS
+      if: steps.libcache.outputs.cache-hit != 'true'
       run: |
         curl -L -o D:/bds.zip https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip
         mkdir BDS
@@ -55,6 +63,7 @@ jobs:
       shell: bash
     
     - name: Install EatPdb
+      if: steps.libcache.outputs.cache-hit != 'true'
       run: |
         curl -L -o D:/eatpdb.zip https://github.com/codehz/EatPdb/releases/download/${{ env.eatpdb_version }}/win-x64.zip
         mkdir D:/eatpdb
@@ -63,13 +72,14 @@ jobs:
       shell: bash
         
     - name: Build bedrock_server_mod.lib
+      if: steps.libcache.outputs.cache-hit != 'true'
       run: |
         mkdir Lib Dist
         cd BDS
         D:/eatpdb/eatpdb exec ../eatpdb.yaml
         lib /def:bedrock_server_mod.def /machine:x64
         cp bedrock_server_mod.lib ../Lib
-        cp bedrock_server_mod.exe ../Dist
+        cp bedrock_server_mod.exe ../Lib
       shell: bash
       
     - name: Build
@@ -82,6 +92,8 @@ jobs:
         ..
         ninja
         ninja install
+        cp ../Lib/bedrock_server_mod.exe ../Dist
+        cp ../Lib/bedrock_server_mod.lib ../Dist/Lib
       shell: bash
         
     - name: Upload artifact
