@@ -36,16 +36,19 @@ jobs:
         arch: x64
       
     - name: Build
+      env:
+        VSINSTALLDIR: ${{ env.VCToolsInstallDir }}../../../../
+        VCINSTALLDIR: ${{ env.VCToolsInstallDir }}../../..
       run: |
         mkdir Build
         cd Build
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DCMAKE_C_COMPILER=${{ env.VSINSTALLDIR }}VC/Tools/Llvm/bin/clang-cl \
-        -DCMAKE_C_COMPILER_AR=${{ env.VSINSTALLDIR }}VC/Tools/Llvm/bin/llvm-ar \
-        -DCMAKE_C_COMPILER_RANLIB=${{ env.VSINSTALLDIR }}VC/Tools/Llvm/bin/llvm-ranlib \
-        -DCMAKE_CXX_COMPILER=${{ env.VSINSTALLDIR }}VC/Tools/Llvm/bin/clang-cl \
-        -DCMAKE_CXX_COMPILER_AR=${{ env.VSINSTALLDIR }}VC/Tools/Llvm/bin/llvm-ar \
-        -DCMAKE_CXX_COMPILER_RANLIB=${{ env.VSINSTALLDIR }}VC/Tools/Llvm/bin/llvm-ranlib \
+        -DCMAKE_C_COMPILER=${{ env.VCINSTALLDIR }}Tools/Llvm/bin/clang-cl \
+        -DCMAKE_C_COMPILER_AR=${{ env.VCINSTALLDIR }}Tools/Llvm/bin/llvm-ar \
+        -DCMAKE_C_COMPILER_RANLIB=${{ env.VCINSTALLDIR }}Tools/Llvm/bin/llvm-ranlib \
+        -DCMAKE_CXX_COMPILER=${{ env.VCINSTALLDIR }}Tools/Llvm/bin/clang-cl \
+        -DCMAKE_CXX_COMPILER_AR=${{ env.VCINSTALLDIR }}Tools/Llvm/bin/llvm-ar \
+        -DCMAKE_CXX_COMPILER_RANLIB=${{ env.VCINSTALLDIR }}Tools/Llvm/bin/llvm-ranlib \
         -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/Dist \
         -DCMAKE_LINKER="${{ env.VCToolsInstallDir }}bin/Hostx64/x64/link" \
         -DCMAKE_MODULE_LINKER_FLAGS=/machine:x64 \
