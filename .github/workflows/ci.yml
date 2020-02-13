@@ -30,6 +30,10 @@ jobs:
         vcpkgGitCommitId: master
         vcpkgTriplet: x64-windows
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
+
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
       
     - name: Build
       uses: lukka/run-cmake@v0
