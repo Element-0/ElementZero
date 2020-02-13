@@ -34,7 +34,6 @@ jobs:
       if: steps.cache.outputs.cache-hit != 'true'
       with:
         vcpkgGitCommitId: master
-        vcpkgTriplet: x64-windows-rel
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
 
     - uses: ilammy/msvc-dev-cmd@v1
