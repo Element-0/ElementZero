@@ -16,7 +16,9 @@ jobs:
     - name: Set vcpkg's response file path used as part of cache's key.
       env:
         vcpkgResponseFile: ${{ github.workspace }}/vcpkg.txt
-      run: echo "::set-env name=vcpkgResponseFile::$vcpkgResponseFile"
+      run: |
+        sed -i 's/VcPkgTriplets/${{ github.workspace }}\/VcPkgTriplets/' $vcpkgResponseFile
+        echo "::set-env name=vcpkgResponseFile::$vcpkgResponseFile"
       shell: bash
 
     - name: Cache vcpkg artifacts
@@ -52,7 +54,7 @@ jobs:
       with:
         path: ${{ github.workspace }}/Lib
         key: lib-${{ hashFiles( 'eatpdb.yaml' ) }}-${{ env.eatpdb_version }}-${{ env.bds_version }}
-        
+
     - name: Download BDS
       if: steps.libcache.outputs.cache-hit != 'true'
       run: |
@@ -61,7 +63,7 @@ jobs:
         cd BDS
         unzip D:/bds.zip
       shell: bash
-    
+
     - name: Install EatPdb
       if: steps.libcache.outputs.cache-hit != 'true'
       run: |
@@ -70,7 +72,7 @@ jobs:
         cd D:/eatpdb
         unzip D:/eatpdb.zip
       shell: bash
-        
+
     - name: Build bedrock_server_mod.lib
       if: steps.libcache.outputs.cache-hit != 'true'
       run: |
@@ -81,7 +83,7 @@ jobs:
         cp bedrock_server_mod.lib ../Lib
         cp bedrock_server_mod.exe ../Lib
       shell: bash
-      
+
     - name: Build
       run: |
         mkdir Build
@@ -98,7 +100,7 @@ jobs:
         cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*
       shell: bash
-        
+
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
