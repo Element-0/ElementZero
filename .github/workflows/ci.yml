@@ -40,17 +40,17 @@ jobs:
         mkdir Build
         cd Build
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DCMAKE_C_COMPILER=${{ env.VCToolsInstallDir }}../../Llvm/bin/clang-cl \
-        -DCMAKE_C_COMPILER_AR=${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ar \
-        -DCMAKE_C_COMPILER_RANLIB=${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ranlib \
-        -DCMAKE_CXX_COMPILER=${{ env.VCToolsInstallDir }}../../Llvm/bin/clang-cl \
-        -DCMAKE_CXX_COMPILER_AR=${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ar \
-        -DCMAKE_CXX_COMPILER_RANLIB=${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ranlib \
-        -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/Dist \
+        -DCMAKE_C_COMPILER="${{ env.VCToolsInstallDir }}../../Llvm/bin/clang-cl" \
+        -DCMAKE_C_COMPILER_AR="${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ar" \
+        -DCMAKE_C_COMPILER_RANLIB="${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ranlib" \
+        -DCMAKE_CXX_COMPILER="${{ env.VCToolsInstallDir }}../../Llvm/bin/clang-cl" \
+        -DCMAKE_CXX_COMPILER_AR="${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ar" \
+        -DCMAKE_CXX_COMPILER_RANLIB="${{ env.VCToolsInstallDir }}../../Llvm/bin/llvm-ranlib" \
+        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/Dist" \
         -DCMAKE_LINKER="${{ env.VCToolsInstallDir }}bin/Hostx64/x64/link" \
         -DCMAKE_MODULE_LINKER_FLAGS=/machine:x64 \
-        -DCMAKE_MAKE_PROGRAM=${{ env.VCToolsInstallDir }}../../../../Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja \
-        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake\
+        -DCMAKE_MAKE_PROGRAM="${{ env.VCToolsInstallDir }}../../../../Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja" \
+        -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
         cmake --build
         cmake --build install
