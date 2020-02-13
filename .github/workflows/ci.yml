@@ -48,7 +48,7 @@ jobs:
         
     - name: Download BDS
       run: |
-        curl -o D:/bds.zip https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip
+        curl -L -o D:/bds.zip https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip
         mkdir BDS
         cd BDS
         unzip D:/bds.zip
@@ -56,7 +56,7 @@ jobs:
     
     - name: Install EatPdb
       run: |
-        curl -o D:/eatpdb.zip https://github.com/codehz/EatPdb/releases/download/${{ env.eatpdb_version }}/win-x64.zip
+        curl -L -o D:/eatpdb.zip https://github.com/codehz/EatPdb/releases/download/${{ env.eatpdb_version }}/win-x64.zip
         mkdir D:/eatpdb
         cd D:/eatpdb
         unzip D:/eatpdb.zip
