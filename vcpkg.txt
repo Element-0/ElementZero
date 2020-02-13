@@ -1,0 +1,6 @@
+boost-algorithm
+boost-core
+boost-format
+sqlitecpp
+yaml-cpp
+chakracore

@@ -9,8 +9,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Enable Developer Command Prompt
-      uses: ilammy/msvc-dev-cmd@v1.0.0
+    - name: Set vcpkg's response file path used as part of cache's key.
+      env:
+        vcpkgResponseFile: ${{ github.workspace }}/vcpkg.txt
+      run: echo "::set-env name=vcpkgResponseFile::$vcpkgResponseFile"
+      shell: bash
+
+    - name: Cache vcpkg artifacts
+      uses: actions/cache@v1
+      with:
+        path: ${{ github.workspace }}/vcpkg
+        key: vcpkg-${{ hashFiles( env.vcpkgResponseFile ) }}
 
     - name: run-vcpkg
       uses: lukka/run-vcpkg@v0.9
@@ -18,18 +27,15 @@ jobs:
       with:
         vcpkgGitCommitId: master
         vcpkgTriplet: x64-windows
-        vcpkgArguments: boost-algorithm boost-core boost-format sqlitecpp yaml-cpp chakracore
-        
-    - name: Prints outputs of run-vcpkg task
-      run: echo "'${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT }}' '${{  steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET }}' "
+        vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
       
     - name: Build
       uses: lukka/run-cmake@v0
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
-        cmakeSettingsJsonPath: CMakeSettings.json
         useVcpkgToolchainFile: true
         configurationRegexFilter: Debug
+        buildDirectory: "${{ github.workspace }}/Build"
         
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
