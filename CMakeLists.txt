@@ -7,6 +7,7 @@ include (ExternalProject)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS ON)
+set (VCPKG_TARGET_TRIPLET "x64-windows-rel")
 
 function (find_and_install_package name)
     find_package (${name} CONFIG REQUIRED)

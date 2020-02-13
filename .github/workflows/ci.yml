@@ -32,7 +32,7 @@ jobs:
       if: steps.cache.outputs.cache-hit != 'true'
       with:
         vcpkgGitCommitId: master
-        vcpkgTriplet: x64-windows
+        vcpkgTriplet: x64-windows-rel
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
 
     - uses: ilammy/msvc-dev-cmd@v1
@@ -87,7 +87,8 @@ jobs:
         mkdir Build
         pushd Build
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DCMAKE_INSTALL_PREFIX="D:/a/wine-bdlauncher/wine-bdlauncher/Dist" \
+        -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
+        -DCMAKE_INSTALL_PREFIX:PATH="D:/a/wine-bdlauncher/wine-bdlauncher/Dist" \
         -DCMAKE_TOOLCHAIN_FILE="D:/a/wine-bdlauncher/wine-bdlauncher/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
         ninja

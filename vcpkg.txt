@@ -1,3 +1,6 @@
+--overlay-triplets=VcPkgTriplets
+--triplet
+x64-windows-rel
 boost-algorithm
 boost-core
 boost-format

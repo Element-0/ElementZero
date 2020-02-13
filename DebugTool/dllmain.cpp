@@ -13,7 +13,7 @@ static struct Settings {
 } settings;
 
 void ApplySettings(YAML::Node const &node) {
-  if (auto subcmd = node["command"]; subcmd) { settings.command.logRegister = subcmd["log-register"].as<bool>(false); }
+  if (auto subcmd = node["command"]; subcmd) { yaml_assign(settings.command.logRegister, subcmd["log-register"]); }
 }
 
 void dllenter() {}

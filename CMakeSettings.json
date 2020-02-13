@@ -12,7 +12,13 @@
             "ctestCommandArgs": "",
             "intelliSenseMode": "windows-msvc-x64",
             "cmakeToolchain": "",
-            "variables": []
+            "variables": [
+                {
+                    "name": "VCPKG_TARGET_TRIPLET",
+                    "value": "x64-windows-rel",
+                    "type": "STRING"
+                }
+            ]
         }
     ]
 }

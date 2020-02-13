@@ -16,19 +16,19 @@ static_assert(sizeof(std::string) == 32);
 namespace YAML {
 template <> struct convert<Settings::Commands> {
   static bool decode(const Node &node, Settings::Commands &rhs) {
-    rhs.transferserver = node["transferserver"].as<bool>(true);
+    yaml_assign(rhs.transferserver, node["transferserver"]);
     return true;
   }
 };
 template <> struct convert<Settings> {
   static bool decode(const Node &node, Settings &rhs) {
-    if (auto commands = node["commands"]; commands) rhs.commands = commands.as<Settings::Commands>();
+    if (auto commands = node["commands"]; commands) yaml_assign(rhs.commands, commands);
     return true;
   }
 };
 } // namespace YAML
 
-extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node) { settings = node.as<Settings>(); }
+extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node) { yaml_assign(settings, node); }
 
 static void startRegister(CommandRegistry *registry) {
   if (settings.commands.transferserver) {

@@ -10,6 +10,8 @@
 #include <boost/format.hpp>
 #include <yaml-cpp/yaml.h>
 #include <dllentry.h>
+#include <SQLiteCpp/SQLiteCpp.h>
+#include "settings.hpp"
 
 class DedicatedServer {
 public:
@@ -17,6 +19,7 @@ public:
 };
 
 static DedicatedServer *mDedicatedServer = nullptr;
+static std::string session;
 
 DedicatedServer *GetDedicatedServer() { return mDedicatedServer; }
 
@@ -25,6 +28,7 @@ TInstanceHook(
     "?start@DedicatedServer@@QEAA?AW4StartResult@1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
     DedicatedServer, std::string const &uuid) {
   mDedicatedServer = this;
+  session          = uuid;
   return original(this, uuid);
 }
 
@@ -142,8 +146,8 @@ static char getPriority(unsigned int pri) {
   }
 }
 
+static std::unique_ptr<SQLite::Database> log_database;
 static BedrockLog::LogDetails *log_instance;
-static std::string format_pattern = "%1$c [%2$s] (%3$s:%4$d) %5$s";
 
 TInstanceHook(void, "?_openLogFile@LogDetails@BedrockLog@@AEAAXXZ", BedrockLog::LogDetails) {
   original(this);
@@ -151,11 +155,32 @@ TInstanceHook(void, "?_openLogFile@LogDetails@BedrockLog@@AEAAXXZ", BedrockLog::
 }
 
 void generalLog(unsigned int pri, std::string_view area, char const *source, unsigned line, std::string content) {
-  auto f    = boost::format(format_pattern) % getPriority(pri) % area % source % line % content;
+  auto f    = boost::format(settings.LogSettings.Format) % getPriority(pri) % area % source % line % content;
   auto data = f.str();
   if (data.back() != '\n') data.append("\n");
   std::cout << data;
   if (log_instance) log_instance->proxy(data);
+  if (log_database) {
+    try {
+      static SQLite::Statement insert{*log_database,
+                                      "INSERT INTO log (session, time, priority, area, source, line, content) "
+                                      "VALUES (?, date('now'), ?, ?, ?, ?, ?)"};
+      if (session != "") {
+        insert.bindNoCopy(1, session);
+        insert.bind(2, pri);
+        insert.bindNoCopy(3, area.data());
+        insert.bindNoCopy(4, source);
+        insert.bind(5, line);
+        insert.bindNoCopy(6, data);
+        insert.exec();
+        insert.reset();
+        insert.clearBindings();
+      }
+    } catch (std::exception &ex) {
+      log_database.reset();
+      std::cerr << ex.what() << std::endl;
+    }
+  }
 }
 
 void Mods::Logger::commit(Level level, unsigned line, std::string value) {
@@ -196,8 +221,6 @@ static YAML::Node readConfig() {
     out << YAML::BeginMap;
     out << YAML::Key << "mod-enabled";
     out << YAML::Value << true;
-    out << YAML::Key << "format-pattern";
-    out << YAML::Value << format_pattern;
     out << YAML::EndMap;
     std::ofstream{config_name} << out.c_str();
     return YAML::LoadFile(config_name);
@@ -216,14 +239,25 @@ void dllenter() {
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
   try {
     const auto cfg = readConfig();
-    if (auto p = cfg["format-pattern"]; p) format_pattern = p.as<std::string>();
-    if (cfg["mod-enabled"].as<bool>()) {
+    yaml_assign(settings, cfg);
+    if (settings.LogSettings.Database != "") {
+      log_database = std::make_unique<SQLite::Database>(
+          settings.LogSettings.Database, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+      log_database->exec(
+          "CREATE TABLE IF NOT EXISTS log (session TEXT, time NUMERIC, priority INTEGER, area TEXT, source TEXT, line "
+          "INTEGER, content TEXT)");
+      // You don't need data safety for log
+      log_database->exec("PRAGMA journal_mode = WAL");
+      log_database->exec("PRAGMA synchronous = NORMAL");
+      LOGV("Log data base initialized (location %s)") % settings.LogSettings.Database;
+    }
+    if (settings.ModEnabled) {
       auto mods_config = cfg["mods"];
       std::error_code ec;
       for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
         if (next->is_regular_file() && next->path().extension() == ".dll") {
           const auto cfgkey = next->path().stem().string();
-          const auto subcfg = mods_config ? mods_config[cfgkey] : YAML::Node{};
+          const auto subcfg = settings.ModSettings.count(cfgkey) ? settings.ModSettings[cfgkey] : YAML::Node{};
           if (subcfg)
             if (auto enabled = subcfg["enabled"]; enabled && !enabled.as<bool>()) continue;
 

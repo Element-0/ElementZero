@@ -2,7 +2,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <yaml-cpp/yaml.h>
+#include "yaml.h"
 
 void dllenter();
 void dllexit();
