@@ -85,15 +85,16 @@ jobs:
     - name: Build
       run: |
         mkdir Build
-        cd Build
+        pushd Build
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
         -DCMAKE_INSTALL_PREFIX="D:/a/wine-bdlauncher/wine-bdlauncher/Dist" \
         -DCMAKE_TOOLCHAIN_FILE="D:/a/wine-bdlauncher/wine-bdlauncher/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
         ninja
         ninja install
-        cp ../Lib/bedrock_server_mod.exe ../Dist
-        cp ../Lib/bedrock_server_mod.lib ../Dist/Lib
+        popd
+        cp Lib/bedrock_server_mod.exe Dist
+        cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*
       shell: bash
         
