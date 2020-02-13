@@ -50,8 +50,8 @@ jobs:
         -DCMAKE_INSTALL_PREFIX="D:/a/wine-bdlauncher/wine-bdlauncher/Dist" \
         -DCMAKE_TOOLCHAIN_FILE="D:/a/wine-bdlauncher/wine-bdlauncher/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
-        cmake --build
-        cmake --build install
+        ninja
+        ninja install
       shell: bash
         
     - name: Upload artifact
