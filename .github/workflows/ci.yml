@@ -41,7 +41,7 @@ jobs:
     - name: install llvm
       run: |
         Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-        scoop install llvm --global
+        scoop install llvm tar --global
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
         echo "::set-env name=PATH::$env:PATH"
@@ -94,6 +94,7 @@ jobs:
         ninja install
         cp ../Lib/bedrock_server_mod.exe ../Dist
         cp ../Lib/bedrock_server_mod.lib ../Dist/Lib
+        tar cvfJ pkg.tar.xz Dist/*
       shell: bash
         
     - name: Upload artifact
@@ -101,3 +102,11 @@ jobs:
       with:
         name: dist
         path: Dist
+
+    - name: Create a new GitHub release if a new tag is pushed
+      uses: yakuhzi/action-release@v1.2.0
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      with:
+        file: pkg.tar.xz
