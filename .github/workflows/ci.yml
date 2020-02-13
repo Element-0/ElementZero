@@ -1,0 +1,37 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Enable Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1.0.0
+
+    - name: run-vcpkg
+      uses: lukka/run-vcpkg@v0.9
+      id: runvcpkg
+      with:
+        vcpkgTriplet: x64-windows
+        vcpkgArguments: boost-algorithm boost-core boost-format sqlitecpp yaml-cpp chakracore
+        
+    - name: Prints outputs of run-vcpkg task
+      run: echo "'${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT }}' '${{  steps.runvcpkg.outputs.RUNVCPKG_VCPKG_TRIPLET }}' "
+      
+    - name: Build
+      uses: lukka/run-cmake@v0
+      with:
+        cmakeListsOrSettingsJson: CMakeSettingsJson
+        cmakeSettingsJsonPath: CMakeSettings.json
+        useVcpkgToolchainFile: true
+        configurationRegexFilter: Debug
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: dist
+        path: Dist
