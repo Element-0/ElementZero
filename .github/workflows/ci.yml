@@ -36,12 +36,24 @@ jobs:
         arch: x64
       
     - name: Build
-      uses: lukka/run-cmake@v0
-      with:
-        cmakeListsOrSettingsJson: CMakeSettingsJson
-        useVcpkgToolchainFile: true
-        configurationRegexFilter: Debug
-        buildDirectory: "${{ github.workspace }}/Build"
+      env:
+        PATH: "${{ env.VCINSTALLDIR }}Tools/Llvm/bin;${{ env.DevEnvDir }}CommonExtensions/Microsoft/CMake/Ninja;${{ env.PATH }}"
+      run: |
+        mkdir Build
+        cd Build
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_C_COMPILER=clang-cl \
+        -DCMAKE_C_COMPILER_AR=llvm-ar \
+        -DCMAKE_C_COMPILER_RANLIB=llvm-ranlib \
+        -DCMAKE_CXX_COMPILER=clang-cl \
+        -DCMAKE_CXX_COMPILER_AR=llvm-ar \
+        -DCMAKE_CXX_COMPILER_RANLIB=llvm-ranlib \
+        -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/Dist \
+        -DCMAKE_LINKER=link \
+        -DCMAKE_MODULE_LINKER_FLAGS=/machine:x64 \
+        -DCMAKE_MAKE_PROGRAM=ninja ..
+        cmake --build
+        cmake --build install
         
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
