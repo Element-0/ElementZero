@@ -5,11 +5,7 @@
 
 <a href="https://github.com/codehz/wine-bdlauncher/releases/latest/download/pkg.tar.xz">![GitHub Releases (by Asset)](https://img.shields.io/github/downloads/codehz/wine-bdlauncher/latest/pkg.tar.xz?style=for-the-badge)</a><br>
 
-Run windows version of BDS in linux with Mod support
-
-(Yes, it is also can be run in windows)
-
-
+Run windows version of BDS in linux with Mod support (Yes, it is also can be run in windows)
 
 ## FAQ
 
@@ -26,9 +22,22 @@ A: I created a dll that simply forwards all APIs to the open source version of C
 
 0. Download bedrock dedicated server binary
 1. Generate bedrock_server_mod.lib (see below)
-2. Build it with Visual Studio 2019 (or use MSBuild manually)
-3. Copy Dist/* to bds folder (or use [symlink](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/))
-4. Run bedrock_server_mod.exe
+2. Install vcpkg and install dependencies (see below)
+3. Build it with Visual Studio 2019 (or use MSBuild manually)
+4. Copy Dist/* to bds folder (or use [symlink](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/))
+5. Run bedrock_server_mod.exe
+
+## Visual Studio 2019 workloads
+
+0. Microsoft.VisualStudio.Workload.NativeDesktop
+1. Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+2. Microsoft.VisualStudio.Component.Windows10SDK.18362
+3. Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang
+
+## How to use vcpkg
+
+0. Download and install [vcpkg](https://github.com/microsoft/vcpkg)
+1. Install dependencies by `vcpkg install --triplet x64-windows @vcpkg.txt`
 
 ## How to get bedrock_server_mod.lib
 
