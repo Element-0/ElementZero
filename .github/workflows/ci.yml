@@ -17,6 +17,7 @@ jobs:
 
     - name: Cache vcpkg artifacts
       uses: actions/cache@v1
+      id: cache
       with:
         path: ${{ github.workspace }}/vcpkg
         key: vcpkg-${{ hashFiles( env.vcpkgResponseFile ) }}
@@ -24,6 +25,7 @@ jobs:
     - name: run-vcpkg
       uses: lukka/run-vcpkg@v0.9
       id: runvcpkg
+      if: steps.cache.outputs.cache-hit != 'true'
       with:
         vcpkgGitCommitId: master
         vcpkgTriplet: x64-windows
