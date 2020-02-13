@@ -16,6 +16,7 @@ jobs:
       uses: lukka/run-vcpkg@v0.9
       id: runvcpkg
       with:
+        vcpkgGitCommitId: master
         vcpkgTriplet: x64-windows
         vcpkgArguments: boost-algorithm boost-core boost-format sqlitecpp yaml-cpp chakracore
         
