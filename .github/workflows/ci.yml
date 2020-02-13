@@ -40,17 +40,16 @@ jobs:
         mkdir Build
         cd Build
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DCMAKE_C_COMPILER="${{ env.VCToolsInstallDir }}..\\..\\Llvm\\bin\\clang-cl" \
-        -DCMAKE_C_COMPILER_AR="${{ env.VCToolsInstallDir }}..\\..\\Llvm\\bin\\llvm-ar" \
-        -DCMAKE_C_COMPILER_RANLIB="${{ env.VCToolsInstallDir }}..\\..\\Llvm\\bin\\llvm-ranlib" \
-        -DCMAKE_CXX_COMPILER="${{ env.VCToolsInstallDir }}..\\..\\Llvm\\bin\\clang-cl" \
-        -DCMAKE_CXX_COMPILER_AR="${{ env.VCToolsInstallDir }}..\\..\\Llvm\\bin\\llvm-ar" \
-        -DCMAKE_CXX_COMPILER_RANLIB="${{ env.VCToolsInstallDir }}..\\..\\Llvm\\bin\\llvm-ranlib" \
-        -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\\Dist" \
-        -DCMAKE_LINKER="${{ env.VCToolsInstallDir }}bin\\Hostx64\\x64\\link" \
-        -DCMAKE_MODULE_LINKER_FLAGS=\\machine:x64 \
-        -DCMAKE_MAKE_PROGRAM="${{ env.VCToolsInstallDir }}..\\..\\..\\..\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\Ninja\\ninja" \
-        -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" \
+        -DCMAKE_C_COMPILER="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\Llvm\\bin\\clang-cl" \
+        -DCMAKE_C_COMPILER_AR="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\Llvm\\bin\\llvm-ar" \
+        -DCMAKE_C_COMPILER_RANLIB="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\Llvm\\bin\\llvm-ranlib" \
+        -DCMAKE_CXX_COMPILER="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\Llvm\\bin\\clang-cl" \
+        -DCMAKE_CXX_COMPILER_AR="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\Llvm\\bin\\llvm-ar" \
+        -DCMAKE_CXX_COMPILER_RANLIB="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\Llvm\\bin\\llvm-ranlib" \
+        -DCMAKE_INSTALL_PREFIX="D:\\a\\wine-bdlauncher\\wine-bdlauncher\\Dist" \
+        -DCMAKE_LINKER="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Tools\\MSVC\\14.24.28314\\bin\\Hostx64\\x64\\link" \
+        -DCMAKE_MODULE_LINKER_FLAGS=/machine:x64 \
+        -DCMAKE_TOOLCHAIN_FILE="D:\\a\\wine-bdlauncher\\wine-bdlauncher\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" \
         ..
         cmake --build
         cmake --build install
