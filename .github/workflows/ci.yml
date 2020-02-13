@@ -28,3 +28,17 @@ jobs:
         vcpkgGitCommitId: master
         vcpkgTriplet: x64-windows
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
+      
+    - name: Build
+      uses: lukka/run-cmake@v0
+      with:
+        cmakeListsOrSettingsJson: CMakeSettingsJson
+        useVcpkgToolchainFile: true
+        configurationRegexFilter: Debug
+        buildDirectory: "${{ github.workspace }}/Build"
+        
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: dist
+        path: Dist
