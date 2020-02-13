@@ -1,5 +1,5 @@
 # WineBDLauncher
-![status](https://img.shields.io/github/workflow/status/codehz/wine-bdlauncher/CI?style=for-the-badge)
+<a href="https://github.com/codehz/wine-bdlauncher/actions">![status](https://img.shields.io/github/workflow/status/codehz/wine-bdlauncher/CI?style=for-the-badge)</a>
 ![platform](https://img.shields.io/badge/platform-win--x64%20%7C%20wine--linux--x64-green?style=for-the-badge)
 <a href="https://t.me/wine_bdlauncher">![Telegram](https://img.shields.io/badge/telegram-wine_bdlauncher-%232CA5E0?style=for-the-badge&logo=Telegram)</a><br>
 
