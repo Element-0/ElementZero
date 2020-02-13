@@ -54,6 +54,7 @@ jobs:
         -DCMAKE_MAKE_PROGRAM=ninja ..
         cmake --build
         cmake --build install
+      shell: bash
         
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
