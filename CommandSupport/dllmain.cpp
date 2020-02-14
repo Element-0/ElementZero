@@ -43,6 +43,16 @@ template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<Co
 template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<Json::Value>() {
   return GETID("?id@?1???$type_id@VCommandRegistry@@VValue@Json@@@@YA?AV?$typeid_t@VCommandRegistry@@@@XZ@4V1@A");
 }
+template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<CommandSelector<Actor>>() {
+  return GETID(
+      "?id@?1???$type_id@VCommandRegistry@@V?$CommandSelector@VActor@@@@@@YA?AV?$typeid_t@VCommandRegistry@@@@XZ@4V1@"
+      "A");
+}
+template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<CommandSelector<Player>>() {
+  return GETID(
+      "?id@?1???$type_id@VCommandRegistry@@V?$CommandSelector@VPlayer@@@@@@YA?AV?$typeid_t@VCommandRegistry@@@@XZ@4V1@"
+      "A");
+}
 
 void dllenter() {}
 void dllexit() {}

@@ -2,7 +2,23 @@
 
 // Working in progress
 class TransferCommand : public Command {
-  void execute(CommandOrigin const &, CommandOutput &) { std::wcout << "Executed (WIP)" << std::endl; }
+public:
+  CommandSelector<Player> selector;
+  std::string hostname = "127.0.0.1";
+  int port             = 19132;
+  TransferCommand() { selector.setIncludeDeadPlayers(true); }
+  void execute(CommandOrigin const &origin, CommandOutput &output) {
+    if (port <= 0 || port > 65535) {
+      output.error("commands.transferserver.invalid.port");
+      return;
+    }
+    auto results = selector.results(origin);
+    for (auto &player : results) {
+      TransferPacket pkt{hostname, port};
+      player->sendNetworkPacket(pkt);
+    }
+    output.success("commands.transferserver.successful");
+  }
 };
 
 static struct Settings {
@@ -31,11 +47,15 @@ template <> struct convert<Settings> {
 extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node) { yaml_assign(settings, node); }
 
 static void startRegister(CommandRegistry *registry) {
+  using namespace commands;
   if (settings.commands.transferserver) {
     std::string name = "transferserver";
     registry->registerCommand(
-        name, "commands.transferserver.description", CommandPermissionLevel::Normal, CommandFlagNone, CommandFlagNone);
-    registry->registerOverload(name, &CommandRegistry::allocateCommand<TransferCommand>, {});
+        name, "commands.transferserver.description", CommandPermissionLevel::Privileged, CommandFlagNone,
+        CommandFlagNone);
+    registry->registerOverload<TransferCommand>(
+        name, mandatory(&TransferCommand::selector, "target"), mandatory(&TransferCommand::hostname, "hostname"),
+        optional(&TransferCommand::port, "port"));
   }
 }
 

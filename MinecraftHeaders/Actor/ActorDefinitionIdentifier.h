@@ -1,0 +1,33 @@
+#pragma once
+
+#include <string>
+#include "../Core/HashedString.h"
+#include "ActorType.h"
+
+class ActorDefinitionIdentifier {
+  std::string ns;             // 0
+  std::string identifier;     // 32
+  std::string event;          // 64
+  std::string fullname;       // 96
+  HashedString canonicalHash; // 128
+
+public:
+  inline HashedString const &getCanonicalHash() const { return canonicalHash; }
+  inline std::string const &getCanonicalName() const { return canonicalHash.getString(); }
+  inline std::string const &getFullName() const { return fullname; }
+  inline std::string const &getIdentifier() const { return identifier; }
+  inline std::string const &getInitEvent() const { return event; }
+  inline std::string const &getNamespace() const { return ns; }
+  inline bool isEmpty() const { return ns.empty() && identifier.empty(); }
+  inline bool isVanilla() const { return ns == "minecraft"; }
+  inline void setIdentifier(std::string const &id) { identifier = id; }
+  inline void setInitEvent(std::string const &e) { event = e; }
+
+  __declspec(dllimport) ActorDefinitionIdentifier(ActorDefinitionIdentifier const &);
+  __declspec(dllimport) ActorDefinitionIdentifier(ActorDefinitionIdentifier &&);
+  __declspec(dllimport) ActorDefinitionIdentifier(std::string, std::string, std::string);
+  __declspec(dllimport) ActorDefinitionIdentifier(std::string const &);
+  __declspec(dllimport) ActorDefinitionIdentifier(ActorType);
+  __declspec(dllimport) ActorDefinitionIdentifier &operator=(ActorDefinitionIdentifier const &);
+  __declspec(dllimport) bool operator==(ActorDefinitionIdentifier const &);
+};

@@ -18,7 +18,7 @@ class HardNonTerminal;
 class CommandRegistry {
 public:
 #pragma region struct
-  class ParseToken;
+  struct ParseToken;
   struct Symbol {
     unsigned val;
   };
@@ -62,9 +62,6 @@ public:
     return true;
   }
 
-  template <typename Type>
-  bool parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
-
   __declspec(dllimport) void registerCommand(
       std::string const &, char const *, CommandPermissionLevel, CommandFlag, CommandFlag);
   __declspec(dllimport) void registerAlias(std::string const &, std::string const &);
@@ -72,6 +69,10 @@ public:
 private:
   __declspec(dllimport) Signature const *findCommand(std::string const &) const;
   __declspec(dllimport) void registerOverloadInternal(Signature &, Overload &);
+
+  template <typename Type>
+  __declspec(dllimport) bool parse(
+      void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
 
   __declspec(dllimport) Symbol addEnumValuesInternal(
       std::string const &, std::vector<std::pair<unsigned long, unsigned long>> const &, typeid_t<CommandRegistry>,
@@ -87,11 +88,16 @@ private:
   unsigned addEnumValues(std::string const &, std::vector<std::string> const &);
 
 public:
+  template <typename T> inline static auto getParseFn() { return &CommandRegistry::parse<T>; }
+
   template <typename T> inline static std::unique_ptr<Command> allocateCommand() { return std::make_unique<T>(); }
   inline void registerOverload(
       std::string const &name, Overload::FactoryFn factory, std::initializer_list<CommandParameterData> args) {
     Signature *signature = const_cast<Signature *>(findCommand(name));
     auto &overload       = signature->overloads.emplace_back(CommandVersion{}, factory, args);
     registerOverloadInternal(*signature, overload);
+  }
+  template <typename T, typename... Params> inline void registerOverload(std::string const &name, Params... params) {
+    registerOverload(name, &allocateCommand<T>, {params...});
   }
 };

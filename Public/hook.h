@@ -16,6 +16,20 @@ HOOKAPI int HookFunction(void *oldfunc, void **poutold, void *newfunc);
 HOOKAPI void *GetServerSymbol(char const *name);
 }
 
+template <typename T> inline void SetVirtualTable(T *self, char const *name) {
+  union {
+    T *self;
+    void **pvtable;
+  } u;
+  u.self     = self;
+  *u.pvtable = GetServerSymbol(name);
+}
+
+template <typename Ret, typename... Params> inline auto CallServerFunction(char const *name, Params... params) {
+  auto fn = (Ret(*)(Params...)) GetServerSymbol(name);
+  return fn(params...);
+}
+
 class SymbolNotFound : std::exception {
   char buffer[4096 + 30];
 
@@ -36,6 +50,7 @@ public:
 #undef HOOKAPI
 
 #ifndef ModLoader_EXPORTS
+
 class THookRegister {
 public:
   THookRegister(void *address, void *hook, void **org) {
