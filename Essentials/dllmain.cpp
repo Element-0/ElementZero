@@ -1,33 +1,8 @@
 #include "pch.h"
+#include "global.h"
+#include <dllentry.h>
 
-// Working in progress
-class TransferCommand : public Command {
-public:
-  CommandSelector<Player> selector;
-  std::string hostname = "127.0.0.1";
-  int port             = 19132;
-  TransferCommand() { selector.setIncludeDeadPlayers(true); }
-  void execute(CommandOrigin const &origin, CommandOutput &output) {
-    if (port <= 0 || port > 65535) {
-      output.error("commands.transferserver.invalid.port");
-      return;
-    }
-    auto results = selector.results(origin);
-    for (auto &player : results) {
-      TransferPacket pkt{hostname, port};
-      player->sendNetworkPacket(pkt);
-    }
-    output.success("commands.transferserver.successful");
-  }
-};
-
-static struct Settings {
-  struct Commands {
-    bool transferserver = true;
-  } commands;
-} settings;
-
-static_assert(sizeof(std::string) == 32);
+Settings settings;
 
 namespace YAML {
 template <> struct convert<Settings::Commands> {
@@ -38,24 +13,21 @@ template <> struct convert<Settings::Commands> {
 };
 template <> struct convert<Settings> {
   static bool decode(const Node &node, Settings &rhs) {
-    if (auto commands = node["commands"]; commands) yaml_assign(rhs.commands, commands);
+    yaml_assign(rhs.commands, node["commands"]);
+    yaml_assign(rhs.force_experimental_gameplay, node["force-experimental-gameplay"]);
+    yaml_assign(rhs.education_feature, node["education-feature"]);
     return true;
   }
 };
 } // namespace YAML
 
-extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node) { yaml_assign(settings, node); }
-
-static void startRegister(CommandRegistry *registry) {
-  using namespace commands;
-  if (settings.commands.transferserver) {
-    std::string name = "transferserver";
-    registry->registerCommand(
-        name, "commands.transferserver.description", CommandPermissionLevel::Privileged, CommandFlagNone,
-        CommandFlagNone);
-    registry->registerOverload<TransferCommand>(
-        name, mandatory(&TransferCommand::selector, "target"), mandatory(&TransferCommand::hostname, "hostname"),
-        optional(&TransferCommand::port, "port"));
+extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node) {
+  DEF_LOGGER("SETTINGS");
+  yaml_assign(settings, node);
+  if (settings.force_experimental_gameplay) {
+    LOGI("Force experimental gameplay enabled");
+    *GetServerSymbol<bool>("?mAllowExperimental@Enchant@@1_NA") = true;
+    *GetServerSymbol<bool>("?mAllowExperimental@Item@@2_NA")    = true;
   }
 }
 

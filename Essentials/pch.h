@@ -14,4 +14,3 @@
 #include <hook.h>
 #include <log.h>
 #include <boost/format.hpp>
-#include <dllentry.h>

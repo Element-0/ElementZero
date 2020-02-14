@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <exception>
+#include <iostream>
 #include <cstdio>
 #include "sig.h"
 
@@ -14,6 +15,15 @@
 extern "C" {
 HOOKAPI int HookFunction(void *oldfunc, void **poutold, void *newfunc);
 HOOKAPI void *GetServerSymbol(char const *name);
+}
+
+template <typename T> T *GetServerSymbol(char const *name) {
+  union {
+    T *target;
+    void *source;
+  } u;
+  u.source = GetServerSymbol(name);
+  return u.target;
 }
 
 template <typename T> inline void SetVirtualTable(T *self, char const *name) {
@@ -55,13 +65,22 @@ class THookRegister {
 public:
   THookRegister(void *address, void *hook, void **org) {
     auto ret = HookFunction(address, org, hook);
-    if (ret != 0) throw FailedToHook(ret);
+    if (ret != 0) {
+      std::cerr << "FailedToHook: " << address << std::endl;
+      throw FailedToHook(ret);
+    }
   }
   THookRegister(char const *sym, void *hook, void **org) {
     auto found = GetServerSymbol(sym);
-    if (found == nullptr) throw SymbolNotFound(sym);
+    if (found == nullptr) {
+      std::cerr << "SymbolNotFound: " << sym << std::endl;
+      throw SymbolNotFound(sym);
+    }
     auto ret = HookFunction(found, org, hook);
-    if (ret != 0) throw FailedToHook(ret);
+    if (ret != 0) {
+      std::cerr << "FailedToHook: " << sym << std::endl;
+      throw FailedToHook(ret);
+    }
   }
   template <typename T> THookRegister(const char *sym, T hook, void **org) {
     union {
