@@ -4,6 +4,7 @@ x64-windows-rel
 boost-algorithm
 boost-core
 boost-format
+boost-multi-index
 sqlitecpp
 yaml-cpp
 chakracore

@@ -2,9 +2,14 @@
 
 #include "Actor.h"
 #include <hook.h>
+#include "../Core/ExtendedCertificate.h"
 
 class Packet;
 class ServerPlayer;
+
+#ifndef BASEAPI
+#  define BASEAPI __declspec(dllimport)
+#endif
 
 class Player : public Actor {
 public:
@@ -15,4 +20,6 @@ public:
   inline void sendNetworkPacket(Packet &pkt) {
     CallServerFunction<void>("?sendNetworkPacket@ServerPlayer@@UEBAXAEAVPacket@@@Z", this, &pkt);
   }
+
+  BASEAPI Certificate &getCertificate();
 };
