@@ -21,22 +21,6 @@ THook(void, "??0LevelSettings@@QEAA@AEBV0@@Z", char *lhs, char *rhs) {
   rhs[36] = settings.education_feature;
   original(lhs, rhs);
 }
-TClasslessInstanceHook(bool, "?supportsScripting@AppPlatformWindows@@UEBA_NXZ") {
-  DEF_LOGGER("Option");
-  LOGI("!!");
-  return settings.force_experimental_gameplay;
-}
-TClasslessInstanceHook(bool, "?isScriptingEnabled@ScriptEngine@@SA_NXZ") {
-  DEF_LOGGER("Option");
-  LOGI("??");
-  return settings.force_experimental_gameplay;
-}
-TClasslessInstanceHook(bool, "?getBool@Option@@QEBA_NXZ") {
-  DEF_LOGGER("Option");
-  auto ret = original(this);
-  LOGV("value: %d") % ret;
-  return ret;
-}
 
 TClasslessInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ") {
   DEF_LOGGER("ScriptEngine");
@@ -100,8 +84,6 @@ TClasslessInstanceHook(
     "?setStack@ResourcePackManager@@QEAAXV?$unique_ptr@VResourcePackStack@@U?$default_delete@VResourcePackStack@@@std@@"
     "@std@@W4ResourcePackStackType@@_N@Z",
     void *ptr, int type, bool flag) {
-  DEF_LOGGER("ResourcePackManager");
-  LOGV("setStack %d %d") % type % flag;
   ((char *) this)[227] = settings.force_experimental_gameplay;
   original(this, ptr, type, flag);
 }
@@ -110,7 +92,7 @@ TClasslessInstanceHook(
     void, "?forEachIn@ResourcePack@@QEBAXAEBVPath@Core@@V?$function@$$A6AXAEBVPath@Core@@@Z@std@@H_N@Z",
     Core::Path const &path, std::function<void(Core::Path const &)> fn, int a, bool flag) {
   if (settings.debug_packs) {
-    DEF_LOGGER("ResourcePack");
+    DEF_LOGGER("PACKDEBUG");
     LOGV("load packs: %p %p %d %d") % (void *) this % path.data % a % flag;
     original(
         this, path,
