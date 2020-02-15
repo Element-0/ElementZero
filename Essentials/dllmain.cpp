@@ -16,6 +16,7 @@ template <> struct convert<Settings> {
     yaml_assign(rhs.commands, node["commands"]);
     yaml_assign(rhs.force_experimental_gameplay, node["force-experimental-gameplay"]);
     yaml_assign(rhs.education_feature, node["education-feature"]);
+    yaml_assign(rhs.debug_packs, node["debug-packs"]);
     return true;
   }
 };

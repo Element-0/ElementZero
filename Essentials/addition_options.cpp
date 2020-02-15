@@ -2,6 +2,8 @@
 
 #include "global.h"
 
+#include <Core/core.h>
+
 TClasslessInstanceHook(bool, "?_isFeatureEnabled@EducationOptions@@AEBA_NW4EducationFeature@@@Z", int v) {
   if (settings.education_feature) return true;
   return original(this, v);
@@ -18,6 +20,108 @@ THook(void, "??0LevelSettings@@QEAA@AEBV0@@Z", char *lhs, char *rhs) {
   rhs[76] = settings.force_experimental_gameplay;
   rhs[36] = settings.education_feature;
   original(lhs, rhs);
+}
+TClasslessInstanceHook(bool, "?supportsScripting@AppPlatformWindows@@UEBA_NXZ") {
+  DEF_LOGGER("Option");
+  LOGI("!!");
+  return settings.force_experimental_gameplay;
+}
+TClasslessInstanceHook(bool, "?isScriptingEnabled@ScriptEngine@@SA_NXZ") {
+  DEF_LOGGER("Option");
+  LOGI("??");
+  return settings.force_experimental_gameplay;
+}
+TClasslessInstanceHook(bool, "?getBool@Option@@QEBA_NXZ") {
+  DEF_LOGGER("Option");
+  auto ret = original(this);
+  LOGV("value: %d") % ret;
+  return ret;
+}
+
+TClasslessInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ") {
+  DEF_LOGGER("ScriptEngine");
+  LOGV("initialize");
+  original(this);
+}
+
+TClasslessInstanceHook(bool, "?_processSystemInitialize@ScriptEngine@@AEAA_NXZ") {
+  DEF_LOGGER("ScriptEngine");
+  auto ret = original(this);
+  LOGV("systemInitialize: %d") % ret;
+  return ret;
+}
+
+struct ScriptQueueData {
+  std::string relative_path, virtual_path, content, uuid, version_code;
+};
+
+TClasslessInstanceHook(bool, "?_runScript@ScriptEngine@@AEAA_NAEBUScriptQueueData@1@@Z", ScriptQueueData &data) {
+  DEF_LOGGER("ScriptEngine");
+  auto ret = original(this, data);
+  LOGV("runScript: %s -> %d") % data.virtual_path % ret;
+  return ret;
+}
+
+TClasslessInstanceHook(
+    bool, "?onErrorReceived@ScriptEngine@@UEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+    std::string const &err) {
+  DEF_LOGGER("ScriptEngine");
+  auto ret = original(this, err);
+  LOGE("%s") % err;
+  return ret;
+}
+TClasslessInstanceHook(
+    bool, "?onWarnReceived@ScriptEngine@@UEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+    std::string const &err) {
+  DEF_LOGGER("ScriptEngine");
+  auto ret = original(this, err);
+  LOGW("%s") % err;
+  return ret;
+}
+TClasslessInstanceHook(
+    bool, "?onInfoReceived@ScriptEngine@@UEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+    std::string const &err) {
+  DEF_LOGGER("ScriptEngine");
+  auto ret = original(this, err);
+  LOGI("%s") % err;
+  return ret;
+}
+TClasslessInstanceHook(
+    bool, "?onLogReceived@ScriptEngine@@UEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+    std::string const &err) {
+  DEF_LOGGER("ScriptEngine");
+  auto ret = original(this, err);
+  LOGV("%s") % err;
+  return ret;
+}
+
+TClasslessInstanceHook(
+    void,
+    "?setStack@ResourcePackManager@@QEAAXV?$unique_ptr@VResourcePackStack@@U?$default_delete@VResourcePackStack@@@std@@"
+    "@std@@W4ResourcePackStackType@@_N@Z",
+    void *ptr, int type, bool flag) {
+  DEF_LOGGER("ResourcePackManager");
+  LOGV("setStack %d %d") % type % flag;
+  ((char *) this)[227] = settings.force_experimental_gameplay;
+  original(this, ptr, type, flag);
+}
+
+TClasslessInstanceHook(
+    void, "?forEachIn@ResourcePack@@QEBAXAEBVPath@Core@@V?$function@$$A6AXAEBVPath@Core@@@Z@std@@H_N@Z",
+    Core::Path const &path, std::function<void(Core::Path const &)> fn, int a, bool flag) {
+  if (settings.debug_packs) {
+    DEF_LOGGER("ResourcePack");
+    LOGV("load packs: %p %p %d %d") % (void *) this % path.data % a % flag;
+    original(
+        this, path,
+        [=](auto const &path) {
+          LOGV("\t%s") % path.data;
+          fn(path);
+        },
+        a, flag);
+  } else {
+    original(this, path, fn, a, flag);
+  }
 }
 
 TClasslessInstanceHook(
