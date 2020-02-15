@@ -17,7 +17,7 @@ public:
     return const_cast<ServerPlayer *>(reinterpret_cast<ServerPlayer const *>(this));
   }
 
-  inline void sendNetworkPacket(Packet &pkt) {
+  inline void sendNetworkPacket(Packet &pkt) const {
     CallServerFunction<void>("?sendNetworkPacket@ServerPlayer@@UEBAXAEAVPacket@@@Z", this, &pkt);
   }
 

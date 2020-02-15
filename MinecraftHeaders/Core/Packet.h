@@ -17,7 +17,8 @@ public:
   uint64_t unk24                    = 0;                                 // 24
   unsigned compressible             = 0;                                 // 32
 
-  inline Packet(unsigned compress = 0) : compressible(compress) {}
+  inline Packet(unsigned compress) : compressible(compress) {}
+  inline Packet() {}
   inline virtual ~Packet() {}
   virtual MinecraftPacketIds getId() const              = 0;
   virtual std::string getName() const                   = 0;

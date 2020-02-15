@@ -8,7 +8,7 @@ DEF_LOGGER("PlayerDB");
 template <uint64_t sig> static void (Mod::PlayerDatabase::*emitter)(sigt<sig>, Mod::PlayerEntry const &);
 
 static Mod::PlayerEntryContainer *container;
-Mod::PlayerDatabase &db = Mod::PlayerDatabase::getInstance();
+Mod::PlayerDatabase &db = Mod::PlayerDatabase::GetInstance();
 
 Mod::PlayerDatabase::PlayerDatabase() {
   emitter<"joined"_sig> = &Mod::PlayerDatabase::Emit;
@@ -16,7 +16,7 @@ Mod::PlayerDatabase::PlayerDatabase() {
   container             = &data;
 }
 
-Mod::PlayerDatabase &Mod::PlayerDatabase::getInstance() {
+Mod::PlayerDatabase &Mod::PlayerDatabase::GetInstance() {
   static Mod::PlayerDatabase db;
   return db;
 }

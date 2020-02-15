@@ -22,15 +22,13 @@ public:
   }
 };
 
-void startRegister(CommandRegistry *registry) {
+void registerTransferServer(CommandRegistry *registry) {
   using namespace commands;
-  if (settings.commands.transferserver) {
-    std::string name = "transferserver";
-    registry->registerCommand(
-        name, "commands.transferserver.description", CommandPermissionLevel::Privileged, CommandFlagNone,
-        CommandFlagNone);
-    registry->registerOverload<TransferCommand>(
-        name, mandatory(&TransferCommand::selector, "target"), mandatory(&TransferCommand::hostname, "hostname"),
-        optional(&TransferCommand::port, "port"));
-  }
+  std::string name = "transferserver";
+  registry->registerCommand(
+      name, "commands.transferserver.description", CommandPermissionLevel::Privileged, CommandFlagNone,
+      CommandFlagNone);
+  registry->registerOverload<TransferCommand>(
+      name, mandatory(&TransferCommand::selector, "target"), mandatory(&TransferCommand::hostname, "hostname"),
+      optional(&TransferCommand::port, "port"));
 }

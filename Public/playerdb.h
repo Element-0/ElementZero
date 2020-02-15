@@ -41,8 +41,8 @@ class PlayerDatabase : public EventEmitter<"joined"_sig, PlayerEntry const &>,
   BASEAPI PlayerDatabase();
 
 public:
-  inline PlayerEntryContainer const &getData() const { return data; }
-  BASEAPI static PlayerDatabase &getInstance();
+  inline PlayerEntryContainer const &GetData() const { return data; }
+  BASEAPI static PlayerDatabase &GetInstance();
 
   USING_EVENTEMITTER("joined", PlayerEntry const &);
   USING_EVENTEMITTER("left", PlayerEntry const &);

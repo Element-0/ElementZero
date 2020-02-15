@@ -16,6 +16,11 @@ THook(void, "?setup@ChangeSettingCommand@@SAXAEAVCommandRegistry@@@Z", CommandRe
   (Mod::CommandSupport::GetInstance().*emitter)(SIG("loaded"), registry);
 }
 
+short &Mod::CommandSupport::type_id_count() {
+  static auto ptr = (short *) GetServerSymbol("?count@?$typeid_t@VCommandRegistry@@@@2GA");
+  return *ptr;
+}
+
 template <std::uint32_t> inline static typeid_t<CommandRegistry> getid(char const *name) {
   static auto ptr = (typeid_t<CommandRegistry> *) GetServerSymbol(name);
   return *ptr;

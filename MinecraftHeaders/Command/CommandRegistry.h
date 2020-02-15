@@ -19,7 +19,8 @@ class CommandRegistry {
 public:
 #pragma region struct
   struct ParseToken;
-  struct Symbol {
+  class Symbol {
+  public:
     unsigned val;
   };
   struct Overload {
@@ -56,12 +57,6 @@ public:
   };
 #pragma endregion struct definition
 
-  template <typename Type, typename TConverter>
-  bool
-  parseEnum(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
-    return true;
-  }
-
   __declspec(dllimport) void registerCommand(
       std::string const &, char const *, CommandPermissionLevel, CommandFlag, CommandFlag);
   __declspec(dllimport) void registerAlias(std::string const &, std::string const &);
@@ -75,20 +70,52 @@ private:
       void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
 
   __declspec(dllimport) Symbol addEnumValuesInternal(
-      std::string const &, std::vector<std::pair<unsigned long, unsigned long>> const &, typeid_t<CommandRegistry>,
+      std::string const &, std::vector<std::pair<uint64_t, uint64_t>> const &, typeid_t<CommandRegistry>,
       bool (CommandRegistry::*)(
           void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
           std::vector<std::string> &) const);
 
   __declspec(dllimport) Symbol addEnumValuesInternal(
-      std::string const &, std::vector<std::pair<std::string, unsigned long>> const &, typeid_t<CommandRegistry>,
+      std::string const &, std::vector<std::pair<std::string, uint64_t>> const &, typeid_t<CommandRegistry>,
       bool (CommandRegistry::*)(
           void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
           std::vector<std::string> &) const);
-  unsigned addEnumValues(std::string const &, std::vector<std::string> const &);
+  __declspec(dllimport) unsigned addEnumValues(std::string const &, std::vector<std::string> const &);
+  __declspec(dllimport) uint64_t getEnumData(CommandRegistry::ParseToken const &) const;
 
 public:
   template <typename T> inline static auto getParseFn() { return &CommandRegistry::parse<T>; }
+
+  template <typename Type>
+  bool
+  fakeparse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const {
+    return false;
+  }
+
+  template <typename Type> struct DefaultIdConverter {
+    template <typename Target, typename Source> static Target convert(Source source) { return (Target) source; }
+    uint64_t operator()(Type value) const { return convert<uint64_t, Type>(value); }
+    Type operator()(uint64_t value) const { return convert<Type, uint64_t>(value); }
+  };
+
+  template <typename Type, typename IDConverter = CommandRegistry::DefaultIdConverter<Type>>
+  bool parseEnum(
+      void *target, CommandRegistry::ParseToken const &token, CommandOrigin const &, int, std::string &,
+      std::vector<std::string> &) const {
+    auto data        = getEnumData(token);
+    *(Type *) target = IDConverter{}(data);
+    return true;
+  }
+
+  template <typename Type, typename IDConverter = CommandRegistry::DefaultIdConverter<Type>>
+  unsigned addEnumValues(
+      std::string const &name, typeid_t<CommandRegistry> tid,
+      std::initializer_list<std::pair<std::string, Type>> const &values) {
+    std::vector<std::pair<std::string, uint64_t>> converted;
+    IDConverter converter;
+    for (auto &value : values) converted.emplace_back(value.first, converter(value.second));
+    return addEnumValuesInternal(name, converted, tid, &CommandRegistry::parseEnum<Type, IDConverter>).val;
+  }
 
   template <typename T> inline static std::unique_ptr<Command> allocateCommand() { return std::make_unique<T>(); }
   inline void registerOverload(

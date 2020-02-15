@@ -11,6 +11,7 @@
 #include <yaml-cpp/yaml.h>
 #include <dllentry.h>
 #include <SQLiteCpp/SQLiteCpp.h>
+#include <Core/Minecraft.h>
 #include "settings.hpp"
 
 class DedicatedServer {
@@ -21,7 +22,13 @@ public:
 static DedicatedServer *mDedicatedServer = nullptr;
 static std::string session;
 
-DedicatedServer *GetDedicatedServer() { return mDedicatedServer; }
+template <> DedicatedServer *LocateService<DedicatedServer>() { return mDedicatedServer; }
+template <> ServiceInstance *LocateService<ServiceInstance>() {
+  static auto ptr =
+      GetServerSymbol<ServiceInstance *>("?mService@?$ServiceLocator@VServerInstance@@@@0PEAVServerInstance@@EA");
+  return *ptr;
+}
+template <> Level *LocateService<Level>() { return LocateService<Minecraft>()->getLevel(); }
 
 TInstanceHook(
     int,

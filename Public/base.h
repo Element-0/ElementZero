@@ -7,4 +7,13 @@
 #endif
 
 class DedicatedServer;
-extern "C" BASEAPI DedicatedServer *GetDedicatedServer();
+class ServiceInstance;
+class Minecraft;
+class Level;
+
+template <typename T> T *LocateService();
+
+template <> BASEAPI DedicatedServer *LocateService<DedicatedServer>();
+template <> BASEAPI ServiceInstance *LocateService<ServiceInstance>();
+template <> BASEAPI Minecraft *LocateService<Minecraft>();
+template <> BASEAPI Level *LocateService<Level>();
