@@ -17,6 +17,11 @@
                     "name": "VCPKG_TARGET_TRIPLET",
                     "value": "x64-windows-rel",
                     "type": "STRING"
+                },
+                {
+                    "name": "NO_INLINE",
+                    "value": "True",
+                    "type": "BOOL"
                 }
             ]
         }

@@ -1,3 +1,33 @@
 #pragma once
 
-class Actor {};
+#include <hook.h>
+#include "../Core/Vec3.h"
+#include "../Core/AutomaticID.h"
+
+class Dimension;
+
+class Actor {
+public:
+  inline std::string getEntityName() const {
+    return CallServerFunction<std::string>(
+        "?getEntityName@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBVActor@@@Z", this);
+  }
+  inline Vec3 const &getPos() const {
+    return CallServerClassMethod<Vec3 const &>("?getPos@Actor@@UEBAAEBVVec3@@XZ", this);
+  }
+  inline Vec3 getFiringPos() const { return CallServerClassMethod<Vec3>("?getFiringPos@Actor@@UEBA?AVVec3@@XZ", this); }
+  inline std::string const &getNameTag() const {
+    return CallServerClassMethod<std::string const &>(
+        "?getNameTag@Actor@@UEBAAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ", this);
+  }
+  inline AutomaticID<Dimension, int> getDimensionId() const {
+    return CallServerClassMethod<AutomaticID<Dimension, int>>(
+        "?getDimensionId@Actor@@UEBA?AV?$AutomaticID@VDimension@@H@@XZ", this);
+  }
+
+  void teleport(Vec3 const &target, Vec3 const &old, AutomaticID<Dimension, int> dim) {
+    CallServerFunction<void>(
+        "?teleport@TeleportCommand@@AEBAXAEAVActor@@VVec3@@PEAV3@V?$AutomaticID@VDimension@@H@@@Z", (void *) 0, this,
+        target, &old, dim);
+  }
+};

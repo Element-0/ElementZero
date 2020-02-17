@@ -4,10 +4,15 @@ project ("WineBDLauncher")
 
 include (ExternalProject)
 
+option (NO_INLINE off)
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS ON)
 set (VCPKG_TARGET_TRIPLET "x64-windows-rel")
+
+if (NO_INLINE)
+    add_compile_options (/Ob0)
+endif ()
 
 function (find_and_install_package name)
     find_package (${name} CONFIG REQUIRED)

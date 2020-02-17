@@ -7,6 +7,9 @@
 #include <Command/CommandFlag.h>
 #include <Command/CommandParameterData.h>
 #include <Command/CommandOutput.h>
+#include <Command/CommandOrigin.h>
+#include <TextObject/TextObjectRoot.h>
+#include <TextObject/TextObjectLocalizedTextWithParams.h>
 #include <Actor/ServerPlayer.h>
 #include <Actor/Player.h>
 #include <Packet/TransferPacket.h>
@@ -22,3 +25,6 @@
 #include <string>
 #include <memory>
 #include <boost/format.hpp>
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>

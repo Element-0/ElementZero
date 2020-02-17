@@ -6,6 +6,7 @@ extern struct Settings {
   struct Commands {
     bool transferserver = true;
     bool customname     = true;
+    bool teleport       = true;
   } commands;
   bool force_experimental_gameplay = false;
   bool education_feature           = false;
@@ -15,5 +16,6 @@ extern struct Settings {
 
 void registerTransferServer(CommandRegistry *registry);
 void registerCustomName(CommandRegistry *registry);
+void registerTeleport(CommandRegistry *registry);
 
 extern std::unique_ptr<SQLite::Database> database;

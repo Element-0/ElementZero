@@ -26,6 +26,15 @@ template <typename T> T *GetServerSymbol(char const *name) {
   return u.target;
 }
 
+template <typename T> T GetServerFunctionSymbol(char const *name) {
+  union {
+    T target;
+    void *source;
+  } u;
+  u.source = GetServerSymbol(name);
+  return u.target;
+}
+
 template <typename T> inline void SetVirtualTable(T *self, char const *name) {
   union {
     T *self;
@@ -35,9 +44,15 @@ template <typename T> inline void SetVirtualTable(T *self, char const *name) {
   *u.pvtable = GetServerSymbol(name);
 }
 
-template <typename Ret, typename... Params> inline auto CallServerFunction(char const *name, Params... params) {
-  auto fn = (Ret(*)(Params...)) GetServerSymbol(name);
+template <typename Ret, typename... Params> inline auto CallServerFunction(char const *name, Params... params) -> Ret {
+  auto fn = GetServerFunctionSymbol<Ret (*)(Params...)>(name);
   return fn(params...);
+}
+
+template <typename Ret, typename Class, typename... Params>
+inline auto CallServerClassMethod(char const *name, Class const *self, Params... params) -> Ret {
+  auto fn = GetServerFunctionSymbol<Ret (Class::*)(Params...)>(name);
+  return (((Class *) self)->*fn)(params...);
 }
 
 class SymbolNotFound : std::exception {
@@ -56,8 +71,6 @@ class FailedToHook : std::exception {
 public:
   HOOKAPI FailedToHook(int code);
 };
-
-#undef HOOKAPI
 
 #ifndef ModLoader_EXPORTS
 

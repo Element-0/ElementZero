@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../Core/Packet.h"
+#include "../TextObject/TextObjectRoot.h"
+#include "../TextObject/TextObjectLocalizedTextWithParams.h"
 #include <hook.h>
 
 #include <string>
@@ -24,7 +26,7 @@ public:
   bool translated;
   std::string xuid;
   std::string unknown;
-  template <TextPacketType type, bool translated = false>
+  template <TextPacketType type, bool translated = true>
   static inline TextPacket createTextPacket(std::string content) {
     TextPacket pkt;
     pkt.type       = type;
@@ -32,7 +34,7 @@ public:
     pkt.content    = content;
     return pkt;
   }
-  template <TextPacketType type, bool translated = false>
+  template <TextPacketType type, bool translated = true>
   static inline TextPacket createTextPacket(std::string source, std::string content) {
     TextPacket pkt;
     pkt.type       = type;
@@ -41,7 +43,7 @@ public:
     pkt.content    = content;
     return pkt;
   }
-  template <TextPacketType type, bool translated = false>
+  template <TextPacketType type, bool translated = true>
   static inline TextPacket createTextPacket(std::string source, std::string content, std::string xuid) {
     TextPacket pkt;
     pkt.type       = type;
@@ -50,6 +52,15 @@ public:
     pkt.content    = content;
     pkt.xuid       = xuid;
     return pkt;
+  }
+  __declspec(dllimport) static TextPacket
+      createTextObjectMessage(TextObjectRoot const &, std::string const &xuid = "", std::string const &unk2 = "");
+
+  static inline TextPacket
+  createTranslatedMessageWithParams(std::string const &text, std::initializer_list<std::string> args) {
+    TextObjectRoot root;
+    root.addChild(TextObjectLocalizedTextWithParams::build("commands.tpa.message.sent", args));
+    return createTextObjectMessage(root);
   }
   inline TextPacket() {}
   inline ~TextPacket() {}
