@@ -235,6 +235,7 @@ static YAML::Node readConfig() {
 }
 
 typedef void (*ApplySettingsType)(YAML::Node const &);
+typedef void (*PrePostInitType)();
 
 void dllenter() {
   using namespace std::filesystem;
@@ -244,6 +245,7 @@ void dllenter() {
   LOGV("Current thread id: %d") % this_id;
   LOGI("Base mod loaded, setting up CtrlC handler...");
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+  std::list<PrePostInitType> PostInits;
   try {
     const auto cfg = readConfig();
     yaml_assign(settings, cfg);
@@ -273,6 +275,8 @@ void dllenter() {
             LOGE("Failed to load mod: %s") % next->path();
             continue;
           }
+          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PreInit")) fn();
+          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PostInit")) PostInits.push_back(fn);
           if (subcfg)
             if (auto fn = (ApplySettingsType) GetProcAddress(lib, "ApplySettings"); fn) {
               try {
@@ -286,6 +290,8 @@ void dllenter() {
       }
       if (ec) LOGE("Warning: Cannot open Mods folder: %s") % ec.message();
     }
+    LOGV("Start post init");
+    for (auto fn : PostInits) { fn(); }
   } catch (std::exception const &e) { LOGE("Unexcepted exception: %s") % e.what(); }
 }
 void dllexit() {}
