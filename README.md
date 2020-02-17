@@ -18,21 +18,30 @@ A: No, because Microsoft uses Chakra.dll, which contains a lot of references to 
 Q: How it works?<br>
 A: I created a dll that simply forwards all APIs to the open source version of Chakra engine i.e. ChakraCore. And this version can run directly under wine.
 
+## Features
+
+0. Compatiable with official BDS
+1. And support behavior pack with custom item/recipes/scripts (* vanilla server *does* support them, but disabled in code)
+2. Can be run in windows and linux (with wine)
+3. Native modding support
+4. /transferserver is back!
+
 ## Build and install
 
 0. Download bedrock dedicated server binary
 1. Generate bedrock_server_mod.lib (see below)
 2. Install vcpkg and install dependencies (see below)
-3. Build it with Visual Studio 2019 (or use MSBuild manually)
+3. Build it with Visual Studio 2019 (or use CMake manually see .githubn/workflows/ci.yaml)
 4. Copy Dist/* to bds folder (or use [symlink](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/))
 5. Run bedrock_server_mod.exe
 
-## Visual Studio 2019 workloads
+## Visual Studio 2019 workloads and components
 
 0. Microsoft.VisualStudio.Workload.NativeDesktop
-1. Microsoft.VisualStudio.Component.VC.Tools.x86.x64
-2. Microsoft.VisualStudio.Component.Windows10SDK.18362
-3. Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang
+1. Microsoft.VisualStudio.Workload.ManagedDesktop
+2. Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+3. Microsoft.VisualStudio.Component.Windows10SDK.18362
+4. Microsoft.VisualStudio.ComponentGroup.NativeDesktop.Llvm.Clang
 
 ## How to use vcpkg
 
