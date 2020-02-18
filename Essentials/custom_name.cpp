@@ -19,7 +19,7 @@ TClasslessInstanceHook(
       char const *postfix = stmt.getColumn("postfix");
       auto replaced       = (boost::format("%s%s%s") % prefix % it->name % postfix).str();
       LOGI("[%s] %s") % it->name % content;
-      auto packet = TextPacket::createTextPacket<TextPacketType::Chat>(replaced, content, it->xuid);
+      auto packet = TextPacket::createTextPacket<TextPacketType::Chat>(replaced, content, std::to_string(it->xuid));
       LocateService<Level>()->forEachPlayer([&](Player const &p) -> bool {
         p.sendNetworkPacket(packet);
         return true;

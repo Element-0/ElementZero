@@ -31,7 +31,7 @@ TClasslessInstanceHook(
   auto name   = ExtendedCertificate::getIdentityName(cert);
   auto xuid   = ExtendedCertificate::getXuid(cert);
   LOGV("%s joined") % name;
-  auto ref = container->emplace(Mod::PlayerEntry{player, name, xuid, uuid});
+  auto ref = container->emplace(Mod::PlayerEntry{player, name, std::stoull(xuid), uuid});
   (db.*emitter<"joined"_sig>) (SIG("joined"), *ref.first);
   return player;
 }

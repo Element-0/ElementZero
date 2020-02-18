@@ -11,29 +11,19 @@
 namespace Mod {
 
 struct PlayerEntry {
-  struct PLAYER {};
-  struct NAME {};
-  struct XUID {};
   Player *player;
   std::string name;
-  std::string xuid;
+  uint64_t xuid;
   mce::UUID uuid;
 };
 
 using PlayerEntryContainer = boost::multi_index_container<
     PlayerEntry,
     boost::multi_index::indexed_by<
-        boost::multi_index::ordered_unique<
-            boost::multi_index::tag<PlayerEntry::PLAYER>,
-            boost::multi_index::member<PlayerEntry, Player *, &PlayerEntry::player>>,
-        boost::multi_index::ordered_unique<
-            boost::multi_index::tag<PlayerEntry::NAME>,
-            boost::multi_index::member<PlayerEntry, std::string, &PlayerEntry::name>>,
-        boost::multi_index::ordered_unique<
-            boost::multi_index::tag<PlayerEntry::XUID>,
-            boost::multi_index::member<PlayerEntry, std::string, &PlayerEntry::xuid>>,
-        boost::multi_index::hashed_unique<
-            boost::multi_index::tag<UUID>, boost::multi_index::member<PlayerEntry, mce::UUID, &PlayerEntry::uuid>>>>;
+        boost::multi_index::ordered_unique<boost::multi_index::member<PlayerEntry, Player *, &PlayerEntry::player>>,
+        boost::multi_index::ordered_unique<boost::multi_index::member<PlayerEntry, std::string, &PlayerEntry::name>>,
+        boost::multi_index::ordered_unique<boost::multi_index::member<PlayerEntry, uint64_t, &PlayerEntry::xuid>>,
+        boost::multi_index::hashed_unique<boost::multi_index::member<PlayerEntry, mce::UUID, &PlayerEntry::uuid>>>>;
 
 class PlayerDatabase : public EventEmitter<"joined"_sig, PlayerEntry const &>,
                        public EventEmitter<"left"_sig, PlayerEntry const &> {
