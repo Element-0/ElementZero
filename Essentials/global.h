@@ -11,6 +11,7 @@ struct Settings {
     template <typename IO> static inline bool io(IO f, Commands &commands, YAML::Node &node) {
       f(commands.transferserver, node["transferserver"]);
       f(commands.customname, node["custom-name"]);
+      f(commands.teleport, node["tpa"]);
       return true;
     }
   } commands;
