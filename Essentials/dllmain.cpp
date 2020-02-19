@@ -5,31 +5,10 @@
 Settings settings;
 std::unique_ptr<SQLite::Database> database;
 
-namespace YAML {
-template <> struct convert<Settings::Commands> {
-  static bool decode(const Node &node, Settings::Commands &rhs) {
-    yaml_assign(rhs.transferserver, node["transferserver"]);
-    yaml_assign(rhs.customname, node["custom-name"]);
-    return true;
-  }
-};
-template <> struct convert<Settings> {
-  static bool decode(const Node &node, Settings &rhs) {
-    yaml_assign(rhs.commands, node["commands"]);
-    yaml_assign(rhs.force_experimental_gameplay, node["force-experimental-gameplay"]);
-    yaml_assign(rhs.education_feature, node["education-feature"]);
-    yaml_assign(rhs.debug_packs, node["debug-packs"]);
-    yaml_assign(rhs.database, node["database"]);
-    return true;
-  }
-};
-} // namespace YAML
+DEFAULT_SETTINGS(settings);
 
-extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node) {
-  DEF_LOGGER("SETTINGS");
-  yaml_assign(settings, node);
+void PreInit() {
   if (settings.force_experimental_gameplay) {
-    LOGI("Force experimental gameplay enabled");
     *GetServerSymbol<bool>("?mAllowExperimental@Enchant@@1_NA") = true;
     *GetServerSymbol<bool>("?mAllowExperimental@Item@@2_NA")    = true;
   }

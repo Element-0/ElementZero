@@ -6,15 +6,23 @@
 #include <hook.h>
 #include <log.h>
 
+DEF_LOGGER("debug");
+
 static struct Settings {
   struct Command {
     bool logRegister = false;
+
+    template <typename IO> static inline bool io(IO f, Command &command, YAML::Node &node) {
+      return f(command.logRegister, node["log-register"]);
+    }
   } command;
+
+  template <typename IO> static inline bool io(IO f, Settings &settings, YAML::Node &node) {
+    return f(settings.command, node["command"]);
+  }
 } settings;
 
-void ApplySettings(YAML::Node const &node) {
-  if (auto subcmd = node["command"]; subcmd) { yaml_assign(settings.command.logRegister, subcmd["log-register"]); }
-}
+DEFAULT_SETTINGS(settings);
 
 void dllenter() {}
 void dllexit() {}

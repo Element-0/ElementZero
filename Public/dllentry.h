@@ -8,6 +8,13 @@ void dllenter();
 void dllexit();
 
 extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node);
+extern "C" __declspec(dllexport) bool GenerateSettings(YAML::Node &node);
+extern "C" __declspec(dllexport) void PreInit();
+extern "C" __declspec(dllexport) void PostInit();
+
+#define DEFAULT_SETTINGS(settings)                                                                                     \
+  void ApplySettings(YAML::Node const &node) { ReadYAML(settings, node); }                                             \
+  bool GenerateSettings(YAML::Node &node) { return WriteYAML(settings, node); }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
   switch (ul_reason_for_call) {

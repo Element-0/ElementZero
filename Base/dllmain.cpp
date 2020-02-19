@@ -234,7 +234,16 @@ static YAML::Node readConfig() {
   }
 }
 
+static void writeConfig(YAML::Node const &node) {
+  constexpr auto config_name = "custom.yaml";
+  YAML::Emitter emitter;
+  emitter.SetIndent(2);
+  emitter << node;
+  std::ofstream{config_name} << emitter.c_str();
+}
+
 typedef void (*ApplySettingsType)(YAML::Node const &);
+typedef bool (*GenerateSettingsType)(YAML::Node &);
 typedef void (*PrePostInitType)();
 
 void dllenter() {
@@ -247,7 +256,8 @@ void dllenter() {
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
   std::list<PrePostInitType> PostInits;
   try {
-    const auto cfg = readConfig();
+    auto cfg     = readConfig();
+    bool changed = false;
     yaml_assign(settings, cfg);
     if (settings.LogSettings.Database != "") {
       log_database = std::make_unique<SQLite::Database>(
@@ -266,8 +276,8 @@ void dllenter() {
       for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
         if (next->is_regular_file() && next->path().extension() == ".dll") {
           const auto cfgkey = next->path().stem().string();
-          const auto subcfg = settings.ModSettings.count(cfgkey) ? settings.ModSettings[cfgkey] : YAML::Node{};
-          if (subcfg)
+          auto subcfg       = settings.ModSettings[cfgkey];
+          if (subcfg.IsMap())
             if (auto enabled = subcfg["enabled"]; enabled && !enabled.as<bool>()) continue;
 
           auto lib = LoadLibrary(next->path().c_str());
@@ -275,9 +285,7 @@ void dllenter() {
             LOGE("Failed to load mod: %s") % next->path();
             continue;
           }
-          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PreInit")) fn();
-          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PostInit")) PostInits.push_back(fn);
-          if (subcfg)
+          if (subcfg.IsMap()) {
             if (auto fn = (ApplySettingsType) GetProcAddress(lib, "ApplySettings"); fn) {
               try {
                 fn(subcfg);
@@ -285,11 +293,19 @@ void dllenter() {
                 LOGE("Failed to apply settings for %s: %s") % canonical(next->path()) % ex.what();
               }
             }
+          } else {
+            if (auto fn = (GenerateSettingsType) GetProcAddress(lib, "GenerateSettings"); fn) fn(subcfg);
+            mods_config[cfgkey] = subcfg;
+            if (!changed) changed = subcfg.IsMap();
+          }
+          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PreInit")) fn();
+          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PostInit")) PostInits.push_back(fn);
           LOGI("Loaded mod %s") % canonical(next->path());
         }
       }
       if (ec) LOGE("Warning: Cannot open Mods folder: %s") % ec.message();
     }
+    if (changed) writeConfig(cfg);
     LOGV("Start post init");
     for (auto fn : PostInits) { fn(); }
   } catch (std::exception const &e) { LOGE("Unexcepted exception: %s") % e.what(); }
