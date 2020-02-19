@@ -69,7 +69,7 @@ public:
     auto dim = it->target->getDimensionId();
     pos.y -= 1;
     auto source = it->source;
-    source->teleportTo(pos, false, dim.value, 0);
+    source->teleport(pos, {0}, dim);
     container.get<1>().erase(it);
     output.success("commands.tpaccept.success", {source});
   }

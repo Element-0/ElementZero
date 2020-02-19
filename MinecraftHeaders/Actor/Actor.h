@@ -26,8 +26,8 @@ public:
   }
 
   void teleport(Vec3 const &target, Vec3 const &old, AutomaticID<Dimension, int> dim) {
-    CallServerFunction<void>(
-        "?teleport@TeleportCommand@@AEBAXAEAVActor@@VVec3@@PEAV3@V?$AutomaticID@VDimension@@H@@@Z", (void *) 0, this,
+    CallServerClassMethod<void>(
+        "?teleport@TeleportCommand@@AEBAXAEAVActor@@VVec3@@PEAV3@V?$AutomaticID@VDimension@@H@@@Z", this, this,
         target, &old, dim);
   }
 };
