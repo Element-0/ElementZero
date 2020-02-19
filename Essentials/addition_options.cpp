@@ -3,6 +3,7 @@
 #include "global.h"
 
 #include <Core/core.h>
+#include <Script/ScriptEngine.h>
 
 TClasslessInstanceHook(bool, "?_isFeatureEnabled@EducationOptions@@AEBA_NW4EducationFeature@@@Z", int v) {
   if (settings.education_feature) return true;
@@ -26,6 +27,7 @@ TClasslessInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ") {
   DEF_LOGGER("ScriptEngine");
   LOGV("initialize");
   original(this);
+  if (settings.load_scripts) loadCustomScript();
 }
 
 TClasslessInstanceHook(bool, "?_processSystemInitialize@ScriptEngine@@AEAA_NXZ") {
@@ -35,11 +37,8 @@ TClasslessInstanceHook(bool, "?_processSystemInitialize@ScriptEngine@@AEAA_NXZ")
   return ret;
 }
 
-struct ScriptQueueData {
-  std::string relative_path, virtual_path, content, uuid, version_code;
-};
-
-TClasslessInstanceHook(bool, "?_runScript@ScriptEngine@@AEAA_NAEBUScriptQueueData@1@@Z", ScriptQueueData &data) {
+TClasslessInstanceHook(
+    bool, "?_runScript@ScriptEngine@@AEAA_NAEBUScriptQueueData@1@@Z", ScriptEngine::ScriptQueueData &data) {
   DEF_LOGGER("ScriptEngine");
   auto ret = original(this, data);
   LOGV("runScript: %s -> %d") % data.virtual_path % ret;
