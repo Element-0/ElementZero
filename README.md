@@ -3,7 +3,7 @@
 ![platform](https://img.shields.io/badge/platform-win--x64%20%7C%20wine--linux--x64-green?style=for-the-badge)
 <a href="https://t.me/wine_bdlauncher">![Telegram](https://img.shields.io/badge/telegram-wine_bdlauncher-%232CA5E0?style=for-the-badge&logo=Telegram)</a><br>
 
-<a href="https://github.com/codehz/wine-bdlauncher/releases/latest/download/pkg.tar.xz">![GitHub Releases (by Asset)](https://img.shields.io/github/downloads/codehz/wine-bdlauncher/latest/pkg.tar.xz?style=for-the-badge)</a><br>
+<a href="https://github.com/codehz/wine-bdlauncher/releases/latest">![GitHub Releases (by Asset)](https://img.shields.io/github/downloads/codehz/wine-bdlauncher/latest/pkg.tar.xz?style=for-the-badge)</a><br>
 
 Run windows version of BDS in linux with Mod support (Yes, it is also can be run in windows)
 
