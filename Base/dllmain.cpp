@@ -202,8 +202,15 @@ TInstanceHook(
   generalLog(pri, BedrockLog::_areaFilterString(id), source, line, buffer);
 }
 
+static bool stopping = false;
+
+THook(void *, "??R?$default_delete@VConsoleInputReader@@@std@@QEBAXPEAVConsoleInputReader@@@Z", void *self, char *s) {
+  ((std::thread *) (s + 88))->detach();
+  auto ret = original(self, s);
+  return ret;
+}
+
 static BOOL ConsoleCtrlHandler(DWORD type) {
-  static bool stopping = false;
   DEF_LOGGER("ConsoleCtrlHandler");
   if (type == CTRL_C_EVENT) {
     if (mDedicatedServer) {
