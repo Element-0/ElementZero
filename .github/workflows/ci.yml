@@ -44,7 +44,7 @@ jobs:
       uses: actions/cache@v1
       id: cachellvm
       with:
-        path: ${{ env.USERPROFILE }}/scoop
+        path: C:/ProgramData/scoop
         key: scoop-llvm9.0.0
 
     - name: install llvm
@@ -57,7 +57,7 @@ jobs:
       run: |
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
-        echo "::set-env name=PATH::$env:USERPROFILE\scoop\shims;$env:PATH"
+        echo "::set-env name=PATH::C:/ProgramData/scoop/shims;$env:PATH"
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
