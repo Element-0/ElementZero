@@ -6,6 +6,6 @@ filter: !blacklist
   - prefix: "??_"
   - prefix: "??@"
   - prefix: "?$TSS"
-  - regex: "std@@[QU]"
+  - regex: "std@@U"
   - name: atexit
   - regex: ".*printf$"
