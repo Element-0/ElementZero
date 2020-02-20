@@ -210,7 +210,6 @@ static BOOL ConsoleCtrlHandler(DWORD type) {
       if (stopping) return TRUE;
       mDedicatedServer->asyncStop();
       LOGW("Requested to stop");
-      fclose(stdin);
       stopping = true;
       return TRUE;
     }
