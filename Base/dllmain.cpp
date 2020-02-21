@@ -190,7 +190,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
   }
 }
 
-void Mods::Logger::commit(Level level, unsigned line, std::string value) {
+void Mod::Logger::commit(Level level, unsigned line, std::string value) {
   generalLog((unsigned) level, name, source, line, value);
 }
 
