@@ -2,12 +2,30 @@
 
 #include "global.h"
 
+#include <chat.h>
+
+static void (Mod::Chat::*emitter)(sigt<"chat"_sig>, Player const &, std::string &, bool &);
+
+namespace Mod {
+
+Chat::Chat() { emitter = &Chat::Emit; }
+
+Chat &Chat::GetInstance() {
+  static Chat instance;
+  return instance;
+}
+
+} // namespace Mod
+
 TClasslessInstanceHook(
     void,
     "?_displayGameMessage@ServerNetworkHandler@@AEAAXAEBVPlayer@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$"
     "allocator@D@2@@std@@@Z",
-    Player *player, std::string const &content) {
+    Player *player, std::string &content) {
   DEF_LOGGER("CHAT");
+  bool block = false;
+  (Mod::Chat::GetInstance().*emitter)(SIG("chat"), *player, content, block);
+  if (block) return;
   auto &playerdb = Mod::PlayerDatabase::GetInstance().GetData();
   auto it        = playerdb.find(player);
   if (it != playerdb.end()) {
