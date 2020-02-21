@@ -13,10 +13,13 @@
 #endif
 
 extern "C" {
+// The core api of the hook function
 HOOKAPI int HookFunction(void *oldfunc, void **poutold, void *newfunc);
+// Used to get a server-defined specific function by name
 HOOKAPI void *GetServerSymbol(char const *name);
 }
 
+// Used to get a server-defined specific function by name
 template <typename T> T *GetServerSymbol(char const *name) {
   union {
     T *target;
@@ -26,6 +29,7 @@ template <typename T> T *GetServerSymbol(char const *name) {
   return u.target;
 }
 
+// Used to get a server-defined specific function by name
 template <typename T> T GetServerFunctionSymbol(char const *name) {
   union {
     T target;
@@ -35,6 +39,7 @@ template <typename T> T GetServerFunctionSymbol(char const *name) {
   return u.target;
 }
 
+// A convenience function for setting a virtual function table
 template <typename T> inline void SetVirtualTable(T *self, char const *name) {
   union {
     T *self;
@@ -44,11 +49,13 @@ template <typename T> inline void SetVirtualTable(T *self, char const *name) {
   *u.pvtable = GetServerSymbol(name);
 }
 
+// A convenience function for calling a specific server-defined function
 template <typename Ret, typename... Params> inline auto CallServerFunction(char const *name, Params... params) -> Ret {
   auto fn = GetServerFunctionSymbol<Ret (*)(Params...)>(name);
   return fn(params...);
 }
 
+// A convenience function for calling a specific server-defined function (for instance method)
 template <typename Ret, typename Class, typename... Params>
 inline auto CallServerClassMethod(char const *name, Class const *self, Params... params) -> Ret {
   auto fn = GetServerFunctionSymbol<Ret (Class::*)(Params...)>(name);

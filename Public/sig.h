@@ -10,7 +10,10 @@ constexpr std::uint32_t fnv1a_32(char const *s, std::size_t count) {
 } // namespace detail
 
 template <std::uint32_t sig> struct sigt {};
+
+// Unique type generated from a string
 constexpr std::uint32_t operator""_sig(char const *s, std::size_t count) { return detail::fnv1a_32(s, count); }
 
+// Unique type value generated from a string
 #define SIG(name)                                                                                                      \
   sigt<name##_sig> {}

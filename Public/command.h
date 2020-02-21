@@ -23,6 +23,7 @@ class Value;
 
 namespace Mod {
 
+// Custom command registration related functions
 class CommandSupport : public EventEmitter<"loaded"_sig, CommandRegistry *> {
   COMMANDAPI CommandSupport();
   static COMMANDAPI short &type_id_count();

@@ -10,6 +10,7 @@
 
 namespace Mod {
 
+// Player database entry structure
 struct PlayerEntry {
   Player *player;
   std::string name;
@@ -25,6 +26,7 @@ using PlayerEntryContainer = boost::multi_index_container<
         boost::multi_index::ordered_unique<boost::multi_index::member<PlayerEntry, uint64_t, &PlayerEntry::xuid>>,
         boost::multi_index::hashed_unique<boost::multi_index::member<PlayerEntry, mce::UUID, &PlayerEntry::uuid>>>>;
 
+// Player database for searching players or subscribing to player join and leave events
 class PlayerDatabase : public EventEmitter<"joined"_sig, PlayerEntry const &>,
                        public EventEmitter<"left"_sig, PlayerEntry const &> {
   PlayerEntryContainer data;

@@ -5,8 +5,9 @@
 #include <boost/format.hpp>
 #include <boost/core/noncopyable.hpp>
 
-namespace Mods {
+namespace Mod {
 
+// Auxiliary class for logging system
 class Logger : public boost::noncopyable {
   char const *source;
   char const *name;
@@ -45,13 +46,14 @@ public:
   Commit log(Level level, unsigned line, char const *pattern) { return {*this, level, line, pattern}; }
 };
 
-} // namespace Mods
+} // namespace Mod
 
 #define __STRINGIFY_AUX(x) #x
 #define __STRINGIFY(x) __STRINGIFY_AUX(x)
+// Define a logging context, which you can use at the top level or inside a function definition
 #define DEF_LOGGER(name)                                                                                               \
-  static ::Mods::Logger _logger { "Mod::" __STRINGIFY(MODNAME), name }
-#define LOGV(content) _logger.log(::Mods::Logger::Level::Verbose, __LINE__, content)
-#define LOGI(content) _logger.log(::Mods::Logger::Level::Info, __LINE__, content)
-#define LOGW(content) _logger.log(::Mods::Logger::Level::Warning, __LINE__, content)
-#define LOGE(content) _logger.log(::Mods::Logger::Level::Error, __LINE__, content)
+  static ::Mod::Logger _logger { "Mod::" __STRINGIFY(MODNAME), name }
+#define LOGV(content) _logger.log(::Mod::Logger::Level::Verbose, __LINE__, content)
+#define LOGI(content) _logger.log(::Mod::Logger::Level::Info, __LINE__, content)
+#define LOGW(content) _logger.log(::Mod::Logger::Level::Warning, __LINE__, content)
+#define LOGE(content) _logger.log(::Mod::Logger::Level::Error, __LINE__, content)

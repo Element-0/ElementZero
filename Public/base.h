@@ -11,6 +11,7 @@ class ServiceInstance;
 class Minecraft;
 class Level;
 
+// Can only be used to get instances of the above types
 template <typename T> T *LocateService();
 
 template <> BASEAPI DedicatedServer *LocateService<DedicatedServer>();

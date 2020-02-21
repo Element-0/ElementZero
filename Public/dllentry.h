@@ -4,13 +4,20 @@
 #include <windows.h>
 #include "yaml.h"
 
+// On dll load
 void dllenter();
+// On dll unload (PS: You should never use any minecraft interface or mod api in this function)
 void dllexit();
 
+// Called if config is present
 extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node);
+// Called if config is not present
 extern "C" __declspec(dllexport) bool GenerateSettings(YAML::Node &node);
+// Called immediately after one of the first two functions is called
 extern "C" __declspec(dllexport) void PreInit();
+// Called after all modules have been loaded
 extern "C" __declspec(dllexport) void PostInit();
+// Called before the server is stopped
 extern "C" __declspec(dllexport) void BeforeUnload();
 
 #define DEFAULT_SETTINGS(settings)                                                                                     \
