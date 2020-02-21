@@ -11,6 +11,7 @@ extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node);
 extern "C" __declspec(dllexport) bool GenerateSettings(YAML::Node &node);
 extern "C" __declspec(dllexport) void PreInit();
 extern "C" __declspec(dllexport) void PostInit();
+extern "C" __declspec(dllexport) void BeforeUnload();
 
 #define DEFAULT_SETTINGS(settings)                                                                                     \
   void ApplySettings(YAML::Node const &node) { ReadYAML(settings, node); }                                             \

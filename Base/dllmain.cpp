@@ -252,6 +252,14 @@ static void writeConfig(YAML::Node const &node) {
 typedef void (*ApplySettingsType)(YAML::Node const &);
 typedef bool (*GenerateSettingsType)(YAML::Node &);
 typedef void (*PrePostInitType)();
+typedef void (*BeforeUnloadType)();
+
+static std::list<BeforeUnloadType> UnloadHooks;
+
+TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
+  for (auto hook : UnloadHooks) { hook(); }
+  original(this);
+}
 
 void dllenter() {
   using namespace std::filesystem;
@@ -307,6 +315,7 @@ void dllenter() {
           }
           if (auto fn = (PrePostInitType) GetProcAddress(lib, "PreInit")) fn();
           if (auto fn = (PrePostInitType) GetProcAddress(lib, "PostInit")) PostInits.push_back(fn);
+          if (auto fn = (BeforeUnloadType) GetProcAddress(lib, "BeforeUnload")) UnloadHooks.push_front(fn);
           LOGI("Loaded mod %s") % canonical(next->path());
         }
       }
