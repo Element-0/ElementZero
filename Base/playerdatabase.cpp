@@ -24,14 +24,14 @@ Mod::PlayerDatabase &Mod::PlayerDatabase::GetInstance() {
 TClasslessInstanceHook(
     Player *,
     "?_createNewPlayer@ServerNetworkHandler@@AEAAAEAVServerPlayer@@AEBVNetworkIdentifier@@AEBVConnectionRequest@@@Z",
-    void *id, void *req) {
+    NetworkIdentifier *id, void *req) {
   auto player = original(this, id, req);
   auto &cert  = player->getCertificate();
   auto uuid   = ExtendedCertificate::getIdentity(cert);
   auto name   = ExtendedCertificate::getIdentityName(cert);
   auto xuid   = ExtendedCertificate::getXuid(cert);
   LOGV("%s joined") % name;
-  auto ref = container->emplace(Mod::PlayerEntry{player, name, std::stoull(xuid), uuid});
+  auto ref = container->emplace(Mod::PlayerEntry{player, name, std::stoull(xuid), uuid, *id});
   (db.*emitter<"joined"_sig>) (SIG("joined"), *ref.first);
   return player;
 }

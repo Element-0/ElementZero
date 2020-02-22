@@ -5,6 +5,7 @@
 #include "../Core/ExtendedCertificate.h"
 #include "../Core/Vec3.h"
 #include "../Core/AutomaticID.h"
+#include "../Command/CommandPermissionLevel.h"
 
 class Packet;
 class ServerPlayer;
@@ -25,6 +26,11 @@ public:
 
   void teleportTo(Vec3 const &vec, bool flag, int a, int b) const {
     CallServerClassMethod<void>("?teleportTo@Player@@UEAAXAEBVVec3@@_NHH@Z", this, &vec, flag, a, b);
+  }
+
+  inline CommandPermissionLevel getCommandPermissionLevel() const {
+    return CallServerClassMethod<CommandPermissionLevel>(
+        "?getCommandPermissionLevel@Player@@UEBA?AW4CommandPermissionLevel@@XZ", this);
   }
 
   BASEAPI Certificate &getCertificate();

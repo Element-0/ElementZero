@@ -6,7 +6,9 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
+#include <boost/multi_index/tag.hpp>
 #include <Actor/Player.h>
+#include <Net/NetworkIdentifier.h>
 
 namespace Mod {
 
@@ -16,15 +18,24 @@ struct PlayerEntry {
   std::string name;
   uint64_t xuid;
   mce::UUID uuid;
+  NetworkIdentifier netid;
 };
 
 using PlayerEntryContainer = boost::multi_index_container<
     PlayerEntry,
     boost::multi_index::indexed_by<
-        boost::multi_index::ordered_unique<boost::multi_index::member<PlayerEntry, Player *, &PlayerEntry::player>>,
-        boost::multi_index::ordered_unique<boost::multi_index::member<PlayerEntry, std::string, &PlayerEntry::name>>,
-        boost::multi_index::ordered_unique<boost::multi_index::member<PlayerEntry, uint64_t, &PlayerEntry::xuid>>,
-        boost::multi_index::hashed_unique<boost::multi_index::member<PlayerEntry, mce::UUID, &PlayerEntry::uuid>>>>;
+        boost::multi_index::ordered_unique<
+            boost::multi_index::tag<Player *>, boost::multi_index::member<PlayerEntry, Player *, &PlayerEntry::player>>,
+        boost::multi_index::ordered_unique<
+            boost::multi_index::tag<std::string>,
+            boost::multi_index::member<PlayerEntry, std::string, &PlayerEntry::name>>,
+        boost::multi_index::ordered_unique<
+            boost::multi_index::tag<uint64_t>, boost::multi_index::member<PlayerEntry, uint64_t, &PlayerEntry::xuid>>,
+        boost::multi_index::hashed_unique<
+            boost::multi_index::tag<mce::UUID>, boost::multi_index::member<PlayerEntry, mce::UUID, &PlayerEntry::uuid>>,
+        boost::multi_index::hashed_unique<
+            boost::multi_index::tag<NetworkIdentifier>,
+            boost::multi_index::member<PlayerEntry, NetworkIdentifier, &PlayerEntry::netid>>>>;
 
 // Player database for searching players or subscribing to player join and leave events
 class PlayerDatabase : public EventEmitter<"joined"_sig, PlayerEntry const &>,
