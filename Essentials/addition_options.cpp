@@ -105,22 +105,16 @@ TClasslessInstanceHook(
   }
 }
 
-TClasslessInstanceHook(
+THook(
     void,
     "??0LevelSettings@@QEAA@IW4GameType@@W4Difficulty@@V?$AutomaticID@VDimension@@H@@W4GeneratorType@@AEBVBlockPos@@_"
     "NHW4EducationEditionOffer@@MM555W4GamePublishSetting@Social@@7555555VGameRules@@55VAbilities@@"
     "I555AEBVBaseGameVersion@@@Z",
-    unsigned int seed, int gametype, int difficulty, int def_dim, int generator, void *blockpos,
-    bool achievementsDisabled, int time, int eduoffer, float rainLevel, float lightningLevel, bool flag0, bool flag1,
-    bool flag2, int xblpublishsetting, int platformpublishsetting, bool flag3, bool flag4, bool flag5, bool flag6,
-    bool flag7, bool flag8, void *rules, bool flag9, bool flag10, void *abilities, unsigned unk1, bool flag11,
-    bool flag12, bool flag13, void *version) {
-  original(
-      this, seed, gametype, difficulty, def_dim, generator, blockpos, achievementsDisabled, time,
-      settings.education_feature ? 1 : 0, rainLevel, lightningLevel, flag0, flag0, flag2, xblpublishsetting,
-      platformpublishsetting, flag3, flag4, flag5, flag6, flag7, flag8, rules, flag9, flag10, abilities, unk1, flag11,
-      flag12, flag13, version);
-  char *access = (char *) this;
+    char *self, void *a, void *b, void *c, void *d, void *e, void *f, void *g, void *h, void *i, void *j, void *k,
+    void *l, void *m, void *n, void *o, void *p, void *q, void *r, void *s, void *t, void *u, void *v, void *w, void *x,
+    void *y, void *z, void *_a, void *_b, void *_c, void *_d, void *_e) {
+  original(self, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, e, s, t, u, v, w, x, y, z, _a, _b, _c, _d, _e);
+  char *access = (char *) self;
   access[76]   = settings.force_experimental_gameplay;
   access[36]   = settings.education_feature;
 }
