@@ -286,6 +286,7 @@ TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
 void dllenter() {
   using namespace std::filesystem;
   DEF_LOGGER("MODLOADER");
+  SetConsoleCP(65001);
 
   std::thread::id this_id = std::this_thread::get_id();
   LOGV("Current thread id: %d") % this_id;
