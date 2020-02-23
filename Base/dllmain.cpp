@@ -41,17 +41,23 @@ TInstanceHook(
   return original(this, uuid);
 }
 
-THook(void, "?activate@RakNetServerLocator@@AEAAXXZ", void *self) {
-  *(RakNet::RakPeer **) ((char *) self + 280) = mRakPeer;
-}
+struct FakeClass {
+  inline FakeClass() {}
+  inline ~FakeClass() {}
+};
 
-THook(void, "??1RakNetServerLocator@@UEAA@XZ", void *self) {
-  *(RakNet::RakPeer **) ((char *) self + 280) = nullptr;
-  original(self);
+TInstanceHook(
+    void,
+    "?announceServer@RakNetServerLocator@@UEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@"
+    "0W4GameType@@HH_N@Z",
+    FakeClass, std::string const &name, std::string const &desc, int type, int player, int max_players, bool flag) {
+  *(RakNet::RakPeer **) ((char *) this + 280) = mRakPeer;
+  original(this, name, desc, type, player, max_players, flag);
+  *(RakNet::RakPeer **) ((char *) this + 280) = nullptr;
 }
 
 THook(void, "??0RakPeer@RakNet@@QEAA@XZ", RakNet::RakPeer *self) {
-  mRakPeer = self;
+  if (!mRakPeer) mRakPeer = self;
   original(self);
 }
 

@@ -3,6 +3,9 @@
 #include <hook.h>
 #include <log.h>
 #include <Net/NetworkIdentifier.h>
+#include <Packet/MobEquipmentPacket.h>
+#include <Item/ItemStack.h>
+#include <Item/Item.h>
 
 DEF_LOGGER("BAC");
 
@@ -22,4 +25,21 @@ TClasslessInstanceHook(
       LOGI("%s try to edit command block") % it->name;
     }
   }
+}
+
+TClasslessInstanceHook(
+    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVMobEquipmentPacket@@@Z",
+    NetworkIdentifier *netid, MobEquipmentPacket *packet) {
+  LOGI("container: %d") % (int) packet->containerId;
+  // is offhand container
+  if (packet->containerId == 119) {
+    // detect if it can be offhand
+    if (auto item = packet->item.getItem(); item && !item->getAllowOffhand()) {
+      auto &db = Mod::PlayerDatabase::GetInstance().GetData().get<NetworkIdentifier>();
+      auto it  = db.find(*netid);
+      if (it != db.end()) { LOGI("%s try to set illegal item to offhand") % it->name; }
+      return;
+    }
+  }
+  original(this, netid, packet);
 }
