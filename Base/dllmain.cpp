@@ -174,6 +174,15 @@ static char getPriority(unsigned int pri) {
   default: return 'U';
   }
 }
+static int getPriorityDecoration(unsigned int pri) {
+  switch (pri) {
+  case 1: return 0;
+  case 2: return 1;
+  case 4: return 2;
+  case 8: return 3;
+  default: return 4;
+  }
+}
 
 static std::unique_ptr<SQLite::Database> log_database;
 static BedrockLog::LogDetails *log_instance;
@@ -187,7 +196,8 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
   auto f    = boost::format(settings.LogSettings.Format) % getPriority(pri) % area % source % line % content;
   auto data = f.str();
   if (data.back() != '\n') data.append("\n");
-  std::cout << data;
+  auto deco = settings.LogSettings.Decorations[getPriorityDecoration(pri)];
+  std::cout << deco.Before << data << deco.After;
   if (log_instance) log_instance->proxy(data);
   if (log_database) {
     try {
@@ -254,12 +264,11 @@ static YAML::Node readConfig() {
   } catch (YAML::BadFile const &e) {
     YAML::Emitter out;
     out.SetIndent(2);
-    out << YAML::BeginMap;
-    out << YAML::Key << "mod-enabled";
-    out << YAML::Value << true;
-    out << YAML::EndMap;
+    YAML::Node node;
+    WriteYAML(settings, node);
+    out << node;
     std::ofstream{config_name} << out.c_str();
-    return YAML::LoadFile(config_name);
+    return node;
   }
 }
 
@@ -288,6 +297,9 @@ void dllenter() {
   DEF_LOGGER("MODLOADER");
   SetConsoleCP(65001);
   SetConsoleOutputCP(65001);
+  SetConsoleMode(
+      GetStdHandle(STD_OUTPUT_HANDLE),
+      ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
   std::thread::id this_id = std::this_thread::get_id();
   LOGV("Current thread id: %d") % this_id;
@@ -296,8 +308,8 @@ void dllenter() {
   std::list<PrePostInitType> PostInits;
   try {
     auto cfg     = readConfig();
-    bool changed = false;
-    yaml_assign(settings, cfg);
+    bool changed = !ReadYAML(settings, cfg);
+    if (changed) WriteYAML(settings, cfg);
     if (settings.LogSettings.Database != "") {
       log_database = std::make_unique<SQLite::Database>(
           settings.LogSettings.Database, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
