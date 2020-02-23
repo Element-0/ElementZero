@@ -20,6 +20,7 @@ public:
 };
 
 static DedicatedServer *mDedicatedServer = nullptr;
+static RakNet::RakPeer *mRakPeer         = nullptr;
 static std::string session;
 
 template <> DedicatedServer *LocateService<DedicatedServer>() { return mDedicatedServer; }
@@ -29,6 +30,7 @@ template <> ServiceInstance *LocateService<ServiceInstance>() {
   return *ptr;
 }
 template <> Level *LocateService<Level>() { return LocateService<Minecraft>()->getLevel(); }
+template <> RakNet::RakPeer *LocateService<RakNet::RakPeer>() { return mRakPeer; }
 
 TInstanceHook(
     int,
@@ -37,6 +39,20 @@ TInstanceHook(
   mDedicatedServer = this;
   session          = uuid;
   return original(this, uuid);
+}
+
+THook(void, "?activate@RakNetServerLocator@@AEAAXXZ", void *self) {
+  *(RakNet::RakPeer **) ((char *) self + 280) = mRakPeer;
+}
+
+THook(void, "??1RakNetServerLocator@@UEAA@XZ", void *self) {
+  *(RakNet::RakPeer **) ((char *) self + 280) = nullptr;
+  original(self);
+}
+
+THook(void, "??0RakPeer@RakNet@@QEAA@XZ", RakNet::RakPeer *self) {
+  mRakPeer = self;
+  original(self);
 }
 
 enum class LogArea {};

@@ -11,8 +11,8 @@ static struct Settings {
     std::string Format   = "%1$c [%2$s] (%3$s:%4$d) %5$s";
     std::string Database = "log.db";
   } LogSettings;
+  std::string UserDatabase = "user.db";
 } settings;
-
 
 namespace YAML {
 
@@ -29,6 +29,7 @@ template <> struct convert<Settings> {
     yaml_assign(rhs.ModEnabled, node["mod-enabled"]);
     yaml_assign(rhs.LogSettings, node["log-settings"]);
     yaml_assign(rhs.ModSettings, node["mods"]);
+    yaml_assign(rhs.UserDatabase, node["user-database"]);
     return true;
   }
 };

@@ -9,6 +9,8 @@ public:
   std::uint64_t a, b;
 
   constexpr inline bool operator==(UUID const &rhs) const noexcept { return a == rhs.a && b == rhs.b; }
+
+  inline operator char const *() const { return (char const *) this; }
 };
 
 } // namespace mce
