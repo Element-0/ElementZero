@@ -30,7 +30,6 @@ TClasslessInstanceHook(
 TClasslessInstanceHook(
     void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVMobEquipmentPacket@@@Z",
     NetworkIdentifier *netid, MobEquipmentPacket *packet) {
-  LOGI("container: %d") % (int) packet->containerId;
   // is offhand container
   if (packet->containerId == 119) {
     // detect if it can be offhand

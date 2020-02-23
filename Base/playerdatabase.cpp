@@ -66,7 +66,7 @@ TClasslessInstanceHook(
   stmt_user.reset();
   stmt_user.clearBindings();
   stmt_login.bindNoCopy(1, uuid, sizeof uuid);
-  stmt_login.bind(2, id->getAddress());
+  stmt_login.bindNoCopy(2, address);
   stmt_login.exec();
   stmt_login.reset();
   stmt_login.clearBindings();
