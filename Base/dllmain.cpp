@@ -237,7 +237,8 @@ TInstanceHook(
 static bool stopping = false;
 
 THook(void *, "??R?$default_delete@VConsoleInputReader@@@std@@QEBAXPEAVConsoleInputReader@@@Z", void *self, char *s) {
-  ((std::thread *) (s + 88))->detach();
+  auto &thrd = *((std::thread *) (s + 88));
+  if (thrd.joinable()) thrd.detach();
   auto ret = original(self, s);
   return ret;
 }
