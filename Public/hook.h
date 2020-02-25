@@ -81,6 +81,10 @@ public:
 
 #ifndef ModLoader_EXPORTS
 
+class FakeClass {
+  inline ~FakeClass() {}
+};
+
 class THookRegister {
 public:
   THookRegister(void *address, void *hook, void **org) {

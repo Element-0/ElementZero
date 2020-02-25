@@ -41,11 +41,6 @@ TInstanceHook(
   return original(this, uuid);
 }
 
-struct FakeClass {
-  inline FakeClass() {}
-  inline ~FakeClass() {}
-};
-
 TInstanceHook(
     void,
     "?announceServer@RakNetServerLocator@@UEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@"
