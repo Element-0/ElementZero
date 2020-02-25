@@ -30,14 +30,22 @@ TClasslessInstanceHook(
 TClasslessInstanceHook(
     void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVMobEquipmentPacket@@@Z",
     NetworkIdentifier *netid, MobEquipmentPacket *packet) {
+  auto &db = Mod::PlayerDatabase::GetInstance().GetData().get<NetworkIdentifier>();
+  auto it  = db.find(*netid);
+  if (it == db.end()) return;
   // is offhand container
   if (packet->containerId == 119) {
+    auto &stack = packet->stack;
     // detect if it can be offhand
-    if (auto item = packet->item.getItem(); item && !item->getAllowOffhand()) {
-      auto &db = Mod::PlayerDatabase::GetInstance().GetData().get<NetworkIdentifier>();
-      auto it  = db.find(*netid);
-      if (it != db.end()) { LOGI("%s try to set illegal item to offhand") % it->name; }
-      return;
+    if (auto item = stack.getItem(); item) {
+      if (!item->getAllowOffhand()) {
+        LOGI("%s try to set illegal item to offhand") % it->name;
+        return;
+      }
+      if (stack.getStackSize() > stack.getMaxStackSize()) {
+        LOGI("%s try to set too many items to offhand") % it->name;
+        return;
+      }
     }
   }
   original(this, netid, packet);

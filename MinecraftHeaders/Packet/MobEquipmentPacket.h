@@ -7,7 +7,7 @@
 class MobEquipmentPacket : public Packet {
 public:
   ActorRuntimeID actorId;
-  ItemStack item;
+  ItemStack stack;
   uint32_t inventorySlot;
   uint32_t hotbarSlot;
   bool flag192;

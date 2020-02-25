@@ -2,6 +2,7 @@
 #include <Actor/Player.h>
 #include <Command/CommandOutput.h>
 #include <Item/Item.h>
+#include <Item/ItemStack.h>
 
 template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t offset) {
   union {
@@ -23,3 +24,5 @@ template <> Minecraft *LocateService<Minecraft>() {
 }
 
 bool Item::getAllowOffhand() const { return direct_access<char>(this, 258) & 0x40; }
+
+unsigned char ItemStackBase::getStackSize() const { return direct_access<unsigned char>(this, 34); }
