@@ -1,0 +1,7 @@
+cmake_minimum_required (VERSION 3.8)
+
+add_subdirectory ("CommandSupport")
+add_subdirectory ("Essentials")
+add_subdirectory ("DebugTool")
+add_subdirectory ("BasicAntiCheat")
+add_subdirectory ("NoEncryption")
