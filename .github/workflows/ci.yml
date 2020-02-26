@@ -64,7 +64,7 @@ jobs:
       id: libcache
       with:
         path: ${{ github.workspace }}/Lib
-        key: lib-${{ hashFiles( 'eatpdb.yaml' ) }}-${{ env.eatpdb_version }}-${{ env.bds_version }}
+        key: lib-${{ hashFiles( 'eatpdb.yaml' ) }}-${{ env.eatpdb_version }}-${{ env.bds_version }}-icon
 
     - name: Download BDS
       if: steps.libcache.outputs.cache-hit != 'true'
@@ -84,15 +84,18 @@ jobs:
         unzip D:/eatpdb.zip
       shell: bash
 
-    - name: Build bedrock_server_mod.lib
+    - name: Build bedrock_server_mod
       if: steps.libcache.outputs.cache-hit != 'true'
       run: |
+        curl -L -o D:/rcedit.exe https://github.com/electron/rcedit/releases/download/v1.1.1/rcedit-x64.exe
         mkdir Lib Dist
-        cd BDS
+        pushd BDS
         D:/eatpdb/eatpdb exec ../eatpdb.yaml
         lib /def:bedrock_server_mod.def /machine:x64
         cp bedrock_server_mod.lib ../Lib
         cp bedrock_server_mod.exe ../Lib
+        popd
+        D:/rcedit.exe Lib/bedrock_server_mod.exe --set-icon index.ico
       shell: bash
 
     - name: Build
