@@ -224,7 +224,7 @@ void Mod::Logger::commit(Level level, unsigned line, std::string value) {
 TInstanceHook(
     void, "?_log_va@LogDetails@BedrockLog@@AEAAXW4LogAreaID@@IPEBDHH1PEAD@Z", BedrockLog::LogDetails, LogAreaID id,
     unsigned pri, char const *source, int line, int index, char const *format, va_list vargs) {
-  static char buffer[65536];
+  static thread_local char buffer[65536];
   vsprintf_s(buffer, format, vargs);
   generalLog(pri, BedrockLog::_areaFilterString(id), source, line, buffer);
 }
