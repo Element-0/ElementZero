@@ -89,13 +89,12 @@ jobs:
       run: |
         curl -L -o D:/rcedit.exe https://github.com/electron/rcedit/releases/download/v1.1.1/rcedit-x64.exe
         mkdir Lib Dist
-        pushd BDS
+        cd BDS
+        D:/rcedit.exe bedrock_server.exe --set-icon ../index.ico
         D:/eatpdb/eatpdb exec ../eatpdb.yaml
         lib /def:bedrock_server_mod.def /machine:x64
         cp bedrock_server_mod.lib ../Lib
         cp bedrock_server_mod.exe ../Lib
-        popd
-        D:/rcedit.exe Lib/bedrock_server_mod.exe --set-icon index.ico
       shell: bash
 
     - name: Build
