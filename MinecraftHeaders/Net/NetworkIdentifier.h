@@ -2,8 +2,13 @@
 #include "../Core/mce.h"
 #include "../RakNet/RakNetTypes.h"
 #include <boost/functional/hash.hpp>
+#include <hook.h>
 
-class __declspec(dllimport) NetworkIdentifier {
+#ifndef BASEAPI
+#  define BASEAPI __declspec(dllimport)
+#endif
+
+class NetworkIdentifier {
 public:
   enum class Type : char {
     GUID  = 0,
@@ -17,9 +22,11 @@ public:
   uint64_t unk136;
   Type type; // 144
 
-  bool operator==(NetworkIdentifier const &) const;
-  uint64_t getHash() const;
-  std::string getAddress() const;
+  __declspec(dllimport) bool operator==(NetworkIdentifier const &) const;
+  __declspec(dllimport) uint64_t getHash() const;
+  __declspec(dllimport) std::string getAddress() const;
+
+  BASEAPI RakNet::SystemAddress getRealAddress() const;
 };
 
 static_assert(offsetof(NetworkIdentifier, unk136) == 136);

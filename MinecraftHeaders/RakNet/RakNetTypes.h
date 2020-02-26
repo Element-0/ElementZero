@@ -24,9 +24,9 @@ private:
   __declspec(dllimport) void ToString_New(bool writePort, char *dest, char portDelineator) const;
 
 public:
-  inline std::string ToString() {
+  inline std::string ToString(bool withPort = true) {
     char buffer[256];
-    ToString_New(true, buffer, '|');
+    ToString_New(withPort, buffer, '|');
     return {buffer};
   }
 };

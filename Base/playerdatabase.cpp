@@ -52,7 +52,7 @@ TClasslessInstanceHook(
   auto uuid    = ExtendedCertificate::getIdentity(cert);
   auto name    = ExtendedCertificate::getIdentityName(cert);
   auto xuid    = std::stoull(ExtendedCertificate::getXuid(cert));
-  auto sadd    = LocateService<RakNet::RakPeer>()->GetSystemAddressFromGuid(id->guid);
+  auto sadd    = id->getRealAddress();
   auto address = sadd.ToString();
   LOGV("%s joined (from %d)") % name % address;
   auto ref = container->emplace(Mod::PlayerEntry{player, name, xuid, uuid, *id});

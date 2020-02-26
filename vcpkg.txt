@@ -5,6 +5,7 @@ boost-algorithm
 boost-core
 boost-format
 boost-multi-index
+boost-scope-exit
 sqlitecpp
 yaml-cpp
 chakracore
