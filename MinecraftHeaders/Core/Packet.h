@@ -24,5 +24,5 @@ public:
   virtual std::string getName() const                   = 0;
   virtual void write(BinaryStream &) const              = 0;
   virtual PacketReadResult read(ReadOnlyBinaryStream &) = 0;
-  virtual bool disallowBatching() const                 = 0;
+  virtual bool disallowBatching() const { return false; }
 };

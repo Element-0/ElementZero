@@ -1,15 +1,12 @@
 #pragma once
 
-#include "../Core/Packet.h"
-#include <hook.h>
-
-class TransferPacket : public Packet {
-  std::string address;
-  int port;
-
+class ActorFallPacket : public Packet {
 public:
-  TransferPacket(std::string address, int port) : address(address), port(port) {}
-  inline virtual ~TransferPacket() {}
+  ActorRuntimeID actorId;
+  float fallDistance;
+  bool inVoid;
+
+  inline ~ActorFallPacket() {}
   __declspec(dllimport) virtual MinecraftPacketIds getId() const;
   __declspec(dllimport) virtual std::string getName() const;
   __declspec(dllimport) virtual void write(BinaryStream &) const;

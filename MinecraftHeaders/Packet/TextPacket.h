@@ -68,5 +68,4 @@ public:
   __declspec(dllimport) virtual std::string getName() const;
   __declspec(dllimport) virtual void write(BinaryStream &) const;
   __declspec(dllimport) virtual PacketReadResult read(ReadOnlyBinaryStream &);
-  virtual bool disallowBatching() const { return false; }
 };

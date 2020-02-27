@@ -4,6 +4,7 @@
 #include <log.h>
 #include <Net/NetworkIdentifier.h>
 #include <Packet/MobEquipmentPacket.h>
+#include <Packet/ActorFallPacket.h>
 #include <Item/ItemStack.h>
 #include <Item/Item.h>
 
@@ -22,7 +23,7 @@ TClasslessInstanceHook(
     if (level > CommandPermissionLevel::Normal) {
       original(this, netid, packet);
     } else {
-      LOGI("%s try to edit command block") % it->name;
+      LOGI("\"%s\"(%d) has been detected using: command block exploit") % it->name;
     }
   }
 }
@@ -38,15 +39,24 @@ TClasslessInstanceHook(
     auto &stack = packet->stack;
     // detect if it can be offhand
     if (auto item = stack.getItem(); item) {
-      if (!item->getAllowOffhand()) {
-        LOGI("%s try to set illegal item to offhand") % it->name;
-        return;
-      }
-      if (stack.getStackSize() > stack.getMaxStackSize()) {
-        LOGI("%s try to set too many items to offhand") % it->name;
+      if (!item->getAllowOffhand() || stack.getStackSize() > stack.getMaxStackSize()) {
+        LOGI("\"%s\"(%d) has been detected using: offhand") % it->name % it->xuid;
         return;
       }
     }
+  }
+  original(this, netid, packet);
+}
+
+TClasslessInstanceHook(
+    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVActorFallPacket@@@Z", NetworkIdentifier *netid,
+    ActorFallPacket *packet) {
+  if (packet->fallDistance < 0.1) {
+    auto &db = Mod::PlayerDatabase::GetInstance().GetData().get<NetworkIdentifier>();
+    auto it  = db.find(*netid);
+    if (it == db.end()) return;
+    LOGI("\"%s\"(%d) has been detected using: No fall") % it->name % it->xuid;
+    packet->inVoid = true;
   }
   original(this, netid, packet);
 }
