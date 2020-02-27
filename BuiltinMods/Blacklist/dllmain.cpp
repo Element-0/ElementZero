@@ -7,11 +7,13 @@
 #include <hook.h>
 #include <log.h>
 #include <dllentry.h>
+#include <command.h>
 
 #include <Core/mce.h>
 #include <Net/NetworkIdentifier.h>
 
 #include "settings.h"
+#include "global.h"
 
 DEF_LOGGER("Blacklist");
 Settings settings;
@@ -25,31 +27,35 @@ void PreInit() {
   database->exec(
       "CREATE TABLE IF NOT EXISTS uuid("
       "value BLOB PRIMARY KEY, "
-      "name TEXT, "
+      "name TEXT COLLATE NOCASE, "
       "reason TEXT NOT NULL, "
       "source TEXT, "
+      "release INTEGER ,"
       "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
   database->exec(
       "CREATE TABLE IF NOT EXISTS xuid("
       "value INTEGER PRIMARY KEY, "
-      "name TEXT, "
+      "name TEXT COLLATE NOCASE, "
       "reason TEXT NOT NULL, "
       "source TEXT, "
+      "release INTEGER ,"
       "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
   database->exec(
       "CREATE TABLE IF NOT EXISTS name("
-      "value TEXT PRIMARY KEY, "
+      "value TEXT PRIMARY KEY COLLATE NOCASE, "
       "reason TEXT NOT NULL, "
       "source TEXT, "
+      "release INTEGER ,"
       "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
   database->exec(
       "CREATE TABLE IF NOT EXISTS iplog("
       "uuid BLOB NOT NULL, "
       "xuid INTEGER, "
-      "name TEXT NOT NULL, "
+      "name TEXT COLLATE NOCASE NOT NULL, "
       "reason TEXT NOT NULL, "
       "address TEXT NOT NULL, "
       "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+  Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), registerBanCommand);
 }
 
 void dllenter() {}

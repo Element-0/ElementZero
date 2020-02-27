@@ -291,6 +291,7 @@ TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
 void dllenter() {
   using namespace std::filesystem;
   DEF_LOGGER("MODLOADER");
+  SetDllDirectory(L"Mods");
   SetConsoleCP(65001);
   SetConsoleOutputCP(65001);
   SetConsoleMode(

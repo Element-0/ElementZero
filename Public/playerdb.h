@@ -21,6 +21,12 @@ struct PlayerEntry {
   NetworkIdentifier netid;
 };
 
+struct OfflinePlayerEntry {
+  std::string name;
+  uint64_t xuid;
+  mce::UUID uuid;
+};
+
 using PlayerEntryContainer = boost::multi_index_container<
     PlayerEntry,
     boost::multi_index::indexed_by<
@@ -46,6 +52,14 @@ class PlayerDatabase : public EventEmitter<"joined"_sig, PlayerEntry const &>,
 public:
   inline PlayerEntryContainer const &GetData() const { return data; }
   BASEAPI static PlayerDatabase &GetInstance();
+  BASEAPI std::optional<PlayerEntry> Find(Player *player);
+  BASEAPI std::optional<PlayerEntry> Find(std::string const &name);
+  BASEAPI std::optional<PlayerEntry> Find(uint64_t xuid);
+  BASEAPI std::optional<PlayerEntry> Find(mce::UUID const &uuid);
+
+  BASEAPI std::optional<OfflinePlayerEntry> FindOffline(std::string const &name);
+  BASEAPI std::optional<OfflinePlayerEntry> FindOffline(uint64_t xuid);
+  BASEAPI std::optional<OfflinePlayerEntry> FindOffline(mce::UUID const &uuid);
 
   USING_EVENTEMITTER("joined", PlayerEntry const &);
   USING_EVENTEMITTER("left", PlayerEntry const &);

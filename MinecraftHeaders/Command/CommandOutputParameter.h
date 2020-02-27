@@ -23,4 +23,6 @@ public:
   inline CommandOutputParameter(Actor const *actor) : str(actor->getEntityName()), type(1) {}
   inline CommandOutputParameter(Actor const &actor) : str(actor.getEntityName()), type(1) {}
   inline CommandOutputParameter(char const *str) : str(str), type(0) {}
+  inline CommandOutputParameter(uint64_t val) : str(std::to_string(val)), type(0) {}
+  inline CommandOutputParameter(int64_t val) : str(std::to_string(val)), type(0) {}
 };

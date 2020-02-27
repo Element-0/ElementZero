@@ -6,6 +6,7 @@ boost-core
 boost-format
 boost-multi-index
 boost-scope-exit
+boost-lexical-cast
 sqlitecpp
 yaml-cpp
 chakracore

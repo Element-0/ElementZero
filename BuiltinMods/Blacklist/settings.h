@@ -6,9 +6,11 @@
 
 struct Settings {
   std::string Database = "blacklist.db";
+  bool EnableCommands = true;
 
   template <typename IO> static inline bool io(IO f, Settings &settings, YAML::Node &node) {
     return f(settings.Database, node["database"]);
+    return f(settings.EnableCommands, node["enable-commands"]);
   }
 };
 
