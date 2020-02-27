@@ -64,7 +64,7 @@ jobs:
       id: libcache
       with:
         path: ${{ github.workspace }}/Lib
-        key: lib-${{ hashFiles( 'eatpdb.yaml' ) }}-${{ env.eatpdb_version }}-${{ env.bds_version }}-icon
+        key: lib-${{ hashFiles( 'eatpdb.yaml' ) }}-${{ env.eatpdb_version }}-${{ env.bds_version }}-iconfix
 
     - name: Download BDS
       if: steps.libcache.outputs.cache-hit != 'true'
