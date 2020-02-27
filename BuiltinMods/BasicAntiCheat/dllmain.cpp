@@ -5,6 +5,7 @@
 #include <Net/NetworkIdentifier.h>
 #include <Packet/MobEquipmentPacket.h>
 #include <Packet/ActorFallPacket.h>
+#include <Packet/TextPacket.h>
 #include <Item/ItemStack.h>
 #include <Item/Item.h>
 
@@ -57,6 +58,23 @@ TClasslessInstanceHook(
     if (it == db.end()) return;
     LOGI("\"%s\"(%d) has been detected using: No fall") % it->name % it->xuid;
     packet->inVoid = true;
+  }
+  original(this, netid, packet);
+}
+
+TClasslessInstanceHook(
+    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVTextPacket@@@Z", NetworkIdentifier *netid,
+    TextPacket *packet) {
+  auto &db = Mod::PlayerDatabase::GetInstance().GetData().get<NetworkIdentifier>();
+  auto it  = db.find(*netid);
+  if (it == db.end()) return;
+  if (packet->type != TextPacketType::Chat) {
+    LOGI("\"%s\"(%d) has been detected using: chat hack") % it->name % it->xuid;
+    return;
+  }
+  if (packet->source != it->name) {
+    LOGI("\"%s\"(%d) has been detected using: fake name") % it->name % it->xuid;
+    return;
   }
   original(this, netid, packet);
 }
