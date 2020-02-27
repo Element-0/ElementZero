@@ -105,16 +105,10 @@ TClasslessInstanceHook(
   }
 }
 
-THook(
-    void,
-    "??0LevelSettings@@QEAA@IW4GameType@@W4Difficulty@@V?$AutomaticID@VDimension@@H@@W4GeneratorType@@AEBVBlockPos@@_"
-    "NHW4EducationEditionOffer@@MM555W4GamePublishSetting@Social@@7555555VGameRules@@55VAbilities@@"
-    "I555AEBVBaseGameVersion@@@Z",
-    char *self, void *a, void *b, void *c, void *d, void *e, void *f, void *g, void *h, void *i, void *j, void *k,
-    void *l, void *m, void *n, void *o, void *p, void *q, void *r, void *s, void *t, void *u, void *v, void *w, void *x,
-    void *y, void *z, void *_a, void *_b, void *_c, void *_d, void *_e) {
-  original(self, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, e, s, t, u, v, w, x, y, z, _a, _b, _c, _d, _e);
-  char *access = (char *) self;
+THook(void *, "??0MinecraftEventing@@QEAA@AEBVPath@Core@@@Z", void *a, void *b) {
+  // HACK FOR LevelSettings
+  char *access = (char *) b + 2800;
   access[76]   = settings.force_experimental_gameplay;
   access[36]   = settings.education_feature;
+  return original(a, b);
 }
