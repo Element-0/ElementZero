@@ -2,7 +2,12 @@
 
 project ("WineBDLauncher")
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+
 include (ExternalProject)
+include (Utility)
+
+generate_git_version (git_version)
 
 option (NO_INLINE off)
 set (CMAKE_CXX_STANDARD 17)
@@ -13,12 +18,6 @@ set (VCPKG_TARGET_TRIPLET "x64-windows-rel")
 if (NO_INLINE)
     add_compile_options (/Ob0)
 endif ()
-
-function (find_and_install_package name)
-    find_package (${name} CONFIG REQUIRED)
-    get_target_property (dll_files ${name} IMPORTED_LOCATION_RELEASE)
-    install (FILES ${dll_files} DESTINATION .)
-endfunction ()
 
 include_directories (Public)
 add_compile_definitions (_UNICODE UNICODE NDEBUG)
@@ -55,9 +54,9 @@ function (add_mod name)
     set_target_properties (${name} PROPERTIES FOLDER Mods)
 endfunction ()
 function (add_base_mod name)
-    file (GLOB_RECURSE srcs CONFIGURE_DEPENDS *.cpp)
+    file (GLOB_RECURSE srcs CONFIGURE_DEPENDS *.cpp *.hint)
     add_library (${name} SHARED ${srcs})
-    target_compile_definitions (${name} PRIVATE MODNAME=${name})
+    target_compile_definitions (${name} PRIVATE MODNAME=${name} EZVERSION=\"${git_version}\")
     target_link_libraries (${name} Boost::headers yaml-cpp ModLoader BedrockServer)
     install (TARGETS ${name} RUNTIME DESTINATION . ARCHIVE DESTINATION Lib)
     install_pdb (${name})
