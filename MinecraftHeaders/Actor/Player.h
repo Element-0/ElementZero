@@ -3,7 +3,7 @@
 #include "Actor.h"
 #include <hook.h>
 #include "../Core/ExtendedCertificate.h"
-#include "../Core/Vec3.h"
+#include "../Math/Vec3.h"
 #include "../Core/AutomaticID.h"
 #include "../Command/CommandPermissionLevel.h"
 

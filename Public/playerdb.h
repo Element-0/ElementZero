@@ -56,6 +56,7 @@ public:
   BASEAPI std::optional<PlayerEntry> Find(std::string const &name);
   BASEAPI std::optional<PlayerEntry> Find(uint64_t xuid);
   BASEAPI std::optional<PlayerEntry> Find(mce::UUID const &uuid);
+  BASEAPI std::optional<PlayerEntry> Find(NetworkIdentifier const &netid);
 
   BASEAPI std::optional<OfflinePlayerEntry> FindOffline(std::string const &name);
   BASEAPI std::optional<OfflinePlayerEntry> FindOffline(uint64_t xuid);

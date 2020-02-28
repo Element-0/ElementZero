@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 #include <cstdint>
-#include "../Core/Vec3.h"
-#include "../Core/BlockPos.h"
+#include "../Math/Vec3.h"
+#include "../Math/BlockPos.h"
 #include "CommandPosition.h"
 #include "InvertableFilter.h"
 #include "../Actor/ActorDefinitionIdentifier.h"

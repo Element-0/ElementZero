@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "../Core/BlockPos.h"
+#include "../Math/BlockPos.h"
 #include "../Actor/Actor.h"
 
 class Player;

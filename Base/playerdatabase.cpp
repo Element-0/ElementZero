@@ -63,6 +63,11 @@ std::optional<Mod::PlayerEntry> Mod::PlayerDatabase::Find(mce::UUID const &uuid)
   if (auto it = view.find(uuid); it != view.end()) return *it;
   return {};
 }
+std::optional<Mod::PlayerEntry> Mod::PlayerDatabase::Find(NetworkIdentifier const &netid) {
+  auto &view = data.get<NetworkIdentifier>();
+  if (auto it = view.find(netid); it != view.end()) return *it;
+  return {};
+}
 std::optional<Mod::OfflinePlayerEntry> Mod::PlayerDatabase::FindOffline(std::string const &name) {
   static SQLite::Statement find_by_name{*sqldb, "SELECT * FROM user WHERE name=? COLLATE NOCASE"};
   BOOST_SCOPE_EXIT_ALL() {
@@ -100,7 +105,7 @@ std::optional<Mod::OfflinePlayerEntry> Mod::PlayerDatabase::FindOffline(mce::UUI
   find_by_uuid.bindNoCopy(1, uuid, sizeof uuid);
   if (find_by_uuid.executeStep()) {
     auto xuid = (uint64_t) find_by_uuid.getColumn(1).getInt64();
-    auto name  = find_by_uuid.getColumn(2).getString();
+    auto name = find_by_uuid.getColumn(2).getString();
     return {{name, xuid, uuid}};
   }
   return {};

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Core/BlockPos.h"
-#include "../Core/Vec3.h"
+#include "../Math/BlockPos.h"
+#include "../Math/Vec3.h"
 #include "../Core/mce.h"
 #include "CommandPermissionLevel.h"
 #include <optional>

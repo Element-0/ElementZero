@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../Core/Packet.h"
+#include "../Actor/ActorRuntimeID.h"
+
 class ActorFallPacket : public Packet {
 public:
   ActorRuntimeID actorId;

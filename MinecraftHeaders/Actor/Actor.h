@@ -1,7 +1,7 @@
 #pragma once
 
 #include <hook.h>
-#include "../Core/Vec3.h"
+#include "../Math/Vec3.h"
 #include "../Core/AutomaticID.h"
 
 class Dimension;

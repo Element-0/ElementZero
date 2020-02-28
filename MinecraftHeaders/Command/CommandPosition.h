@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Core/Vec3.h"
+#include "../Math/Vec3.h"
 
 class CommandPosition {
 public:
