@@ -15,13 +15,26 @@ void dllenter() {}
 void dllexit() {}
 
 TClasslessInstanceHook(
+  void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVStructureBlockUpdatePacket@@@Z",
+    NetworkIdentifier *netid, void *packet) {
+  auto &db = Mod::PlayerDatabase::GetInstance().GetData().get<NetworkIdentifier>();
+  auto it  = db.find(*netid);
+  if (it != db.end()) {
+    if (it->player->canUseOperatorBlocks()) {
+      original(this, netid, packet);
+    } else {
+      LOGI("\"%s\"(%d) has been detected using: structure block exploit") % it->name;
+    }
+  }
+}
+
+TClasslessInstanceHook(
     void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVCommandBlockUpdatePacket@@@Z",
     NetworkIdentifier *netid, void *packet) {
   auto &db = Mod::PlayerDatabase::GetInstance().GetData().get<NetworkIdentifier>();
   auto it  = db.find(*netid);
   if (it != db.end()) {
-    auto level = it->player->getCommandPermissionLevel();
-    if (level > CommandPermissionLevel::Normal) {
+    if (it->player->canUseOperatorBlocks()) {
       original(this, netid, packet);
     } else {
       LOGI("\"%s\"(%d) has been detected using: command block exploit") % it->name;

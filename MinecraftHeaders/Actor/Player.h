@@ -34,4 +34,6 @@ public:
   }
 
   BASEAPI Certificate &getCertificate();
+
+  __declspec(dllimport) bool canUseOperatorBlocks() const;
 };
