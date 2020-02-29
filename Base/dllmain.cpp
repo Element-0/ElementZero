@@ -3,16 +3,20 @@
 #include <thread>
 #include <fstream>
 #include <iterator>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+#include <SQLiteCpp/SQLiteCpp.h>
+#include <Core/Minecraft.h>
+
 #include <hook.h>
 #include <base.h>
 #include <log.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 #include <dllentry.h>
-#include <SQLiteCpp/SQLiteCpp.h>
-#include <Core/Minecraft.h>
+
 #include "settings.hpp"
+#include "loader.h"
 
 class DedicatedServer {
 public:
@@ -103,18 +107,6 @@ static void writeConfig(YAML::Node const &node) {
   std::ofstream{config_name} << emitter.c_str();
 }
 
-typedef void (*ApplySettingsType)(YAML::Node const &);
-typedef bool (*GenerateSettingsType)(YAML::Node &);
-typedef void (*PrePostInitType)();
-typedef void (*BeforeUnloadType)();
-
-static std::list<BeforeUnloadType> UnloadHooks;
-
-TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
-  for (auto hook : UnloadHooks) { hook(); }
-  original(this);
-}
-
 void dllenter() {
   using namespace std::filesystem;
   DEF_LOGGER("MODLOADER");
@@ -129,51 +121,12 @@ void dllenter() {
   LOGV("Current thread id: %d") % this_id;
   LOGI("Base mod loaded, setting up CtrlC handler...");
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
-  std::list<PrePostInitType> PostInits;
   try {
-    auto cfg     = readConfig();
-    bool changed = !ReadYAML(settings, cfg);
-    if (changed) WriteYAML(settings, cfg);
+    auto cfg = readConfig();
+    auto mods = cfg["mods"];
     initDatabase();
-    if (settings.ModEnabled) {
-      auto mods_config = cfg["mods"];
-      std::error_code ec;
-      for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
-        if (next->is_regular_file() && next->path().extension() == ".dll") {
-          const auto cfgkey = next->path().stem().string();
-          auto subcfg       = settings.ModSettings[cfgkey];
-          if (subcfg.IsMap())
-            if (auto enabled = subcfg["enabled"]; enabled && !enabled.as<bool>()) continue;
-
-          auto lib = LoadLibrary(next->path().c_str());
-          if (!lib) {
-            LOGE("Failed to load mod: %s") % next->path();
-            continue;
-          }
-          if (subcfg.IsMap()) {
-            if (auto fn = (ApplySettingsType) GetProcAddress(lib, "ApplySettings"); fn) {
-              try {
-                fn(subcfg);
-              } catch (std::exception const &ex) {
-                LOGE("Failed to apply settings for %s: %s") % canonical(next->path()) % ex.what();
-              }
-            }
-          } else {
-            if (auto fn = (GenerateSettingsType) GetProcAddress(lib, "GenerateSettings"); fn) fn(subcfg);
-            mods_config[cfgkey] = subcfg;
-            if (!changed) changed = subcfg.IsMap();
-          }
-          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PreInit")) fn();
-          if (auto fn = (PrePostInitType) GetProcAddress(lib, "PostInit")) PostInits.push_back(fn);
-          if (auto fn = (BeforeUnloadType) GetProcAddress(lib, "BeforeUnload")) UnloadHooks.push_front(fn);
-          LOGI("Loaded mod %s") % canonical(next->path());
-        }
-      }
-      if (ec) LOGE("Warning: Cannot open Mods folder: %s") % ec.message();
-    }
-    if (changed) writeConfig(cfg);
-    LOGV("Start post init");
-    for (auto fn : PostInits) { fn(); }
+    if (settings.ModEnabled) loadMods(mods);
+    writeConfig(cfg);
   } catch (std::exception const &e) { LOGE("Unexcepted exception: %s") % e.what(); }
 }
 void dllexit() {}
