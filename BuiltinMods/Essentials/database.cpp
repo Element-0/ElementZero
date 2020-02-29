@@ -46,7 +46,6 @@ void initDatabase() {
         break;
       }
       }
-      database->exec("PRAGMA user_version = 1");
       trans.commit();
     } catch (SQLite::Exception const &sqle) {
       DEF_LOGGER("essentials");
@@ -64,4 +63,5 @@ void initDatabase() {
       "name TEXT, "
       "content TEXT, "
       "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+  database->exec("PRAGMA user_version = 1");
 }
