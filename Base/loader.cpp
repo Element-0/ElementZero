@@ -134,6 +134,7 @@ void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib) {
   }
   subcfg["enabled"] = true;
   if (lib.generateSettings) lib.generateSettings(subcfg);
+  if (lib.preInit) lib.preInit();
   if (lib.postInit) PostInits.emplace_back(lib.postInit);
   if (lib.beforeUnload) UnloadHooks.emplace_back(lib.beforeUnload);
 }
