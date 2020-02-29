@@ -34,3 +34,6 @@ static struct Settings {
            f(settings.ModSettings, node["mods"]) && f(settings.UserDatabase, node["user-database"]);
   }
 } settings;
+
+extern std::string session;
+void initDatabase();
