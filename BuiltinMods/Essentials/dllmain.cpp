@@ -13,6 +13,7 @@ void PreInit() {
     *GetServerSymbol<bool>("?mAllowExperimental@Item@@2_NA")    = true;
   }
   database = std::make_unique<SQLite::Database>(settings.database, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+  initDatabase();
 }
 
 void dllenter() {

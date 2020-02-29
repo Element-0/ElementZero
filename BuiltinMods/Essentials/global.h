@@ -38,5 +38,6 @@ void registerCustomName(CommandRegistry *registry);
 void registerTeleport(CommandRegistry *registry);
 
 void loadCustomScript();
+void initDatabase();
 
 extern std::unique_ptr<SQLite::Database> database;
