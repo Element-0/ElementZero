@@ -15,27 +15,27 @@ static char const *dumpMode(Mode mode) {
   }
 }
 
-class CoreProtectCommand : public Command {
+class SpawnProtectionCommand : public Command {
 public:
   Mode target_mode;
-  CoreProtectCommand() {}
+  SpawnProtectionCommand() {}
 
   void execute(CommandOrigin const &origin, CommandOutput &output) {
     mode = target_mode;
-    output.success("commands.core-protect.success", {dumpMode(mode)});
+    output.success("commands.spawn-protection.success", {dumpMode(mode)});
   }
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     addEnum<Mode>(
-        registry, "core-protect-mode",
+        registry, "spawn-protection-mode",
         {{"disable", Mode::Disabled}, {"enforce", Mode::Enforce}, {"permissive", Mode::Permissive}});
     registry->registerCommand(
-        "core-protect", "commands.core-protect.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
-        CommandFlagNone);
-    registry->registerOverload<CoreProtectCommand>(
-        "core-protect",
-        mandatory<CommandParameterDataType::ENUM>(&CoreProtectCommand::target_mode, "mode", "core-protect-mode"));
+        "spawn-protection", "commands.spawn-protection.description", CommandPermissionLevel::Privileged,
+        CommandFlagCheat, CommandFlagNone);
+    registry->registerOverload<SpawnProtectionCommand>(
+        "spawn-protection", mandatory<CommandParameterDataType::ENUM>(
+                                &SpawnProtectionCommand::target_mode, "mode", "spawn-protection-mode"));
   }
 };
 
-void initCommand(CommandRegistry *registry) { CoreProtectCommand::setup(registry); }
+void initCommand(CommandRegistry *registry) { SpawnProtectionCommand::setup(registry); }
