@@ -26,7 +26,6 @@ template <> void migrateDatabase<0, 1>() {
       "SELECT make_uuid(uuid_a, uuid_b), "
       "prefix, postfix "
       "FROM custom_name_bak_0");
-  database->exec("PRAGMA user_version = 1");
 }
 
 void initDatabase() {
@@ -47,6 +46,7 @@ void initDatabase() {
         break;
       }
       }
+      database->exec("PRAGMA user_version = 1");
       trans.commit();
     } catch (SQLite::Exception const &sqle) {
       DEF_LOGGER("essentials");
