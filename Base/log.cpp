@@ -135,7 +135,7 @@ static std::unique_ptr<SQLite::Database> log_database;
 static BedrockLog::LogDetails *log_instance;
 
 void initDatabase() {
-  DEF_LOGGER("LOG_DATABASE");
+  DEF_LOGGER("LogDatabase");
   if (settings.LogSettings.Database != "") {
     log_database =
         std::make_unique<SQLite::Database>(settings.LogSettings.Database, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
@@ -159,7 +159,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
   auto data = f.str();
   if (data.back() != '\n') data.append("\n");
   auto deco = settings.LogSettings.Decorations[getPriorityDecoration(pri)];
-  std::cout << deco.Before << data << deco.After;
+  if (!settings.LogSettings.HideVerbose || pri > 1) std::cout << deco.Before << data << deco.After;
   if (log_instance) log_instance->proxy(data);
   if (log_database) {
     try {

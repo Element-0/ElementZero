@@ -18,6 +18,8 @@
 #include "settings.hpp"
 #include "loader.h"
 
+Settings settings;
+
 class DedicatedServer {
 public:
   __declspec(dllexport) void asyncStop() { *(((bool *) this) + 48) = true; }
@@ -109,7 +111,7 @@ static void writeConfig(YAML::Node const &node) {
 
 void dllenter() {
   using namespace std::filesystem;
-  DEF_LOGGER("MODLOADER");
+  DEF_LOGGER("Base");
   SetDllDirectory(L"Mods");
   SetConsoleCP(65001);
   SetConsoleOutputCP(65001);
@@ -123,6 +125,8 @@ void dllenter() {
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
   try {
     auto cfg = readConfig();
+    bool changed = !ReadYAML(settings, cfg);
+    if (changed) WriteYAML(settings, cfg);
     auto mods = cfg["mods"];
     initDatabase();
     if (settings.ModEnabled) loadMods(mods);
