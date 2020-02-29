@@ -1,5 +1,6 @@
 #include <string>
 #include <memory>
+#include <mutex>
 
 #include <SQLiteCpp/SQLiteCpp.h>
 
@@ -140,8 +141,22 @@ void initDatabase() {
     log_database =
         std::make_unique<SQLite::Database>(settings.LogSettings.Database, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
     log_database->exec(
-        "CREATE TABLE IF NOT EXISTS log (session TEXT, time NUMERIC, priority INTEGER, area TEXT, source TEXT, line "
-        "INTEGER, content TEXT)");
+        "CREATE TABLE IF NOT EXISTS log ("
+        "session TEXT, "
+        "time NUMERIC, "
+        "priority INTEGER, "
+        "area TEXT, "
+        "source TEXT, "
+        "line INTEGER, "
+        "content TEXT)");
+    log_database->exec(
+        "CREATE TEMP TABLE pending ("
+        "time NUMERIC, "
+        "priority INTEGER, "
+        "area TEXT, "
+        "source TEXT, "
+        "line INTEGER, "
+        "content TEXT)");
     // You don't need data safety for log
     log_database->exec("PRAGMA journal_mode = WAL");
     log_database->exec("PRAGMA synchronous = NORMAL");
@@ -167,6 +182,15 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
                                       "INSERT INTO log (session, time, priority, area, source, line, content) "
                                       "VALUES (?, date('now'), ?, ?, ?, ?, ?)"};
       if (session != "") {
+        static std::once_flag o;
+        std::call_once(o, [] {
+          SQLite::Statement stmt{*log_database,
+                                 "INSERT INTO log SELECT "
+                                 "?, time, priority, area, source, line, content "
+                                 "FROM temp.pending"};
+          stmt.bind(1, session);
+          stmt.exec();
+        });
         insert.bindNoCopy(1, session);
         insert.bind(2, pri);
         insert.bindNoCopy(3, area.data());
@@ -176,6 +200,18 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
         insert.exec();
         insert.reset();
         insert.clearBindings();
+      } else {
+        static SQLite::Statement insert_temp{*log_database,
+                                             "INSERT INTO temp.pending (time, priority, area, source, line, content) "
+                                             "VALUES (date('now'), ?, ?, ?, ?, ?)"};
+        insert_temp.bind(1, pri);
+        insert_temp.bindNoCopy(2, area.data());
+        insert_temp.bindNoCopy(3, source);
+        insert_temp.bind(4, line);
+        insert_temp.bindNoCopy(5, data);
+        insert_temp.exec();
+        insert_temp.reset();
+        insert_temp.clearBindings();
       }
     } catch (std::exception &ex) {
       log_database.reset();
