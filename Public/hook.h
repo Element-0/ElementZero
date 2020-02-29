@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <exception>
 #include <iostream>
+#include <cstring>
 #include <cstdio>
 #include "sig.h"
 
@@ -19,13 +20,73 @@ HOOKAPI int HookFunction(void *oldfunc, void **poutold, void *newfunc);
 HOOKAPI void *GetServerSymbol(char const *name);
 }
 
-// Used to get a server-defined specific function by name
+// Used to get a server-defined specific symbol by name
 template <typename T> T *GetServerSymbol(char const *name) {
   union {
     T *target;
     void *source;
   } u;
   u.source = GetServerSymbol(name);
+  return u.target;
+}
+
+template <int length> struct PatchSpan {
+  unsigned char data[length];
+  using ref_t = char (&)[length];
+
+  // constexpr PatchSpan() noexcept {}
+  // constexpr PatchSpan(ref_t ref) noexcept { memcpy(data, ref, sizeof data); }
+
+  constexpr bool operator==(ref_t ref) const noexcept { return memcmp(data, ref, sizeof data) == 0; }
+  constexpr bool operator!=(ref_t ref) const noexcept { return memcmp(data, ref, sizeof data) != 0; }
+  constexpr bool operator==(PatchSpan ref) const noexcept { return memcmp(data, ref.data, sizeof data) == 0; }
+  constexpr bool operator!=(PatchSpan ref) const noexcept { return memcmp(data, ref.data, sizeof data) != 0; }
+  void operator=(ref_t ref) { memcpy(data, ref, sizeof data); }
+  void VerifyPatch(PatchSpan expected, PatchSpan target);
+  void VerifyPatchFunction(PatchSpan expected, PatchSpan target);
+
+  std::string Dump() const noexcept {
+    char buffer[2 * length + 1] = {};
+    char *ptr                   = buffer;
+    for (auto ch : data) ptr += sprintf(ptr, "%02X", (unsigned) ch);
+    return {buffer};
+  }
+};
+
+struct FailedToPatch : std::exception {
+  std::string info;
+
+  template <int length> FailedToPatch(PatchSpan<length> const &current, PatchSpan<length> const &expected) {
+    info = "Failed to patch: expected " + expected.Dump() + ", but actual " + current.Dump();
+  }
+
+  const char *what() const noexcept { return info.c_str(); }
+};
+
+template <int length> void PatchSpan<length>::VerifyPatch(PatchSpan<length> expected, PatchSpan<length> target) {
+  if (*this == expected)
+    *this = target;
+  else
+    throw FailedToPatch(*this, expected);
+}
+
+template <int length>
+void PatchSpan<length>::VerifyPatchFunction(PatchSpan<length> expected, PatchSpan<length> target) {
+  DWORD old;
+  VirtualProtect((LPVOID) this, (SIZE_T) length, PAGE_EXECUTE_READWRITE, &old);
+  VerifyPatch(expected, target);
+  VirtualProtect((LPVOID) this, (SIZE_T) length, old, NULL);
+}
+
+// Used to get a server-defined specific symbol by name and offset
+template <typename T> T *GetServerSymbolWithOffset(char const *name, int offset) {
+  union {
+    T *target;
+    char *off;
+    void *source;
+  } u;
+  u.source = GetServerSymbol(name);
+  u.off += offset;
   return u.target;
 }
 
