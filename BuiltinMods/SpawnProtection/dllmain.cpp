@@ -21,9 +21,10 @@ DEFAULT_SETTINGS(settings);
 void dllenter() {}
 void dllexit() {}
 
-void PreInit() { mode = settings.AllowOperator ? Mode::Permissive : Mode::Enforce; }
-
-void PostInit() { Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), initCommand); }
+void PreInit() {
+  mode = settings.AllowOperator ? Mode::Permissive : Mode::Enforce;
+  Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), initCommand);
+}
 
 static bool Check(Player *player, int x, int z) {
   if (mode == Mode::Disabled) return true;
