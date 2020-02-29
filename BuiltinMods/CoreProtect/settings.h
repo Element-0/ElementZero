@@ -21,3 +21,9 @@ struct Settings {
 };
 
 extern Settings settings;
+
+enum struct Mode { Disabled, Enforce, Permissive };
+extern Mode mode;
+
+class CommandRegistry;
+void initCommand(CommandRegistry *registry);

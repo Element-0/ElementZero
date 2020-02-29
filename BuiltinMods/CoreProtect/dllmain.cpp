@@ -9,19 +9,21 @@
 #include <hook.h>
 #include <log.h>
 #include <playerdb.h>
+#include <command.h>
 
 #include "settings.h"
 
 Settings settings;
+Mode mode;
 
 DEFAULT_SETTINGS(settings);
 
 void dllenter() {}
 void dllexit() {}
 
-static enum struct Mode { Disabled, Enforce, Permissive } mode;
-
 void PreInit() { mode = settings.AllowOperator ? Mode::Permissive : Mode::Enforce; }
+
+void PostInit() { Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), initCommand); }
 
 static bool Check(Player *player, int x, int z) {
   if (mode == Mode::Disabled) return true;
