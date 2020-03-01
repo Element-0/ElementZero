@@ -29,6 +29,14 @@ static DedicatedServer *mDedicatedServer = nullptr;
 static RakNet::RakPeer *mRakPeer         = nullptr;
 std::string session;
 
+mce::UUID const &SessionUUID() {
+  if (!session.empty()) {
+    static auto cached = mce::UUID::fromString(session);
+    return cached;
+  }
+  return mce::UUID::EMPTY;
+}
+
 template <> DedicatedServer *LocateService<DedicatedServer>() { return mDedicatedServer; }
 template <> ServiceInstance *LocateService<ServiceInstance>() {
   static auto ptr =
@@ -124,7 +132,7 @@ void dllenter() {
   LOGI("Base mod loaded, setting up CtrlC handler...");
   SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
   try {
-    auto cfg = readConfig();
+    auto cfg     = readConfig();
     bool changed = !ReadYAML(settings, cfg);
     if (changed) WriteYAML(settings, cfg);
     auto mods = cfg["mods"];

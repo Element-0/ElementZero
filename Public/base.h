@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Core/mce.h>
+
 #ifdef Base_EXPORTS
 #  define BASEAPI __declspec(dllexport)
 #else
@@ -13,6 +15,8 @@ class Level;
 namespace RakNet {
 class RakPeer;
 }
+
+BASEAPI mce::UUID const &SessionUUID();
 
 // Can only be used to get instances of the above types
 template <typename T> T *LocateService();

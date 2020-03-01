@@ -2,10 +2,23 @@
 
 #include <functional>
 #include <vector>
+#include <optional>
 #include <boost/core/noncopyable.hpp>
 #include "sig.h"
 
 namespace Mod {
+
+template <typename T> class CallbackToken {
+  std::optional<T> reason;
+
+public:
+  CallbackToken() {}
+  operator T const &() const { return *reason; }
+  operator bool() const { return reason.has_value(); }
+  T const &operator*() const { return *reason; }
+  T const *operator->() const { return &*reason; }
+  void operator()(T value) & { reason = {value}; }
+};
 
 // This class can be used to publish and subscribe to events
 // Declaring multiple independent events through multiple inheritance

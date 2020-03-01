@@ -19,6 +19,7 @@ public:
   __declspec(dllimport) virtual ~ItemStackBase();
 
   __declspec(dllimport) short getId() const;
+  __declspec(dllimport) short getAuxValue() const;
   __declspec(dllimport) int getIdAux() const;
   __declspec(dllimport) unsigned char getMaxStackSize() const;
   __declspec(dllimport) Item const *getItem() const;

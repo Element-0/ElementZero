@@ -10,3 +10,4 @@ boost-lexical-cast
 sqlitecpp
 yaml-cpp
 chakracore
+msgpack

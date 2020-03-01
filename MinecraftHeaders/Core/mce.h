@@ -15,6 +15,7 @@ public:
 
   __declspec(dllimport) std::string asString() const;
   __declspec(dllimport) static UUID fromString(std::string const &source);
+  __declspec(dllimport) static UUID EMPTY;
 
   inline bool empty() const noexcept { return a == 0 && b == 0; }
 };
