@@ -32,7 +32,7 @@ public:
   bool operator<(lc_string const &rhs) const { return data < rhs.data; }
 };
 
-using lc_set = std::unordered_set<lc_string, std::hash<std::string>, std::equal_to<std::string>>;
+using lc_set = std::set<lc_string>;
 
 struct ModLibrary {
   lc_string name;
