@@ -15,7 +15,11 @@ struct Settings {
   }
 };
 
+class CommandRegistry;
+
 extern Settings settings;
 extern std::unique_ptr<SQLite::Database> database;
+extern bool disable_temporary;
+
 void InitDatabase();
-void InitCommand();
+void InitCommand(CommandRegistry *registry);

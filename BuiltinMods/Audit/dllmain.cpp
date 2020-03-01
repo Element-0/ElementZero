@@ -8,6 +8,7 @@
 
 #include <dllentry.h>
 #include <playerdb.h>
+#include <command.h>
 #include <hook.h>
 #include <base.h>
 #include <audit.h>
@@ -45,6 +46,7 @@ auto &mAuditSystem = AuditSystem::GetInstance();
 
 void PreInit() {
   if (!settings.Database.empty()) InitDatabase();
+  Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), InitCommand);
 }
 
 TClasslessInstanceHook(
@@ -61,7 +63,7 @@ TClasslessInstanceHook(
   if (auto it = db.Find(netid); it) {
     Mod::CallbackToken<std::string> token;
     (mAuditSystem.*EmitPlayerAction)(SIG("action"), *it, action, token);
-    if (database) {
+    if (database && !disable_temporary) {
       static SQLite::Statement stmt{*database,
                                     "INSERT INTO audit_action "
                                     "(session, player, dimension, blocked, type, x, y, z, face) VALUES "
@@ -97,7 +99,7 @@ TClasslessInstanceHook(
   if (auto it = db.Find(netid); it) {
     Mod::CallbackToken<std::string> token;
     (mAuditSystem.*EmitPlayerTransaction)(SIG("inventory_transaction"), *it, *pkt.transaction, token);
-    if (database) {
+    if (database && !disable_temporary) {
       static SQLite::Statement stmt{*database,
                                     "INSERT INTO audit_transaction "
                                     "(session, player, dimension, blocked, data) VALUES "
