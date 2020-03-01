@@ -9,6 +9,7 @@
 #include <log.h>
 #include <playerdb.h>
 #include <command.h>
+#include <audit.h>
 
 #include "settings.h"
 
@@ -20,9 +21,15 @@ DEFAULT_SETTINGS(settings);
 void dllenter() {}
 void dllexit() {}
 
+void checkAction(Mod::PlayerEntry const &, Mod::PlayerAction const &, Mod::CallbackToken<std::string> &);
+void checkInventoryTransaction(
+    Mod::PlayerEntry const &, ComplexInventoryTransaction const &, Mod::CallbackToken<std::string> &);
+
 void PreInit() {
   mode = settings.AllowOperator ? Mode::Permissive : Mode::Enforce;
   Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), initCommand);
+  Mod::AuditSystem::GetInstance().AddListener(SIG("action"), checkAction);
+  Mod::AuditSystem::GetInstance().AddListener(SIG("inventory_transaction"), checkInventoryTransaction);
 }
 
 static bool Check(Player *player, int x, int z) {
@@ -33,49 +40,41 @@ static bool Check(Player *player, int x, int z) {
   return false;
 }
 
-TClasslessInstanceHook(
-    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVPlayerActionPacket@@@Z",
-    NetworkIdentifier const &netid, PlayerActionPacket const &pkt) {
-  auto &db = Mod::PlayerDatabase::GetInstance();
-  if (auto it = db.Find(netid); it) {
-    if (it->player->getDimensionId() == 0) {
-      switch (pkt.type) {
-      case PlayerActionType::START_BREAK:
-      case PlayerActionType::CONTINUE_BREAK:
-      case PlayerActionType::STOP_BREAK:
-      case PlayerActionType::INTERACT_BLOCK:
-        if (!Check(it->player, pkt.pos.x, pkt.pos.z)) return;
-      default: break;
-      }
+void checkAction(
+    Mod::PlayerEntry const &entry, Mod::PlayerAction const &action, Mod::CallbackToken<std::string> &token) {
+  DEF_LOGGER("debug");
+  if (entry.player->getDimensionId() == 0) {
+    switch (action.type) {
+    case PlayerActionType::START_BREAK:
+    case PlayerActionType::CONTINUE_BREAK:
+    case PlayerActionType::INTERACT_BLOCK:
+      if (!Check(entry.player, action.pos.x, action.pos.z)) token("Blocked by SpawnProtection");
+    default: break;
     }
   }
-  original(this, netid, pkt);
 }
-
-TClasslessInstanceHook(
-    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVInventoryTransactionPacket@@@Z",
-    NetworkIdentifier const &netid, InventoryTransactionPacket const &pkt) {
-  auto &db = Mod::PlayerDatabase::GetInstance();
-  if (auto it = db.Find(netid); it) {
-    switch (pkt.transaction->type) {
+void checkInventoryTransaction(
+    Mod::PlayerEntry const &entry, ComplexInventoryTransaction const &transaction,
+    Mod::CallbackToken<std::string> &token) {
+  if (entry.player->getDimensionId() == 0) {
+    switch (transaction.type) {
     case ComplexInventoryTransaction::Type::ITEM_USE: {
-      auto &data    = (ItemUseInventoryTransaction const &) *pkt.transaction;
+      auto &data    = (ItemUseInventoryTransaction const &) transaction;
       auto composed = data.playerPos + data.clickPos;
-      if (!Check(it->player, composed.x, composed.z)) {
-        data.onTransactionError(*it->player, InventoryTransactionError::Unexcepted);
-        return;
+      if (!Check(entry.player, composed.x, composed.z)) {
+        data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
+        token("Blocked by SpawnProtection");
       }
     } break;
     case ComplexInventoryTransaction::Type::ITEM_USE_ON_ACTOR: {
-      auto &data    = (ItemUseInventoryTransaction const &) *pkt.transaction;
+      auto &data    = (ItemUseOnActorInventoryTransaction const &) transaction;
       auto composed = data.playerPos + data.clickPos;
-      if (!Check(it->player, composed.x, composed.z)) {
-        data.onTransactionError(*it->player, InventoryTransactionError::Unexcepted);
-        return;
+      if (!Check(entry.player, composed.x, composed.z)) {
+        data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
+        token("Blocked by SpawnProtection");
       }
     } break;
     default: break;
     }
   }
-  original(this, netid, pkt);
 }
