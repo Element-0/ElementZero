@@ -11,3 +11,4 @@ sqlitecpp
 yaml-cpp
 chakracore
 msgpack
+gsl-lite
