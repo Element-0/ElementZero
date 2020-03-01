@@ -1,5 +1,4 @@
 #include <Actor/Player.h>
-#include <Actor/GameMode.h>
 #include <Math/BlockPos.h>
 #include <Net/NetworkIdentifier.h>
 #include <Packet/PlayerActionPacket.h>
