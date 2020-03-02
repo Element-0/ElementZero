@@ -19,4 +19,6 @@ template <typename T> class PathBuffer {
   operator T const &() const noexcept { return value; }
 };
 
+enum class LevelStorageResult {};
+
 } // namespace Core
