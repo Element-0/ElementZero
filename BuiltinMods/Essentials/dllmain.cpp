@@ -28,6 +28,7 @@ void dllenter() {
     if (settings.commands.transferserver) registerTransferServer(x);
     if (settings.commands.customname) registerCustomName(x);
     if (settings.commands.teleport) registerTeleport(x);
+    if (settings.commands.home) registerHome(x);
   });
 }
 void dllexit() {}

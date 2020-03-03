@@ -19,6 +19,8 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
 
 Certificate &Player::getCertificate() { return *direct_access<Certificate *>(this, 3208); }
 
+BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos const>(this, 7548); }
+
 void CommandOutput::success() { direct_access<bool>(this, 40) = true; }
 
 template <> Minecraft *LocateService<Minecraft>() {

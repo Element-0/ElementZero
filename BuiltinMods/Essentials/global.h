@@ -7,11 +7,13 @@ struct Settings {
     bool transferserver = true;
     bool customname     = true;
     bool teleport       = true;
+    bool home           = true;
 
     template <typename IO> static inline bool io(IO f, Commands &commands, YAML::Node &node) {
       f(commands.transferserver, node["transferserver"]);
       f(commands.customname, node["custom-name"]);
       f(commands.teleport, node["tpa"]);
+      f(commands.home, node["home"]);
       return true;
     }
   } commands;
@@ -36,6 +38,7 @@ extern Settings settings;
 void registerTransferServer(CommandRegistry *registry);
 void registerCustomName(CommandRegistry *registry);
 void registerTeleport(CommandRegistry *registry);
+void registerHome(CommandRegistry *registry);
 
 void loadCustomScript();
 void initDatabase();

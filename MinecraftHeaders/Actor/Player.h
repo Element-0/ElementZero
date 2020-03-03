@@ -4,6 +4,7 @@
 #include <hook.h>
 #include "../Core/ExtendedCertificate.h"
 #include "../Math/Vec3.h"
+#include "../Math/BlockPos.h"
 #include "../Core/AutomaticID.h"
 #include "../Command/CommandPermissionLevel.h"
 
@@ -34,6 +35,7 @@ public:
   }
 
   BASEAPI Certificate &getCertificate();
+  BASEAPI BlockPos const &getSpawnPosition() const;
 
   __declspec(dllimport) bool canUseOperatorBlocks() const;
 };
