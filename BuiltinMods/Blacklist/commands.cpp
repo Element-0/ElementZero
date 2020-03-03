@@ -94,7 +94,6 @@ public:
       auto it = *results.begin();
       if (auto opt = Mod::PlayerDatabase::GetInstance().Find(it); opt) {
         opt->netid.kick(reason);
-        opt->player->kick();
         insertAuto(*opt, reason, op, output);
       } else {
         output.error("commands.ban.error.unexpected");
@@ -125,10 +124,7 @@ public:
     }
     auto &pdb = Mod::PlayerDatabase::GetInstance();
     if (auto opt = pdb.FindOffline(target); opt) {
-      if (auto online = pdb.Find(opt->uuid); online) {
-        online->netid.kick(reason);
-        online->player->kick();
-      }
+      if (auto online = pdb.Find(opt->uuid); online) online->netid.kick(reason);
       insertAuto(*opt, reason, op, output);
     } else {
       insertForName(target, reason, op);
@@ -234,10 +230,36 @@ public:
   }
 };
 
+class ForceKickCommand : public Command {
+  CommandSelector<Player> selector;
+
+public:
+  ForceKickCommand() { selector.setIncludeDeadPlayers(true); }
+
+  void execute(CommandOrigin const &origin, CommandOutput &output) {
+    auto res = selector.results(origin);
+    if (res.empty()) {
+      output.error("commands.generic.selector.empty");
+      return;
+    }
+    for (auto it : res) it->kick();
+    output.success("commands.force-kick.success");
+    return;
+  }
+  static void setup(CommandRegistry *registry) {
+    using namespace commands;
+    registry->registerCommand(
+        "force-kick", "commands.force-kick.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
+        CommandFlagNone);
+    registry->registerOverload<ForceKickCommand>("force-kick", mandatory(&ForceKickCommand::selector, "target"));
+  }
+};
+
 void registerBanCommand(CommandRegistry *registry) {
   registry->registerCommand(
       "ban", "commands.ban.description", CommandPermissionLevel::Privileged, CommandFlagCheat, CommandFlagNone);
   BanCommand::setup(registry);
   BanNameCommand::setup(registry);
   UnbanCommand::setup(registry);
+  ForceKickCommand::setup(registry);
 }
