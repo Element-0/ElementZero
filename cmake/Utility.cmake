@@ -2,7 +2,7 @@ macro (generate_git_version _out_var)
     find_package (Git QUIET)
     if (GIT_FOUND)
         execute_process (
-            COMMAND ${GIT_EXECUTABLE} describe --abbrev=6 --dirty --always --tags
+            COMMAND ${GIT_EXECUTABLE} describe --abbrev=6 --always --tags
             OUTPUT_VARIABLE ${_out_var}
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_QUIET
