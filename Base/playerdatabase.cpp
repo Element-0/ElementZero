@@ -160,6 +160,6 @@ TClasslessInstanceHook(
     stmt_logout.exec();
     (db.*emitter<"left"_sig>) (SIG("left"), *it);
     container->erase(it);
+    original(this, player, flag);
   }
-  original(this, player, flag);
 }

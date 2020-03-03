@@ -10,6 +10,7 @@
 
 class Packet;
 class ServerPlayer;
+class NetworkIdentifier;
 
 #ifndef BASEAPI
 #  define BASEAPI __declspec(dllimport)
@@ -35,7 +36,9 @@ public:
   }
 
   BASEAPI Certificate &getCertificate();
+  BASEAPI NetworkIdentifier const &getNetworkIdentifier() const;
   BASEAPI BlockPos const &getSpawnPosition() const;
+  BASEAPI void kick();
 
   __declspec(dllimport) bool canUseOperatorBlocks() const;
 };

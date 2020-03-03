@@ -93,6 +93,8 @@ public:
     case 1: {
       auto it = *results.begin();
       if (auto opt = Mod::PlayerDatabase::GetInstance().Find(it); opt) {
+        opt->netid.kick(reason);
+        opt->player->kick();
         insertAuto(*opt, reason, op, output);
       } else {
         output.error("commands.ban.error.unexpected");
@@ -121,7 +123,12 @@ public:
       output.error("commands.ban.error.no.empty");
       return;
     }
-    if (auto opt = Mod::PlayerDatabase::GetInstance().FindOffline(target); opt) {
+    auto &pdb = Mod::PlayerDatabase::GetInstance();
+    if (auto opt = pdb.FindOffline(target); opt) {
+      if (auto online = pdb.Find(opt->uuid); online) {
+        online->netid.kick(reason);
+        online->player->kick();
+      }
       insertAuto(*opt, reason, op, output);
     } else {
       insertForName(target, reason, op);

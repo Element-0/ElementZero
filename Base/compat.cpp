@@ -1,9 +1,11 @@
 #include <base.h>
 #include <Actor/Player.h>
+#include <Core/Minecraft.h>
 #include <Command/CommandOutput.h>
 #include <Item/Item.h>
 #include <Item/ItemStack.h>
 #include <Net/NetworkIdentifier.h>
+#include <Net/ServerNetworkHandler.h>
 #include <RakNet/RakPeer.h>
 
 #include "loader.h"
@@ -23,10 +25,24 @@ Certificate &Player::getCertificate() { return *direct_access<Certificate *>(thi
 
 BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos const>(this, 7548); }
 
+NetworkIdentifier const &Player::getNetworkIdentifier() const {
+  return direct_access<NetworkIdentifier const>(this, 2904);
+}
+
+void NetworkIdentifier::kick(std::string const &reason) const {
+  LocateService<ServerNetworkHandler>()->disconnectClient(*this, reason, reason.empty());
+}
+
+void Player::kick() { LocateService<ServerNetworkHandler>()->forceDisconnectClient(this, true); }
+
 void CommandOutput::success() { direct_access<bool>(this, 40) = true; }
 
 template <> Minecraft *LocateService<Minecraft>() {
-  return direct_access<Minecraft *>(LocateService<ServiceInstance>(), 32);
+  return *GetServerSymbol<Minecraft *>("?mGame@ServerCommand@@1PEAVMinecraft@@EA");
+}
+
+template <> ServerNetworkHandler *LocateService<ServerNetworkHandler>() {
+  return LocateService<Minecraft>()->getServerNetworkHandler();
 }
 
 bool Item::getAllowOffhand() const { return direct_access<char>(this, 258) & 0x40; }

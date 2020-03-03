@@ -27,6 +27,7 @@ public:
   __declspec(dllimport) std::string getAddress() const;
 
   BASEAPI RakNet::SystemAddress getRealAddress() const;
+  BASEAPI void kick(std::string const &reason) const;
 };
 
 static_assert(offsetof(NetworkIdentifier, unk136) == 136);
