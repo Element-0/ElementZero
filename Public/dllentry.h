@@ -2,6 +2,9 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+#include <filesystem>
+
 #include "yaml.h"
 
 // On dll load
@@ -17,6 +20,8 @@ extern "C" __declspec(dllexport) bool GenerateSettings(YAML::Node &node);
 extern "C" __declspec(dllexport) void PreInit();
 // Called after all modules have been loaded
 extern "C" __declspec(dllexport) void PostInit();
+// Called after world path have been resolved
+extern "C" __declspec(dllexport) void WorldInit(std::filesystem::path const &);
 // Called before the server is stopped
 extern "C" __declspec(dllexport) void BeforeUnload();
 

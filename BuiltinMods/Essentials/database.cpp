@@ -4,6 +4,9 @@
 #include <sqlite3.h>
 #include <boost/scope_exit.hpp>
 
+std::unique_ptr<SQLite::Database> database;
+std::unique_ptr<SQLite::Database> world_database;
+
 template <int from, int to> void migrateDatabase();
 
 template <> void migrateDatabase<0, 1>() {
@@ -64,4 +67,18 @@ void initDatabase() {
       "content TEXT, "
       "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
   database->exec("PRAGMA user_version = 1");
+}
+
+void initWorldDatabase(std::filesystem::path const &base) {
+  auto real = base / settings.worldDatabase;
+  world_database = std::make_unique<SQLite::Database>(real.string(), SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+  world_database->exec(
+      "CREATE TABLE IF NOT EXISTS warp ("
+      "uuid BLOB NOT NULL, "
+      "name TEXT NOT NULL, "
+      "dim INTEGER, "
+      "x INTEGER, "
+      "y INTEGER, "
+      "z INTEGER, "
+      "PRIMARY KEY (uuid, name))");
 }

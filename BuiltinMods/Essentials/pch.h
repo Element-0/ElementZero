@@ -20,11 +20,13 @@
 #include <hook.h>
 #include <playerdb.h>
 #include <log.h>
+#include <filesystem>
 #include <boost/format.hpp>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <string>
 #include <memory>
 #include <boost/format.hpp>
+#include <boost/scope_exit.hpp>
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>

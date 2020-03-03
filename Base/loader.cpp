@@ -17,6 +17,7 @@ DEF_LOGGER("ModLoader");
 typedef void (*ApplySettingsType)(YAML::Node const &);
 typedef bool (*GenerateSettingsType)(YAML::Node &);
 typedef void (*PrePostInitType)();
+typedef void (*WorldInitType)(std::filesystem::path const &);
 typedef void (*BeforeUnloadType)();
 
 class lc_string {
@@ -44,6 +45,7 @@ struct ModLibrary {
   ApplySettingsType applySettings;
   GenerateSettingsType generateSettings;
   PrePostInitType preInit, postInit;
+  WorldInitType worldInit;
   BeforeUnloadType beforeUnload;
 
   lc_set dependencies;
@@ -51,6 +53,7 @@ struct ModLibrary {
 
 static std::list<ModLibrary> LibList;
 static std::list<PrePostInitType> PostInits;
+static std::list<WorldInitType> WorldInits;
 static std::list<BeforeUnloadType> UnloadHooks;
 static lc_set LibNameList;
 
@@ -77,6 +80,7 @@ void loadMods(YAML::Node &cfg_node) {
       lib.generateSettings = (GenerateSettingsType) GetProcAddress(handle, "GenerateSettings");
       lib.preInit          = (PrePostInitType) GetProcAddress(handle, "PreInit");
       lib.postInit         = (PrePostInitType) GetProcAddress(handle, "PostInit");
+      lib.worldInit        = (WorldInitType) GetProcAddress(handle, "WorldInit");
       lib.beforeUnload     = (BeforeUnloadType) GetProcAddress(handle, "BeforeUnload");
       LibList.emplace_back(lib);
       LibNameList.emplace(name);
@@ -136,10 +140,15 @@ void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib) {
   if (lib.generateSettings) lib.generateSettings(subcfg);
   if (lib.preInit) lib.preInit();
   if (lib.postInit) PostInits.emplace_back(lib.postInit);
+  if (lib.worldInit) WorldInits.emplace_back(lib.worldInit);
   if (lib.beforeUnload) UnloadHooks.emplace_back(lib.beforeUnload);
 }
 
 TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
   for (auto hook : UnloadHooks) { hook(); }
   original(this);
+}
+
+void worldHook(std::filesystem::path const &path) {
+  for (auto init : WorldInits) init(path);
 }

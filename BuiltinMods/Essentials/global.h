@@ -8,12 +8,14 @@ struct Settings {
     bool customname     = true;
     bool teleport       = true;
     bool home           = true;
+    bool warp           = true;
 
     template <typename IO> static inline bool io(IO f, Commands &commands, YAML::Node &node) {
       f(commands.transferserver, node["transferserver"]);
       f(commands.customname, node["custom-name"]);
       f(commands.teleport, node["tpa"]);
       f(commands.home, node["home"]);
+      f(commands.warp, node["warp"]);
       return true;
     }
   } commands;
@@ -22,6 +24,7 @@ struct Settings {
   bool debug_packs                 = false;
   bool load_scripts                = true;
   std::string database             = "essentials.db";
+  std::string worldDatabase        = "essentials.db";
 
   template <typename IO> static inline bool io(IO f, Settings &settings, YAML::Node &node) {
     f(settings.commands, node["commands"]);
@@ -29,6 +32,7 @@ struct Settings {
     f(settings.education_feature, node["education-feature"]);
     f(settings.debug_packs, node["debug-packs"]);
     f(settings.database, node["database"]);
+    f(settings.worldDatabase, node["world-database"]);
     return true;
   }
 };
@@ -39,8 +43,11 @@ void registerTransferServer(CommandRegistry *registry);
 void registerCustomName(CommandRegistry *registry);
 void registerTeleport(CommandRegistry *registry);
 void registerHome(CommandRegistry *registry);
+void registerWarp(CommandRegistry *registry);
 
 void loadCustomScript();
 void initDatabase();
+void initWorldDatabase(std::filesystem::path const &);
 
 extern std::unique_ptr<SQLite::Database> database;
+extern std::unique_ptr<SQLite::Database> world_database;

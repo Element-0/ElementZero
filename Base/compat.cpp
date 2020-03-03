@@ -6,6 +6,8 @@
 #include <Net/NetworkIdentifier.h>
 #include <RakNet/RakPeer.h>
 
+#include "loader.h"
+
 template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t offset) {
   union {
     size_t raw;
@@ -33,4 +35,10 @@ unsigned char ItemStackBase::getStackSize() const { return direct_access<unsigne
 
 RakNet::SystemAddress NetworkIdentifier::getRealAddress() const {
   return LocateService<RakNet::RakPeer>()->GetSystemAddressFromGuid(guid);
+}
+
+TClasslessInstanceHook(bool, "?loadLevelData@DBStorage@@UEAA_NAEAVLevelData@@@Z", void *data) {
+  auto path = direct_access<std::string>(this, 152);
+  worldHook(std::filesystem::weakly_canonical(path));
+  return original(this, data);
 }
