@@ -127,7 +127,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "warp", "commands.warp.decsription", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "warp", "commands.warp.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
     addEnum<To>(registry, "warp-to", {{"to", To::placeholder}});
     addEnum<List>(registry, "warp-list", {{"list", List::placeholder}});
     addEnum<SetOrDelete>(registry, "warp-set-or-del", {{"set", SetOrDelete::set}, {"del", SetOrDelete::del}});

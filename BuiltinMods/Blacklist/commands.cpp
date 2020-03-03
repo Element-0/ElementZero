@@ -95,7 +95,7 @@ public:
       if (auto opt = Mod::PlayerDatabase::GetInstance().Find(it); opt) {
         insertAuto(*opt, reason, op, output);
       } else {
-        output.error("commands.ban.error.unexcepted");
+        output.error("commands.ban.error.unexpected");
       }
     } break;
     default: output.error("commands.generic.selector.tooManyTargets"); break;
