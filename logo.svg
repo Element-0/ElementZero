@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128px" height="128px" stroke-width="0" filter="url(#shadow)" viewBox="0 0 40 40">
+    <defs>
+        <filter id="shadow" x="0" y="0" width="100%" height="100%">
+            <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0"/>
+            <feColorMatrix result="matrixOut" in="offOut" type="matrix" values="0.2 0 0 0 0 0 0.2 0 0 0 0 0 0.2 0 0 0 0 0 1 0"/>
+            <feGaussianBlur result="blurOut" in="matrixOut" stdDeviation="4"/>
+            <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
+        </filter>
+    </defs>
+    <svg xmlns="http://www.w3.org/2000/svg" x="4" y="8" width="32" height="24" viewBox="0 0 32 24">
+        <defs>
+            <mask id="text">
+                <g transform="translate(7,7)" fill="white">
+                    <path d="M 0,1 1,0 14,0 12,2 2,2 2,8 6,8 4,10 0,10"/>
+                    <path d="M 3,4 9,4 9,5 8,6 3,6"/>
+                    <path d="M 15,0 18,0 8,10 5,10"/>
+                    <path d="M 11,8 18,8 18,9 17,10 9,10"/>
+                </g>
+            </mask>
+            <mask id="bg">
+                <path d="M 1,4 4,1 31,1 31,20 28,23 1,23 Z" fill="white" stroke="black" stroke-linejoin="miter" stroke-width="2"/>
+            </mask>
+            <mask id="bgb">
+                <path d="M 1,4 4,1 31,1 31,20 28,23 1,23 Z" fill="black" stroke="white" stroke-linejoin="miter" stroke-width="2"/>
+            </mask>
+            <linearGradient id="border" x1="0" y1="1" x2="1" y2="0">
+                <stop stop-color="#C1B5FF" offset="0%"/>
+                <stop stop-color="#5EF0FF" offset="100%"/>
+            </linearGradient>
+            <linearGradient id="font" x1="0" y1="1" x2="1" y2="0">
+                <stop stop-color="#5EF0FF" offset="0%"/>
+                <stop stop-color="#FFFFFF" offset="100%"/>
+            </linearGradient>
+            <radialGradient id="fill" cx="1" cy="0" r="1">
+                <stop stop-color="#444" offset="0%"/>
+                <stop stop-color="#222" offset="100%"/>
+            </radialGradient>
+            <pattern id="dot" x="0" y="0" width="1" height="1" patternTransform="rotate(15)" patternUnits="userSpaceOnUse">
+                <rect y="0.5" width="1" height="0.2" fill="#0001"/>
+                <rect y="0.2" width="1" height="0.2" fill="#7771"/>
+            </pattern>
+            <filter id="noise" width="32" height="24">
+                <feTurbulence baseFrequency="0.2" type="fractalNoise" result="noise" numOctaves="2"/>
+                <feDiffuseLighting in="noise" lighting-color="white" surfaceScale="4" result="light">
+                    <feDistantLight azimuth="135" elevation="60"/>
+                </feDiffuseLighting>
+                <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="1"/>
+            </filter>
+        </defs>
+        <rect width="32" height="24" mask="url(#bg)" filter="url(#noise)" fill="url(#fill)"/>
+        <rect width="32" height="24" mask="url(#bgb)" fill="url(#border)"/>
+        <rect width="32" height="24" fill="url(#font)" mask="url(#text)"/>
+    </svg>
+</svg>
