@@ -1,6 +1,6 @@
-<p align="center">
-<img src="https://ipfs.hertz.services/ipfs/QmVofAhT58PrpHC1k5wbQWzBG5iG8oSkemYx7RSvZQZKPn/new.svg" width="256px" height="256px" />
-</p>
+<h1 align="center">
+<img src="https://ipfs.io/ipfs/QmYiuQE7WUeawAMTvQf9RUC7wWXb2b1wCFddVBpt6U7e1S/logo.png" width="256px" height="256px" />
+</h1>
 
 <a href="https://github.com/codehz/ElementZero/actions">![status](https://img.shields.io/github/workflow/status/codehz/ElementZero/CI?style=for-the-badge)</a>
 ![platform](https://img.shields.io/badge/platform-win--x64%20%7C%20wine--linux--x64-green?style=for-the-badge)
