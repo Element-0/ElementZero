@@ -28,7 +28,7 @@ void dllenter() {
   Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), [](auto x) {
     if (settings.commands.transferserver) registerTransferServer(x);
     if (settings.commands.customname) registerCustomName(x);
-    if (settings.commands.teleport) registerTeleport(x);
+    if (settings.commands.teleport.enabled) registerTeleport(x);
     if (settings.commands.home) registerHome(x);
     if (settings.commands.warp) registerWarp(x);
   });

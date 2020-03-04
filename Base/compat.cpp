@@ -14,7 +14,7 @@
 template <typename Holder> struct ValueHolder {
   Holder value;
   ~ValueHolder() {}
-  operator Holder() const {return value};
+  operator Holder() const { return value; }
 };
 
 template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t offset) {

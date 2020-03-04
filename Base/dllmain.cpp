@@ -27,6 +27,7 @@ public:
 
 static DedicatedServer *mDedicatedServer = nullptr;
 static RakNet::RakPeer *mRakPeer         = nullptr;
+static AppPlatform *mAppPlatform         = nullptr;
 std::string session;
 
 mce::UUID const &SessionUUID() {
@@ -45,6 +46,9 @@ template <> ServiceInstance *LocateService<ServiceInstance>() {
 }
 template <> Level *LocateService<Level>() { return LocateService<Minecraft>()->getLevel(); }
 template <> RakNet::RakPeer *LocateService<RakNet::RakPeer>() { return mRakPeer; }
+template <> AppPlatform *LocateService<AppPlatform>() { return mAppPlatform; }
+
+TClasslessInstanceHook(void, "?initialize@AppPlatform@@QEAAXXZ") { mAppPlatform = (AppPlatform *) this; }
 
 TInstanceHook(
     int,

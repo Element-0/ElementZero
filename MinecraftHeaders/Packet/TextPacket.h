@@ -57,9 +57,9 @@ public:
       createTextObjectMessage(TextObjectRoot const &, std::string const &xuid = "", std::string const &unk2 = "");
 
   static inline TextPacket
-  createTranslatedMessageWithParams(std::string const &text, std::initializer_list<std::string> args) {
+  createTranslatedMessageWithParams(std::string const &text, std::initializer_list<std::string> args = {}) {
     TextObjectRoot root;
-    root.addChild(TextObjectLocalizedTextWithParams::build("commands.tpa.message.sent", args));
+    root.addChild(TextObjectLocalizedTextWithParams::build(text, args));
     return createTextObjectMessage(root);
   }
   inline TextPacket() {}

@@ -2,17 +2,20 @@
 
 #include "global.h"
 
+using namespace Mod::Scheduler;
+
 struct TeleportEntry {
   Player *source;
   Player *target;
+  Token token;
 };
 
 using TeleportEntryContainer = boost::multi_index_container<
     TeleportEntry,
     boost::multi_index::indexed_by<
         boost::multi_index::ordered_unique<boost::multi_index::member<TeleportEntry, Player *, &TeleportEntry::source>>,
-        boost::multi_index::ordered_unique<
-            boost::multi_index::member<TeleportEntry, Player *, &TeleportEntry::target>>>>;
+        boost::multi_index::ordered_unique<boost::multi_index::member<TeleportEntry, Player *, &TeleportEntry::target>>,
+        boost::multi_index::ordered_unique<boost::multi_index::member<TeleportEntry, Token, &TeleportEntry::token>>>>;
 
 static TeleportEntryContainer container;
 
@@ -34,12 +37,26 @@ public:
     case 1: target = *res.begin(); break;
     default: output.error("commands.generic.selector.tooManyTargets"); return;
     }
-    auto source     = (Player *) origin.getEntity();
-    auto [_, emres] = container.emplace(TeleportEntry{source, target});
-    if (!emres) {
-      output.error("commands.tpa.error.pending");
-      return;
+    auto source = (Player *) origin.getEntity();
+    bool failed = false;
+    if (container.get<0>().count(source)) {
+      output.error("commands.tpa.error.pending.source");
+      failed = true;
     }
+    if (container.get<1>().count(target)) {
+      output.error("commands.tpa.error.pending.target");
+      failed = true;
+    }
+    if (failed) return;
+    auto token = SetTimeOut(std::chrono::seconds(settings.commands.teleport.timeout), [](Token token) {
+      auto &db = container.get<2>();
+      if (auto it = db.find(token); it != db.end()) {
+        auto pkt = TextPacket::createTranslatedMessageWithParams("commands.tpa.message.timeout");
+        it->target->sendNetworkPacket(pkt);
+        db.erase(it);
+      }
+    });
+    container.emplace(TeleportEntry{source, target, token});
     auto pkt = TextPacket::createTranslatedMessageWithParams(
         "commands.tpa.message.sent", {ExtendedCertificate::getIdentityName(source->getCertificate())});
     target->sendNetworkPacket(pkt);
@@ -70,6 +87,7 @@ public:
     pos.y -= 1;
     auto source = it->source;
     source->teleport(pos, {0}, dim);
+    ClearTimeOut(it->token);
     container.get<1>().erase(it);
     output.success("commands.tpaccept.success", {source});
   }
@@ -96,6 +114,7 @@ public:
     auto pkt = TextPacket::createTextPacket<TextPacketType::SystemMessage>("commands.tpa.message.reject");
     it->source->sendNetworkPacket(pkt);
     auto source = it->source;
+    ClearTimeOut(it->token);
     container.get<1>().erase(it);
     output.success("commands.tpdeny.success", {source});
   }
@@ -108,8 +127,16 @@ public:
 };
 
 static void onPlayerLeft(Mod::PlayerEntry const &entry) {
-  container.get<0>().erase(entry.player);
-  container.get<1>().erase(entry.player);
+  auto &left = container.get<0>();
+  if (auto it = left.find(entry.player); it != left.end()) {
+    ClearTimeOut(it->token);
+    left.erase(it);
+  }
+  auto &right = container.get<1>();
+  if (auto it = right.find(entry.player); it != right.end()) {
+    ClearTimeOut(it->token);
+    right.erase(it);
+  }
 }
 
 void registerTeleport(CommandRegistry *registry) {

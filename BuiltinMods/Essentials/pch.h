@@ -1,6 +1,19 @@
 #pragma once
 
-#include <command.h>
+#include <iostream>
+#include <filesystem>
+#include <string>
+#include <memory>
+
+#include <boost/format.hpp>
+#include <boost/scope_exit.hpp>
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+#include <boost/multi_index/member.hpp>
+
+#include <yaml-cpp/yaml.h>
+#include <SQLiteCpp/SQLiteCpp.h>
+
 #include <Command/Command.h>
 #include <Command/CommandRegistry.h>
 #include <Command/CommandPermissionLevel.h>
@@ -15,18 +28,9 @@
 #include <Packet/TransferPacket.h>
 #include <Packet/TextPacket.h>
 #include <Level/Level.h>
-#include <iostream>
-#include <yaml-cpp/yaml.h>
+
+#include <command.h>
 #include <hook.h>
 #include <playerdb.h>
 #include <log.h>
-#include <filesystem>
-#include <boost/format.hpp>
-#include <SQLiteCpp/SQLiteCpp.h>
-#include <string>
-#include <memory>
-#include <boost/format.hpp>
-#include <boost/scope_exit.hpp>
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/member.hpp>
+#include <scheduler.h>

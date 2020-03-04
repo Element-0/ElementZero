@@ -6,9 +6,17 @@ struct Settings {
   struct Commands {
     bool transferserver = true;
     bool customname     = true;
-    bool teleport       = true;
-    bool home           = true;
-    bool warp           = true;
+    struct Teleport {
+      bool enabled = true;
+      int timeout  = 30;
+
+      template <typename IO> static inline bool io(IO f, Teleport &self, YAML::Node &node) {
+        f(self.enabled, node["enabled"]);
+        f(self.timeout, node["timeout"]);
+      }
+    } teleport;
+    bool home = true;
+    bool warp = true;
 
     template <typename IO> static inline bool io(IO f, Commands &commands, YAML::Node &node) {
       f(commands.transferserver, node["transferserver"]);

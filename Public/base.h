@@ -11,6 +11,7 @@
 class DedicatedServer;
 class ServiceInstance;
 class Minecraft;
+class AppPlatform;
 class ServerNetworkHandler;
 class Level;
 namespace RakNet {
@@ -27,4 +28,5 @@ template <> BASEAPI ServiceInstance *LocateService<ServiceInstance>();
 template <> BASEAPI Minecraft *LocateService<Minecraft>();
 template <> BASEAPI ServerNetworkHandler *LocateService<ServerNetworkHandler>();
 template <> BASEAPI Level *LocateService<Level>();
+template <> BASEAPI AppPlatform *LocateService<AppPlatform>();
 template <> BASEAPI RakNet::RakPeer *LocateService<RakNet::RakPeer>();
