@@ -2,6 +2,7 @@
 #include <Actor/Player.h>
 #include <Core/Minecraft.h>
 #include <Command/CommandOutput.h>
+#include <Level/Level.h>
 #include <Item/Item.h>
 #include <Item/ItemStack.h>
 #include <Net/NetworkIdentifier.h>
@@ -9,6 +10,12 @@
 #include <RakNet/RakPeer.h>
 
 #include "loader.h"
+
+template <typename Holder> struct ValueHolder {
+  Holder value;
+  ~ValueHolder() {}
+  operator Holder() const {return value};
+};
 
 template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t offset) {
   union {
@@ -36,6 +43,10 @@ void NetworkIdentifier::kick(std::string const &reason) const {
 void Player::kick() { LocateService<ServerNetworkHandler>()->forceDisconnectClient(this, true); }
 
 void CommandOutput::success() { direct_access<bool>(this, 40) = true; }
+
+uint64_t Level::GetServerTick() {
+  return CallServerClassMethod<ValueHolder<uint64_t>>("?getCurrentServerTick@Level@@UEBA?BUTick@@XZ", this);
+}
 
 template <> Minecraft *LocateService<Minecraft>() {
   return *GetServerSymbol<Minecraft *>("?mGame@ServerCommand@@1PEAVMinecraft@@EA");
