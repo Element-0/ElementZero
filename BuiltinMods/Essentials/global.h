@@ -11,19 +11,15 @@ struct Settings {
       int timeout  = 30;
 
       template <typename IO> static inline bool io(IO f, Teleport &self, YAML::Node &node) {
-        f(self.enabled, node["enabled"]);
-        f(self.timeout, node["timeout"]);
+        return f(self.enabled, node["enabled"]) && f(self.timeout, node["timeout"]);
       }
     } teleport;
     bool home = true;
     bool warp = true;
 
     template <typename IO> static inline bool io(IO f, Commands &commands, YAML::Node &node) {
-      f(commands.transferserver, node["transferserver"]);
-      f(commands.customname, node["custom-name"]);
-      f(commands.teleport, node["tpa"]);
-      f(commands.home, node["home"]);
-      f(commands.warp, node["warp"]);
+      return f(commands.transferserver, node["transferserver"]) && f(commands.customname, node["custom-name"]) &&
+             f(commands.teleport, node["tpa"]) && f(commands.home, node["home"]) && f(commands.warp, node["warp"]);
       return true;
     }
   } commands;
@@ -35,13 +31,10 @@ struct Settings {
   std::string worldDatabase        = "essentials.db";
 
   template <typename IO> static inline bool io(IO f, Settings &settings, YAML::Node &node) {
-    f(settings.commands, node["commands"]);
-    f(settings.force_experimental_gameplay, node["force-experimental-gameplay"]);
-    f(settings.education_feature, node["education-feature"]);
-    f(settings.debug_packs, node["debug-packs"]);
-    f(settings.database, node["database"]);
-    f(settings.worldDatabase, node["world-database"]);
-    return true;
+    return f(settings.commands, node["commands"]) &&
+           f(settings.force_experimental_gameplay, node["force-experimental-gameplay"]) &&
+           f(settings.education_feature, node["education-feature"]) && f(settings.debug_packs, node["debug-packs"]) &&
+           f(settings.database, node["database"]) && f(settings.worldDatabase, node["world-database"]);
   }
 };
 
