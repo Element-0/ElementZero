@@ -121,6 +121,15 @@ static void writeConfig(YAML::Node const &node) {
   std::ofstream{config_name} << emitter.c_str();
 }
 
+class MBuf : public std::stringbuf {
+public:
+  int sync() {
+    fputs(str().c_str(), stdout);
+    str("");
+    return 0;
+  }
+} buf;
+
 void dllenter() {
   using namespace std::filesystem;
   DEF_LOGGER("Base");
@@ -130,6 +139,7 @@ void dllenter() {
   SetConsoleMode(
       GetStdHandle(STD_OUTPUT_HANDLE),
       ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+  std::cout.rdbuf(&buf);
 
   std::thread::id this_id = std::this_thread::get_id();
   LOGV("Current thread id: %d") % this_id;
