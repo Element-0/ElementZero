@@ -169,14 +169,20 @@ TInstanceHook(void, "?_openLogFile@LogDetails@BedrockLog@@AEAAXXZ", BedrockLog::
   log_instance = this;
 }
 
+std::set<std::string_view> LogFilters;
+
 void generalLog(unsigned int pri, std::string_view area, char const *source, unsigned line, std::string content) {
   auto f    = boost::format(settings.LogSettings.Format) % getPriority(pri) % area % source % line % content;
   auto data = f.str();
   if (data.back() != '\n') data.append("\n");
   auto deco = settings.LogSettings.Decorations[getPriorityDecoration(pri)];
-  if (!settings.LogSettings.HideVerbose || pri > 1) std::cout << deco.Before << data << deco.After;
+  if (!LogFilters.count(area) && (!settings.LogSettings.HideVerbose || pri > 1))
+    std::cout << deco.Before << data << deco.After;
   if (log_instance) log_instance->proxy(data);
   if (log_database) {
+    static std::once_flag of;
+    std::call_once(
+        of, [] { LogFilters.insert(settings.LogSettings.Filters.begin(), settings.LogSettings.Filters.end()); });
     try {
       static SQLite::Statement insert{*log_database,
                                       "INSERT INTO log (session, time, priority, area, source, line, content) "

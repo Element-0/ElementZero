@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <yaml.h>
 
 struct Settings {
@@ -11,6 +12,7 @@ struct Settings {
     std::string Format   = "%1$c [%2$s] (%3$s:%4$d) %5$s";
     std::string Database = "log.db";
     bool HideVerbose     = false;
+    std::vector<std::string> Filters;
     struct DecorationPair {
       std::string Before = "";
       std::string After  = "";
@@ -23,9 +25,10 @@ struct Settings {
 
     template <typename IO> static inline bool io(IO f, LogSettingsType &log, YAML::Node &node) {
       return f(log.Format, node["format"]) && f(log.Database, node["database"]) &&
-             f(log.HideVerbose, node["hide-verbose"]) && f(log.Decorations[0], node["verbose"]) &&
-             f(log.Decorations[1], node["information"]) && f(log.Decorations[2], node["warning"]) &&
-             f(log.Decorations[3], node["error"]) && f(log.Decorations[4], node["unknown"]);
+             f(log.HideVerbose, node["hide-verbose"]) && f(log.Filters, node["filters"]) &&
+             f(log.Decorations[0], node["verbose"]) && f(log.Decorations[1], node["information"]) &&
+             f(log.Decorations[2], node["warning"]) && f(log.Decorations[3], node["error"]) &&
+             f(log.Decorations[4], node["unknown"]);
     }
   } LogSettings;
   std::string UserDatabase = "user.db";
