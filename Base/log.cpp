@@ -180,7 +180,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
     try {
       static SQLite::Statement insert{*log_database,
                                       "INSERT INTO log (session, time, priority, area, source, line, content) "
-                                      "VALUES (?, date('now'), ?, ?, ?, ?, ?)"};
+                                      "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
       if (session != "") {
         static std::once_flag o;
         std::call_once(o, [] {
