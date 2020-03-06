@@ -12,8 +12,8 @@ struct Settings {
     std::string Database = "log.db";
     bool HideVerbose     = false;
     struct DecorationPair {
-      std::string Before = "\u001B[0m";
-      std::string After  = "\u001B[0m";
+      std::string Before = "";
+      std::string After  = "";
 
       template <typename IO> static inline bool io(IO f, DecorationPair &pair, YAML::Node &node) {
         return f(pair.Before, node["before"]) && f(pair.After, node["after"]);
