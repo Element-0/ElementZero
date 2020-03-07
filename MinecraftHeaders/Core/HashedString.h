@@ -4,8 +4,8 @@
 #include <cstdint>
 
 class HashedString {
-  std::string str;
   uint64_t hash;
+  std::string str;
 
 public:
   std::string const &getString() const { return str; }
