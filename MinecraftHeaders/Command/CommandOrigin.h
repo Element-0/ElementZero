@@ -1,10 +1,12 @@
 #pragma once
 
+#include <optional>
+#include <memory>
+
 #include "../Math/BlockPos.h"
 #include "../Math/Vec3.h"
 #include "../Core/mce.h"
 #include "CommandPermissionLevel.h"
-#include <optional>
 
 enum class CommandOriginType : char {
   Player           = 0,
