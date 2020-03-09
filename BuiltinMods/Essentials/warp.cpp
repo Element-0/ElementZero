@@ -268,9 +268,17 @@ public:
     case SetOrDelete::set: {
       auto dim = ent.player->getDimensionId().value;
       auto pos = ent.player->getPos();
-      sys.SetWarp(ent.uuid, {name, false, dim, pos});
+      auto err = sys.SetWarp(ent.uuid, {name, false, dim, pos});
+      if (err) {
+        output.error("commands.warp.error.disallow", {name, *err});
+      } else {
+        output.success("commands.warp.success.set", {name, pos});
+      }
     } break;
-    case SetOrDelete::del: sys.DelWarp(ent.uuid, name); break;
+    case SetOrDelete::del: {
+      sys.DelWarp(ent.uuid, name);
+      output.success("commands.warp.success.del", {name});
+    } break;
     }
   }
 
