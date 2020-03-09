@@ -14,6 +14,13 @@ enum class CommandFlagValue : char {
 
 struct CommandFlag {
   CommandFlagValue value;
+
+  constexpr bool operator==(CommandFlag const &rhs) const noexcept { return value == rhs.value; }
+  constexpr bool operator!=(CommandFlag const &rhs) const noexcept { return value != rhs.value; }
+  CommandFlag &operator|=(CommandFlag const &rhs) {
+    value = (CommandFlagValue)((char) rhs.value | (char) value);
+    return *this;
+  }
 };
 constexpr inline CommandFlag CommandFlagNone        = {CommandFlagValue::None};
 constexpr inline CommandFlag CommandFlagUsage       = {CommandFlagValue::Usage};
