@@ -2,11 +2,197 @@
 
 #include "global.h"
 
+void (Mod::Essentials::WarpSystem::*EmitWarp)(
+    sigt<"warp"_sig>, Player *, Mod::Essentials::WarpInfo const &, Mod::CallbackToken<std::string> &);
+void (Mod::Essentials::WarpSystem::*EmitSetWarp)(
+    sigt<"set_warp"_sig>, mce::UUID const &, Mod::Essentials::WarpInfo const &, Mod::CallbackToken<std::string> &);
+
+Mod::Essentials::WarpSystem::WarpSystem() {
+  EmitWarp    = &Mod::Essentials::WarpSystem::Emit;
+  EmitSetWarp = &Mod::Essentials::WarpSystem::Emit;
+}
+
+Mod::Essentials::WarpSystem &Mod::Essentials::WarpSystem::GetInstance() {
+  static Mod::Essentials::WarpSystem instance;
+  return instance;
+}
+
+int Mod::Essentials::WarpSystem::GetGlobalWarpCount() {
+  static SQLite::Statement stmt_count{*world_database, "SELECT count(*) FROM global_warp"};
+  BOOST_SCOPE_EXIT_ALL() { stmt_count.reset(); };
+  if (!stmt_count.executeStep()) throw;
+  return stmt_count.getColumn(0).getInt();
+}
+
+std::vector<Mod::Essentials::WarpInfo> Mod::Essentials::WarpSystem::GetGlobalWarpList() {
+  static SQLite::Statement stmt_list{*world_database, "SELECT name, dim, x, y, z FROM global_warp"};
+  BOOST_SCOPE_EXIT_ALL() { stmt_list.reset(); };
+  std::vector<Mod::Essentials::WarpInfo> ret;
+
+  while (stmt_list.executeStep()) {
+    auto name = stmt_list.getColumn(0).getString();
+    auto dim  = stmt_list.getColumn(1).getInt();
+    auto x    = (float) stmt_list.getColumn(2).getDouble();
+    auto y    = (float) stmt_list.getColumn(3).getDouble();
+    auto z    = (float) stmt_list.getColumn(4).getDouble();
+    Vec3 pos{x, y, z};
+    ret.push_back({name, true, dim, pos});
+  }
+  return ret;
+}
+
+std::optional<Mod::Essentials::WarpInfo> Mod::Essentials::WarpSystem::GetGlobalWarp(std::string const &name) {
+  static SQLite::Statement stmt{*world_database, "SELECT dim, x, y, z FROM global_warp WHERE name = ?"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt.clearBindings();
+    stmt.reset();
+  };
+  stmt.bindNoCopy(1, name);
+  if (stmt.executeStep()) {
+    auto dim = stmt.getColumn(0).getInt();
+    auto x   = (float) stmt.getColumn(1).getDouble();
+    auto y   = (float) stmt.getColumn(2).getDouble() - 1;
+    auto z   = (float) stmt.getColumn(3).getDouble();
+    Vec3 pos = {x, y, z};
+    return {{name, true, dim, pos}};
+  }
+  return {};
+}
+
+void Mod::Essentials::WarpSystem::SetGlobalWarp(Mod::Essentials::WarpInfo info) {
+  static SQLite::Statement stmt{*world_database,
+                                "INSERT OR REPLACE INTO global_warp "
+                                "(name, dim, x, y, z) "
+                                "VALUES (?, ?, ?, ?, ?)"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt.clearBindings();
+    stmt.reset();
+  };
+  stmt.bindNoCopy(1, info.Name);
+  auto dim = info.Dimension;
+  auto pos = info.Position;
+  stmt.bind(2, dim);
+  stmt.bind(3, pos.x);
+  stmt.bind(4, pos.y);
+  stmt.bind(5, pos.z);
+  stmt.exec();
+}
+
+void Mod::Essentials::WarpSystem::DelGlobalWarp(std::string const &name) {
+  static SQLite::Statement stmt{*world_database, "DELETE FROM global_warp WHERE name = ?"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt.clearBindings();
+    stmt.reset();
+  };
+  stmt.bindNoCopy(1, name);
+  stmt.exec();
+}
+
+int Mod::Essentials::WarpSystem::GetWarpCount(mce::UUID const &uuid) {
+  static SQLite::Statement stmt_count{*world_database, "SELECT count(*) FROM warp WHERE uuid = ?"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt_count.clearBindings();
+    stmt_count.reset();
+  };
+  stmt_count.bindNoCopy(1, uuid, sizeof uuid);
+  if (!stmt_count.executeStep()) throw;
+  return stmt_count.getColumn(0).getInt();
+}
+
+std::vector<Mod::Essentials::WarpInfo> Mod::Essentials::WarpSystem::GetWarpList(mce::UUID const &uuid) {
+  static SQLite::Statement stmt_list{*world_database, "SELECT name, dim, x, y, z FROM warp WHERE uuid = ?"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt_list.clearBindings();
+    stmt_list.reset();
+  };
+  stmt_list.bindNoCopy(1, uuid, sizeof uuid);
+  std::vector<Mod::Essentials::WarpInfo> ret;
+  while (stmt_list.executeStep()) {
+    auto name = stmt_list.getColumn(0).getString();
+    auto dim  = stmt_list.getColumn(1).getInt();
+    auto x    = (float) stmt_list.getColumn(2).getDouble();
+    auto y    = (float) stmt_list.getColumn(3).getDouble();
+    auto z    = (float) stmt_list.getColumn(4).getDouble();
+    Vec3 pos{x, y, z};
+    ret.push_back({name, false, dim, pos});
+  }
+  return ret;
+}
+
+std::optional<Mod::Essentials::WarpInfo>
+Mod::Essentials::WarpSystem::GetWarp(mce::UUID const &uuid, std::string const &name) {
+  static SQLite::Statement stmt{*world_database, "SELECT dim, x, y, z FROM warp WHERE uuid = ? AND name = ?"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt.clearBindings();
+    stmt.reset();
+  };
+  stmt.bindNoCopy(1, uuid, sizeof uuid);
+  stmt.bindNoCopy(2, name);
+  if (stmt.executeStep()) {
+    auto dim = stmt.getColumn(0).getInt();
+    auto x   = (float) stmt.getColumn(1).getDouble();
+    auto y   = (float) stmt.getColumn(2).getDouble() - 1;
+    auto z   = (float) stmt.getColumn(3).getDouble();
+    Vec3 pos = {x, y, z};
+    return {{name, true, dim, pos}};
+  }
+  return {};
+}
+
+std::optional<std::string> Mod::Essentials::WarpSystem::SetWarp(mce::UUID const &uuid, Mod::Essentials::WarpInfo info) {
+  SQLite::Transaction trans{*world_database};
+  static SQLite::Statement stmt{*world_database,
+                                "INSERT OR REPLACE INTO warp "
+                                "(uuid, name, dim, x, y, z) "
+                                "VALUES (?, ?, ?, ?, ?, ?)"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt.clearBindings();
+    stmt.tryReset();
+  };
+  stmt.bindNoCopy(1, uuid, sizeof uuid);
+  stmt.bindNoCopy(2, info.Name);
+  auto dim = info.Dimension;
+  auto pos = info.Position;
+  stmt.bind(3, dim);
+  stmt.bind(4, pos.x);
+  stmt.bind(5, pos.y);
+  stmt.bind(6, pos.z);
+  stmt.exec();
+  Mod::CallbackToken<std::string> token;
+  (this->*EmitSetWarp)(SIG("set_warp"), uuid, info, token);
+  if (token) return token;
+  trans.commit();
+  return {};
+}
+
+void Mod::Essentials::WarpSystem::DelWarp(mce::UUID const &uuid, std::string const &name) {
+  static SQLite::Statement stmt{*world_database,
+                                "DELETE FROM warp "
+                                "WHERE uuid = ? AND name = ?"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt.clearBindings();
+    stmt.tryReset();
+  };
+  stmt.bindNoCopy(1, uuid, sizeof uuid);
+  stmt.bindNoCopy(2, name);
+  stmt.exec();
+}
+
+std::optional<std::string> Mod::Essentials::WarpSystem::Warp(Player *player, Mod::Essentials::WarpInfo const &info) {
+  Mod::CallbackToken<std::string> token;
+  (this->*EmitWarp)(SIG("warp"), player, info, token);
+  if (token) return token;
+  player->teleport(info.Position, {}, info.Dimension);
+  return {};
+}
+
 static bool VerifyName(std::string_view name) {
   if (name.size() > 16 || name.size() < 1) return false;
   return name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-") ==
          std::string::npos;
 }
+
+static auto &sys = Mod::Essentials::WarpSystem::GetInstance();
 
 class WarpCommand : public Command {
 public:
@@ -29,87 +215,45 @@ public:
 #pragma endregion
 
   void printGlobalList(CommandOrigin const &origin, CommandOutput &output) {
-    static SQLite::Statement stmt_count{*world_database, "SELECT count(*) FROM global_warp"};
-    BOOST_SCOPE_EXIT_ALL() { stmt_count.reset(); };
-    if (stmt_count.executeStep() != true) return; // impossible actually
-    auto count = stmt_count.getColumn(0).getInt();
+    auto count = sys.GetGlobalWarpCount();
     output.success("commands.warp.success.count.global", {count});
     if (count == 0) return;
-    static SQLite::Statement stmt_list{*world_database, "SELECT name, dim, x, y, z FROM global_warp"};
-    BOOST_SCOPE_EXIT_ALL() { stmt_list.reset(); };
-    while (stmt_list.executeStep()) {
-      auto ename = "." + stmt_list.getColumn(0).getString();
-      auto dim   = stmt_list.getColumn(1).getInt();
-      auto x     = (float) stmt_list.getColumn(2).getDouble();
-      auto y     = (float) stmt_list.getColumn(3).getDouble();
-      auto z     = (float) stmt_list.getColumn(4).getDouble();
-      Vec3 pos{x, y, z};
-      output.success("commands.warp.success.list", {ename, dim, pos});
-    }
+    auto list = sys.GetGlobalWarpList();
+    for (auto item : list)
+      output.success("commands.warp.success.list", {"." + item.Name, item.Dimension, item.Position});
   }
 
   void printList(Mod::PlayerEntry const &ent, CommandOrigin const &origin, CommandOutput &output) {
-    static SQLite::Statement stmt_count{*world_database, "SELECT count(*) FROM warp WHERE uuid = ?"};
-    BOOST_SCOPE_EXIT_ALL() {
-      stmt_count.clearBindings();
-      stmt_count.reset();
-    };
-    stmt_count.bindNoCopy(1, ent.uuid, sizeof ent.uuid);
-    if (stmt_count.executeStep() != true) return; // impossible actually
-    auto count = stmt_count.getColumn(0).getInt();
+    auto count = sys.GetWarpCount(ent.uuid);
     output.success("commands.warp.success.count", {count});
     if (count == 0) return;
-    static SQLite::Statement stmt_list{*world_database, "SELECT name, dim, x, y, z FROM warp WHERE uuid = ?"};
-    BOOST_SCOPE_EXIT_ALL() {
-      stmt_list.clearBindings();
-      stmt_list.reset();
-    };
-    stmt_list.bindNoCopy(1, ent.uuid, sizeof ent.uuid);
-    while (stmt_list.executeStep()) {
-      auto ename = stmt_list.getColumn(0).getString();
-      auto dim   = stmt_list.getColumn(1).getInt();
-      auto x     = (float) stmt_list.getColumn(2).getDouble();
-      auto y     = (float) stmt_list.getColumn(3).getDouble();
-      auto z     = (float) stmt_list.getColumn(4).getDouble();
-      Vec3 pos{x, y, z};
-      output.success("commands.warp.success.list", {ename, dim, pos});
-    }
+    auto list = sys.GetWarpList(ent.uuid);
+    for (auto item : list) output.success("commands.warp.success.list", {item.Name, item.Dimension, item.Position});
   }
 
   void handleTo(Mod::PlayerEntry const &ent, CommandOrigin const &origin, CommandOutput &output) {
-    static SQLite::Statement global_stmt{*world_database, "SELECT dim, x, y, z FROM global_warp WHERE name = ?"};
-    static SQLite::Statement stmt{*world_database, "SELECT dim, x, y, z FROM warp WHERE uuid = ? AND name = ?"};
-    SQLite::Statement *cstmt;
+    std::optional<Mod::Essentials::WarpInfo> opt;
     if (name[0] == '.') {
-      std::string_view vname = name;
-      vname.remove_prefix(1);
+      std::string vname{name.c_str() + 1};
       if (!VerifyName(vname)) {
         output.error("commands.warp.error.format");
         return;
       }
-      cstmt = &global_stmt;
-      cstmt->bindNoCopy(1, name.c_str() + 1);
+      opt = sys.GetGlobalWarp(vname);
     } else {
       if (!VerifyName(name)) {
         output.error("commands.warp.error.format");
         return;
       }
-      cstmt = &stmt;
-      cstmt->bindNoCopy(1, ent.uuid, sizeof ent.uuid);
-      cstmt->bindNoCopy(2, name);
+      opt = sys.GetWarp(ent.uuid, name);
     }
-    BOOST_SCOPE_EXIT_ALL(cstmt) {
-      cstmt->clearBindings();
-      cstmt->reset();
-    };
-    if (cstmt->executeStep()) {
-      auto dim = cstmt->getColumn(0).getInt();
-      auto x   = (float) cstmt->getColumn(1).getDouble();
-      auto y   = (float) cstmt->getColumn(2).getDouble() - 1;
-      auto z   = (float) cstmt->getColumn(3).getDouble();
-      Vec3 pos = {x, y, z};
-      ent.player->teleport(pos, {}, dim);
-      output.success("commands.warp.success.warp", {name, pos});
+    if (opt) {
+      auto err = sys.Warp(ent.player, *opt);
+      if (err) {
+        output.error("commands.warp.error.disallow", {name, *err});
+      } else {
+        output.success("commands.warp.success.warp", {name, opt->Position});
+      }
     } else {
       output.error("commands.warp.error.warp.not.found", {name});
     }
@@ -120,41 +264,13 @@ public:
       output.error("commands.warp.error.format");
       return;
     }
-    if (setOrDelete == SetOrDelete::set) {
-      static SQLite::Statement stmt{*world_database,
-                                    "INSERT OR REPLACE INTO warp "
-                                    "(uuid, name, dim, x, y, z) "
-                                    "VALUES (?, ?, ?, ?, ?, ?)"};
-      BOOST_SCOPE_EXIT_ALL() {
-        stmt.clearBindings();
-        stmt.tryReset();
-      };
-      stmt.bindNoCopy(1, ent.uuid, sizeof ent.uuid);
-      stmt.bindNoCopy(2, name);
-      auto dim = ent.player->getDimensionId();
+    switch (setOrDelete) {
+    case SetOrDelete::set: {
+      auto dim = ent.player->getDimensionId().value;
       auto pos = ent.player->getPos();
-      stmt.bind(3, dim.value);
-      stmt.bind(4, pos.x);
-      stmt.bind(5, pos.y);
-      stmt.bind(6, pos.z);
-      try {
-        stmt.exec();
-        output.success("commands.warp.success.set", {name, pos});
-      } catch (SQLite::Exception const &ex) { output.success("commands.warp.error.set", {name, ex.what()}); }
-    } else {
-      static SQLite::Statement stmt{*world_database,
-                                    "DELETE FROM warp "
-                                    "WHERE uuid = ? AND name = ?"};
-      BOOST_SCOPE_EXIT_ALL() {
-        stmt.clearBindings();
-        stmt.tryReset();
-      };
-      stmt.bindNoCopy(1, ent.uuid, sizeof ent.uuid);
-      stmt.bindNoCopy(2, name);
-      try {
-        stmt.exec();
-        output.success("commands.warp.success.del", {name});
-      } catch (SQLite::Exception const &ex) { output.success("commands.warp.error.del", {name, ex.what()}); }
+      sys.SetWarp(ent.uuid, {name, false, dim, pos});
+    } break;
+    case SetOrDelete::del: sys.DelWarp(ent.uuid, name); break;
     }
   }
 
@@ -215,34 +331,11 @@ public:
     auto ent = *Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
     switch (setOrDel) {
     case SetOrDel::set: {
-      static SQLite::Statement stmt{*world_database,
-                                    "INSERT OR REPLACE INTO global_warp "
-                                    "(name, dim, x, y, z) "
-                                    "VALUES (?, ?, ?, ?, ?)"};
-      BOOST_SCOPE_EXIT_ALL() {
-        stmt.clearBindings();
-        stmt.reset();
-      };
-      stmt.bindNoCopy(1, name);
-      auto dim = ent.player->getDimensionId();
+      auto dim = ent.player->getDimensionId().value;
       auto pos = ent.player->getPos();
-      stmt.bind(2, dim.value);
-      stmt.bind(3, pos.x);
-      stmt.bind(4, pos.y);
-      stmt.bind(5, pos.z);
-      stmt.exec();
-      output.success("commands.global-warp.success.set", {name, pos});
+      sys.SetGlobalWarp({name, true, dim, pos});
     } break;
-    case SetOrDel::del: {
-      static SQLite::Statement stmt{*world_database, "DELETE FROM global_warp WHERE name = ?"};
-      BOOST_SCOPE_EXIT_ALL() {
-        stmt.clearBindings();
-        stmt.reset();
-      };
-      stmt.bindNoCopy(1, name);
-      stmt.exec();
-      output.success("commands.global-warp.success.del", {name});
-    } break;
+    case SetOrDel::del: sys.DelGlobalWarp(name); break;
     }
   }
   static void setup(CommandRegistry *registry) {

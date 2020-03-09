@@ -34,3 +34,4 @@
 #include <playerdb.h>
 #include <log.h>
 #include <scheduler.h>
+#include <essentials.h>
