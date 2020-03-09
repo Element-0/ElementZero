@@ -70,7 +70,7 @@ void initDatabase() {
 }
 
 void initWorldDatabase(std::filesystem::path const &base) {
-  auto real = base / settings.worldDatabase;
+  auto real      = base / settings.worldDatabase;
   world_database = std::make_unique<SQLite::Database>(real.string(), SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
   world_database->exec(
       "CREATE TABLE IF NOT EXISTS warp ("
@@ -81,4 +81,11 @@ void initWorldDatabase(std::filesystem::path const &base) {
       "y INTEGER, "
       "z INTEGER, "
       "PRIMARY KEY (uuid, name))");
+  world_database->exec(
+      "CREATE TABLE IF NOT EXISTS global_warp ("
+      "name TEXT NOT NULL PRIMARY KEY, "
+      "dim INTEGER, "
+      "x INTEGER, "
+      "y INTEGER, "
+      "z INTEGER)");
 }
