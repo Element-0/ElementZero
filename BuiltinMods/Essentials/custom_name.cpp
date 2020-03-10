@@ -67,9 +67,11 @@ TClasslessInstanceHook(
   original(this, player, content);
 }
 
+enum class Action { Set, Clear };
+
 class SetCustomNameCommand : public Command {
 public:
-  enum class Sig { Set } _sig;
+  Action _sig;
   enum class Key { Prefix, Postfix } key;
   CommandSelector<Player> selector;
   std::string str = "";
@@ -110,7 +112,7 @@ public:
 
   static void setup(CommandRegistry *registry) {
     using namespace commands;
-    commands::addEnum<Sig>(registry, "custom-name-set", {{"set", Sig::Set}});
+    commands::addEnum<Action>(registry, "custom-name-set", {{"set", Action::Set}});
     commands::addEnum<Key>(registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}});
     registry->registerOverload<SetCustomNameCommand>(
         "custom-name", mandatory<CommandParameterDataType::ENUM>(&SetCustomNameCommand::_sig, "set", "custom-name-set"),
@@ -121,7 +123,7 @@ public:
 
 class ClearCustomNameCommand : public Command {
 public:
-  enum class Sig { Clear } _sig;
+  Action _sig;
   CommandSelector<Player> selector;
   ClearCustomNameCommand() { selector.setIncludeDeadPlayers(true); }
 
@@ -146,7 +148,7 @@ public:
 
   static void setup(CommandRegistry *registry) {
     using namespace commands;
-    auto ssig = commands::addEnum<Sig>(registry, "custom-name-clear", {{"clear", Sig::Clear}});
+    auto ssig = commands::addEnum<Action>(registry, "custom-name-clear", {{"clear", Action::Clear}});
     registry->registerOverload<ClearCustomNameCommand>(
         "custom-name", mandatory<CommandParameterDataType::ENUM>(&ClearCustomNameCommand::_sig, "clear", ssig),
         mandatory(&ClearCustomNameCommand::selector, "target"));

@@ -35,8 +35,8 @@ TInstanceHook(
     DEF_LOGGER("CommandRegister");
     LOGV("override");
     for (auto &param : ovd.params) {
-      LOGV("\t%s[%s] %d(%d) +%d(%d)") % param.name % (param.desc ? param.desc : "") % param.tid.value %
-          (int) param.type % param.offset % param.flag_offset;
+      LOGV("\t%c %s[%s] %d(%d) +%d(%d)") % (param.optional ? '+' : '-') % param.name % (param.desc ? param.desc : "") %
+          param.tid.value % (int) param.type % param.offset % param.flag_offset;
     }
   }
   return original(this, signature, ovd);
@@ -57,4 +57,24 @@ TInstanceHook(
     LOGV("Command: %s (%s) [%d/%d] {%d}") % name % desc % (int) a.value % (int) b.value % (int) perm;
   }
   return original(this, name, desc, perm, a, b);
+}
+
+TInstanceHook2(
+    "CommandRegistry::addEnumValuesInternal", CommandRegistry::Symbol,
+    "?addEnumValuesInternal@CommandRegistry@@AEAA?AVSymbol@1@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@"
+    "2@@std@@AEBV?$vector@U?$pair@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_K@std@@V?$allocator@U?"
+    "$pair@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@_K@std@@@2@@4@V?$typeid_t@VCommandRegistry@@@@"
+    "P81@EBA_NPEAXAEBUParseToken@1@AEBVCommandOrigin@@HAEAV34@AEAV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$"
+    "allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@4@@Z@Z",
+    CommandRegistry, std::string const &name, std::vector<std::pair<std::string, uint64_t>> const &mapped,
+    typeid_t<CommandRegistry> tid,
+    bool (CommandRegistry::*parser)(
+        void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
+        std::vector<std::string> &) const) {
+  if (settings.command.logRegister) {
+    DEF_LOGGER("CommandRegister");
+    LOGV("Enum: %s [%d]") % name % tid.value;
+    for (auto &[k, v] : mapped) LOGV("\t%s -> %d") % k % v;
+  }
+  return original(this, name, mapped, tid, parser);
 }

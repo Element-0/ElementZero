@@ -7,6 +7,8 @@ void (Mod::Essentials::WarpSystem::*EmitWarp)(
 void (Mod::Essentials::WarpSystem::*EmitSetWarp)(
     sigt<"set_warp"_sig>, mce::UUID const &, Mod::Essentials::WarpInfo const &, Mod::CallbackToken<std::string> &);
 
+#pragma region API
+
 Mod::Essentials::WarpSystem::WarpSystem() {
   EmitWarp    = &Mod::Essentials::WarpSystem::Emit;
   EmitSetWarp = &Mod::Essentials::WarpSystem::Emit;
@@ -192,24 +194,14 @@ static bool VerifyName(std::string_view name) {
          std::string::npos;
 }
 
+#pragma endregion
+
 static auto &sys = Mod::Essentials::WarpSystem::GetInstance();
 
 class WarpCommand : public Command {
 public:
 #pragma region detail
-  enum class To { placeholder };
-  enum class List { placeholder };
-  enum class SetOrDelete { set, del };
-
-  union {
-    To to;
-    List list;
-    SetOrDelete setOrDelete;
-  };
-
-  bool isTo;
-  bool isList;
-  bool isSetOrDelete;
+  enum class Action { To, List, Set, Del } action;
 
   std::string name;
 #pragma endregion
@@ -264,8 +256,8 @@ public:
       output.error("commands.warp.error.format");
       return;
     }
-    switch (setOrDelete) {
-    case SetOrDelete::set: {
+    switch (action) {
+    case Action::Set: {
       auto dim = ent.player->getDimensionId().value;
       auto pos = ent.player->getPos();
       auto err = sys.SetWarp(ent.uuid, {name, false, dim, pos});
@@ -275,7 +267,7 @@ public:
         output.success("commands.warp.success.set", {name, pos});
       }
     } break;
-    case SetOrDelete::del: {
+    case Action::Del: {
       sys.DelWarp(ent.uuid, name);
       output.success("commands.warp.success.del", {name});
     } break;
@@ -284,7 +276,7 @@ public:
 
   void execute(CommandOrigin const &origin, CommandOutput &output) {
     if (origin.getOriginType() != CommandOriginType::Player) {
-      if (isList) {
+      if (action == Action::List) {
         printGlobalList(origin, output);
         return;
       }
@@ -292,32 +284,35 @@ public:
       return;
     }
     auto ent = *Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
-    if (isList) {
+    switch (action) {
+    case Action::To: handleTo(ent, origin, output); break;
+    case Action::List:
       printGlobalList(origin, output);
       printList(ent, origin, output);
-    } else if (isTo) {
-      handleTo(ent, origin, output);
-    } else if (isSetOrDelete) {
-      handleSetOrDelete(ent, origin, output);
+      break;
+    case Action::Set:
+    case Action::Del: handleSetOrDelete(ent, origin, output); break;
+    default: break;
     }
   }
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
         "warp", "commands.warp.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
-    addEnum<To>(registry, "warp-to", {{"to", To::placeholder}});
-    addEnum<List>(registry, "warp-list", {{"list", List::placeholder}});
-    addEnum<SetOrDelete>(registry, "warp-set-or-del", {{"set", SetOrDelete::set}, {"del", SetOrDelete::del}});
+    addEnum<Action>(registry, "warp-to", {{"to", Action::To}});
+    addEnum<Action>(registry, "warp-list", {{"list", Action::List}});
+    addEnum<Action>(registry, "warp-set", {{"set", Action::Set}});
+    addEnum<Action>(registry, "warp-del", {{"del", Action::Del}});
     registry->registerOverload<WarpCommand>(
-        "warp", mandatory<CommandParameterDataType::ENUM>(&WarpCommand::to, "to", "warp-to", &WarpCommand::isTo),
+        "warp", mandatory<CommandParameterDataType::ENUM>(&WarpCommand::action, "to", "warp-to"),
         mandatory(&WarpCommand::name, "name"));
     registry->registerOverload<WarpCommand>(
-        "warp",
-        mandatory<CommandParameterDataType::ENUM>(&WarpCommand::list, "list", "warp-list", &WarpCommand::isList));
+        "warp", mandatory<CommandParameterDataType::ENUM>(&WarpCommand::action, "list", "warp-list"));
     registry->registerOverload<WarpCommand>(
-        "warp",
-        mandatory<CommandParameterDataType::ENUM>(
-            &WarpCommand::setOrDelete, "set-or-del", "warp-set-or-del", &WarpCommand::isSetOrDelete),
+        "warp", mandatory<CommandParameterDataType::ENUM>(&WarpCommand::action, "set", "warp-set"),
+        mandatory(&WarpCommand::name, "name"));
+    registry->registerOverload<WarpCommand>(
+        "warp", mandatory<CommandParameterDataType::ENUM>(&WarpCommand::action, "del", "warp-del"),
         mandatory(&WarpCommand::name, "name"));
   }
 };
