@@ -42,6 +42,8 @@ void NetworkIdentifier::kick(std::string const &reason) const {
 
 void Player::kick() { LocateService<ServerNetworkHandler>()->forceDisconnectClient(this, true); }
 
+std::string &ServerNetworkHandler::GetMotd() { return direct_access<std::string>(this, 608); }
+
 void CommandOutput::success() { direct_access<bool>(this, 40) = true; }
 
 uint64_t Level::GetServerTick() {
