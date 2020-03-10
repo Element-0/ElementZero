@@ -122,7 +122,7 @@ jobs:
         path: Dist
 
     - name: Create a new GitHub release if a new tag is pushed
-      uses: uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v1
       with:
         name: v${{ env.GITHUB_TAG_NAME }}
         prerelease: false
