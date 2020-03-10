@@ -167,7 +167,7 @@ public:
 void registerCustomName(CommandRegistry *registry) {
   commands::addEnum<Key>(registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}});
   registry->registerCommand(
-      "custom-name", "commands.custom-name.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
+      "custom-name", "commands.custom-name.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
       CommandFlagNone);
   SetCustomNameCommand::setup(registry);
   ClearCustomNameCommand::setup(registry);

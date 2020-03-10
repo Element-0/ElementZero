@@ -23,7 +23,7 @@ public:
   }
   static void setup(CommandRegistry *registry) {
     registry->registerCommand(
-        "balance", "commands.balance.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "balance", "commands.balance.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<BalanceCommand>("balance");
   }
 };
@@ -60,7 +60,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "update-balance", "commands.update-balance.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
+        "update-balance", "commands.update-balance.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
         CommandFlagNone);
     registry->registerOverload<UpdateBalanceCommand>(
         "update-balance", mandatory(&UpdateBalanceCommand::selector, "target"),
@@ -88,7 +88,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "get-balance", "commands.get-balance.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
+        "get-balance", "commands.get-balance.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
         CommandFlagNone);
     registry->registerOverload<GetBalanceCommand>("get-balance", mandatory(&GetBalanceCommand::selector, "target"));
   }

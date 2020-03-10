@@ -23,7 +23,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "audit", "commands.audit.description", CommandPermissionLevel::Privileged, CommandFlagCheat, CommandFlagNone);
+        "audit", "commands.audit.description", CommandPermissionLevel::GameMasters, CommandFlagCheat, CommandFlagNone);
     addEnum<Mode>(registry, "audit-mode", {{"off", Mode::Disable}, {"on", Mode::Enable}});
     registry->registerOverload<AuditCommand>(
         "audit",

@@ -30,7 +30,7 @@ public:
         registry, "spawn-protection-mode",
         {{"disable", Mode::Disabled}, {"enforce", Mode::Enforce}, {"permissive", Mode::Permissive}});
     registry->registerCommand(
-        "spawn-protection", "commands.spawn-protection.description", CommandPermissionLevel::Privileged,
+        "spawn-protection", "commands.spawn-protection.description", CommandPermissionLevel::GameMasters,
         CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<SpawnProtectionCommand>(
         "spawn-protection", mandatory<CommandParameterDataType::ENUM>(

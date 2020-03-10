@@ -22,7 +22,7 @@ public:
   }
   static void setup(CommandRegistry *registry) {
     registry->registerCommand(
-        "home", "commands.home.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "home", "commands.home.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<HomeCommand>("home");
   }
 };
@@ -46,7 +46,7 @@ public:
   }
   static void setup(CommandRegistry *registry) {
     registry->registerCommand(
-        "spawn", "commands.spawn.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "spawn", "commands.spawn.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<SpawnCommand>("spawn");
   }
 };

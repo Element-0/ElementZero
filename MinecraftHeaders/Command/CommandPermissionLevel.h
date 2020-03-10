@@ -1,3 +1,10 @@
 #pragma once
 
-enum class CommandPermissionLevel : char { Normal = 0, Privileged = 1, AutomationPlayer = 2, OperatorOnly = 3, ConsoleOnly = 4 };
+enum class CommandPermissionLevel : char {
+  Any         = 0,
+  GameMasters = 1,
+  Admin       = 2,
+  Host        = 3,
+  Owner       = 4,
+  Internal    = 5,
+};

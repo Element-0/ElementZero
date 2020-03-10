@@ -4,8 +4,7 @@
 #include <array>
 
 #include "../Command/CommandPermissionLevel.h"
-
-enum class PlayerPermissions : unsigned char;
+#include "PlayerPermissions.h"
 
 class PermissionsHandler {
 public:

@@ -65,7 +65,7 @@ public:
 
   static void setup(CommandRegistry *registry) {
     registry->registerCommand(
-        "tpa", "commands.tpa.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "tpa", "commands.tpa.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<TeleportRequest>("tpa", commands::mandatory(&TeleportRequest::selector, "selector"));
   }
 };
@@ -94,7 +94,7 @@ public:
 
   static void setup(CommandRegistry *registry) {
     registry->registerCommand(
-        "tpaccept", "commands.tpaccept.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "tpaccept", "commands.tpaccept.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<TeleportAccept>("tpaccept");
   }
 };
@@ -121,7 +121,7 @@ public:
 
   static void setup(CommandRegistry *registry) {
     registry->registerCommand(
-        "tpdeny", "commands.tpdeny.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "tpdeny", "commands.tpdeny.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<TeleportDeny>("tpdeny");
   }
 };

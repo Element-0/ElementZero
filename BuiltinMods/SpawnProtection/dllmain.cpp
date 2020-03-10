@@ -36,7 +36,7 @@ static bool Check(Player *player, int x, int z) {
   if (mode == Mode::Disabled) return true;
   if (x < settings.Start.x || x > settings.End.x) return true;
   if (z < settings.Start.z || z > settings.End.z) return true;
-  if (player->getCommandPermissionLevel() != CommandPermissionLevel::Normal && mode == Mode::Permissive) return true;
+  if (player->getCommandPermissionLevel() != CommandPermissionLevel::Any && mode == Mode::Permissive) return true;
   return false;
 }
 

@@ -26,7 +26,7 @@ void registerTransferServer(CommandRegistry *registry) {
   using namespace commands;
   std::string name = "transferserver";
   registry->registerCommand(
-      name, "commands.transferserver.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
+      name, "commands.transferserver.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
       CommandFlagNone);
   registry->registerOverload<TransferCommand>(
       name, mandatory(&TransferCommand::selector, "target"), mandatory(&TransferCommand::hostname, "hostname"),

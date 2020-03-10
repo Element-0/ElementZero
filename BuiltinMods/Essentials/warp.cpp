@@ -304,7 +304,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "warp", "commands.warp.description", CommandPermissionLevel::Normal, CommandFlagCheat, CommandFlagNone);
+        "warp", "commands.warp.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
     addEnum<To>(registry, "warp-to", {{"to", To::placeholder}});
     addEnum<List>(registry, "warp-list", {{"list", List::placeholder}});
     addEnum<SetOrDelete>(registry, "warp-set-or-del", {{"set", SetOrDelete::set}, {"del", SetOrDelete::del}});
@@ -349,7 +349,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "global-warp", "commands.global-warp.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
+        "global-warp", "commands.global-warp.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
         CommandFlagNone);
     addEnum<SetOrDel>(registry, "global-warp-set-or-del", {{"set", SetOrDel::set}, {"del", SetOrDel::del}});
     registry->registerOverload<GlobalWarpCommand>(

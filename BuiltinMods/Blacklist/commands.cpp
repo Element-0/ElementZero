@@ -225,7 +225,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "unban", "commands.unban.description", CommandPermissionLevel::Privileged, CommandFlagCheat, CommandFlagNone);
+        "unban", "commands.unban.description", CommandPermissionLevel::GameMasters, CommandFlagCheat, CommandFlagNone);
     registry->registerOverload<UnbanCommand>("unban", mandatory(&UnbanCommand::target, "target"));
   }
 };
@@ -249,7 +249,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "force-kick", "commands.force-kick.description", CommandPermissionLevel::Privileged, CommandFlagCheat,
+        "force-kick", "commands.force-kick.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
         CommandFlagNone);
     registry->registerOverload<ForceKickCommand>("force-kick", mandatory(&ForceKickCommand::selector, "target"));
   }
@@ -257,7 +257,7 @@ public:
 
 void registerBanCommand(CommandRegistry *registry) {
   registry->registerCommand(
-      "ban", "commands.ban.description", CommandPermissionLevel::Privileged, CommandFlagCheat, CommandFlagNone);
+      "ban", "commands.ban.description", CommandPermissionLevel::GameMasters, CommandFlagCheat, CommandFlagNone);
   BanCommand::setup(registry);
   BanNameCommand::setup(registry);
   UnbanCommand::setup(registry);
