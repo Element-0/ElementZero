@@ -9,6 +9,7 @@ boost-scope-exit
 boost-lexical-cast
 sqlitecpp
 yaml-cpp
+jsoncpp
 chakracore
 msgpack
 gsl-lite

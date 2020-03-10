@@ -13,16 +13,16 @@ using namespace Mod::Scheduler;
 using namespace boost::multi_index;
 using namespace std::chrono;
 
-Tick::rep current_ticks = 0;
+GameTick::rep current_ticks = 0;
 
 struct SimpleClock {
-  using rep        = Tick::rep;
-  using period     = Tick::period;
-  using duration   = Tick;
-  using time_point = time_point<SimpleClock, Tick>;
+  using rep        = GameTick::rep;
+  using period     = GameTick::period;
+  using duration   = GameTick;
+  using time_point = time_point<SimpleClock, GameTick>;
 
   static constexpr bool is_steady = true;
-  static time_point now() noexcept { return time_point{Tick{current_ticks}}; }
+  static time_point now() noexcept { return time_point{GameTick{current_ticks}}; }
 };
 
 using TimePoint = SimpleClock::time_point;
@@ -40,7 +40,7 @@ using EventContainer = multi_index_container<
               ordered_non_unique<tag<TimePoint>, member<OneShotEvent, TimePoint, &OneShotEvent::next>>>>;
 
 struct IntervalEvent : OneShotEvent {
-  Tick interval;
+  GameTick interval;
 };
 
 template <typename T> EventContainer<T> container;
@@ -80,14 +80,14 @@ TClasslessInstanceHook(void, "?tick@Level@@UEAAXXZ") {
   original(this);
 }
 
-Token Mod::Scheduler::SetTimeOut(Tick timeout, Handler fn) {
+Token Mod::Scheduler::SetTimeOut(GameTick timeout, Handler fn) {
   static Token max = 0;
   auto current     = max++;
   container<OneShotEvent>.emplace(OneShotEvent{current, fn, (SimpleClock::now() + timeout)});
   return current;
 }
 
-Token Mod::Scheduler::SetInterval(Tick interval, Handler fn) {
+Token Mod::Scheduler::SetInterval(GameTick interval, Handler fn) {
   static Token max = 0;
   auto current     = max++;
   container<IntervalEvent>.emplace(IntervalEvent{{current, fn, (SimpleClock::now() + interval)}, interval});

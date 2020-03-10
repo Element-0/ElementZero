@@ -48,6 +48,8 @@ uint64_t Level::GetServerTick() {
   return CallServerClassMethod<ValueHolder<uint64_t>>("?getCurrentServerTick@Level@@UEBA?BUTick@@XZ", this);
 }
 
+LevelDataWrapper &Level::GetLevelDataWrapper() { return direct_access<LevelDataWrapper>(this, 536); }
+
 template <> Minecraft *LocateService<Minecraft>() {
   return *GetServerSymbol<Minecraft *>("?mGame@ServerCommand@@1PEAVMinecraft@@EA");
 }

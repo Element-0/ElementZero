@@ -51,4 +51,6 @@ public:
   USING_RECEVENTEMITTER("set_warp", mce::UUID const &, WarpInfo const &, Mod::CallbackToken<std::string> &);
 };
 
+//class HomeSystem {};
+
 } // namespace Mod::Essentials

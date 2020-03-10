@@ -9,16 +9,16 @@
 namespace Mod::Scheduler {
 
 using namespace std::chrono_literals;
-using Token   = size_t;
-using Handler = std::function<void(Token)>;
-using Tick    = std::chrono::duration<uint64_t, std::ratio<1, 20>>;
+using Token    = size_t;
+using Handler  = std::function<void(Token)>;
+using GameTick = std::chrono::duration<uint64_t, std::ratio<1, 20>>;
 
-constexpr Tick operator"" _tick(unsigned long long secs) { return Tick(secs); }
+constexpr GameTick operator"" _tick(unsigned long long secs) { return GameTick(secs); }
 
-BASEAPI Token SetTimeOut(Tick timeout, Handler fn);
+BASEAPI Token SetTimeOut(GameTick timeout, Handler fn);
 BASEAPI void ClearTimeOut(Token token);
 
-BASEAPI Token SetInterval(Tick interval, Handler fn);
+BASEAPI Token SetInterval(GameTick interval, Handler fn);
 BASEAPI void ClearInterval(Token token);
 
 } // namespace Mod::Scheduler
