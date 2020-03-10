@@ -342,8 +342,12 @@ public:
       auto dim = ent.player->getDimensionId().value;
       auto pos = ent.player->getPos();
       sys.SetGlobalWarp({name, true, dim, pos});
+      output.success("commands.warp.success.set", {name, pos});
     } break;
-    case SetOrDel::del: sys.DelGlobalWarp(name); break;
+    case SetOrDel::del: {
+      sys.DelGlobalWarp(name);
+      output.success("commands.warp.success.del", {name});
+    } break;
     }
   }
   static void setup(CommandRegistry *registry) {
