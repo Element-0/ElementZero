@@ -97,6 +97,13 @@ protected:
   }
 };
 
+template <typename Fn> auto RecursiveEventHandlerAdaptor(Fn fn) {
+  return [=]<typename Tempo, typename... Params>(Tempo tempo, Params && ... params) {
+    fn(std::forward<Params>(params)...);
+    tempo();
+  };
+}
+
 } // namespace Mod
 
 // Be sure to use this macro to make multiple inherited function overloading effective

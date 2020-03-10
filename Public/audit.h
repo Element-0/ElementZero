@@ -22,8 +22,9 @@ struct PlayerAction {
   ActorRuntimeID actorId;
 };
 
-class AuditSystem : EventEmitter<"action"_sig, PlayerEntry const &, PlayerAction const &, CallbackToken<std::string> &>,
-                    EventEmitter<
+class AuditSystem : public RecursiveEventEmitter<
+                        "action"_sig, PlayerEntry const &, PlayerAction const &, CallbackToken<std::string> &>,
+                    public RecursiveEventEmitter<
                         "inventory_transaction"_sig, PlayerEntry const &, ComplexInventoryTransaction const &,
                         CallbackToken<std::string> &> {
   AUDITAPI AuditSystem();
@@ -31,8 +32,8 @@ class AuditSystem : EventEmitter<"action"_sig, PlayerEntry const &, PlayerAction
 public:
   AUDITAPI static AuditSystem &GetInstance();
 
-  USING_EVENTEMITTER("action", PlayerEntry const &, PlayerAction const &, CallbackToken<std::string> &);
-  USING_EVENTEMITTER(
+  USING_RECEVENTEMITTER("action", PlayerEntry const &, PlayerAction const &, CallbackToken<std::string> &);
+  USING_RECEVENTEMITTER(
       "inventory_transaction", PlayerEntry const &, ComplexInventoryTransaction const &, CallbackToken<std::string> &);
 };
 

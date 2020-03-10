@@ -19,6 +19,8 @@ if (NO_INLINE)
     add_compile_options (/Ob0)
 endif ()
 
+add_compile_options (-Wno-c++2a-extensions)
+
 include_directories (Public)
 add_compile_definitions (_UNICODE UNICODE NDEBUG)
 add_compile_options (-Wno-invalid-offsetof -Wno-deprecated-declarations)

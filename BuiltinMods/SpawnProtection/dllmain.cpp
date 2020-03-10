@@ -28,8 +28,9 @@ void checkInventoryTransaction(
 void PreInit() {
   mode = settings.AllowOperator ? Mode::Permissive : Mode::Enforce;
   Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), initCommand);
-  Mod::AuditSystem::GetInstance().AddListener(SIG("action"), checkAction);
-  Mod::AuditSystem::GetInstance().AddListener(SIG("inventory_transaction"), checkInventoryTransaction);
+  Mod::AuditSystem::GetInstance().AddListener(SIG("action"), {Mod::RecursiveEventHandlerAdaptor(checkAction)});
+  Mod::AuditSystem::GetInstance().AddListener(
+      SIG("inventory_transaction"), {Mod::RecursiveEventHandlerAdaptor(checkInventoryTransaction)});
 }
 
 static bool Check(Player *player, int x, int z) {
