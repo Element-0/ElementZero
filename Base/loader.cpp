@@ -1,4 +1,5 @@
 #include "loader.h"
+#include "settings.hpp"
 
 #include <filesystem>
 #include <list>
@@ -65,8 +66,17 @@ void loadMods(YAML::Node &cfg_node) {
     if (next->is_regular_file() && next->path().extension() == ".dll") {
       const auto cfgkey = next->path().stem().string();
       auto subcfg       = cfg_node[cfgkey];
-      if (subcfg.IsMap())
-        if (auto enabled = subcfg["enabled"]; enabled && !enabled.as<bool>()) continue;
+      if (subcfg.IsMap()) {
+        auto enabled = subcfg["enabled"];
+        if (!enabled) {
+          enabled = settings.ModDefaultEnabled;
+          if (!settings.ModDefaultEnabled) continue;
+        } else if (!enabled.as<bool>())
+          continue;
+      } else {
+        subcfg["enabled"] = settings.ModDefaultEnabled;
+        if (!settings.ModDefaultEnabled) continue;
+      }
       auto handle = LoadLibrary(next->path().c_str());
       if (!handle) {
         LOGE("Failed to load mod: %s") % next->path();

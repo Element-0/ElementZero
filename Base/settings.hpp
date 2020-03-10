@@ -6,7 +6,8 @@
 #include <yaml.h>
 
 struct Settings {
-  bool ModEnabled = true;
+  bool ModEnabled        = true;
+  bool ModDefaultEnabled = false;
   std::map<std::string, YAML::Node> ModSettings;
   struct LogSettingsType {
     std::string Format   = "%1$c [%2$s] (%3$s:%4$d) %5$s";
@@ -34,8 +35,9 @@ struct Settings {
   std::string UserDatabase = "user.db";
 
   template <typename IO> static inline bool io(IO f, Settings &settings, YAML::Node &node) {
-    return f(settings.ModEnabled, node["mod-enabled"]) && f(settings.LogSettings, node["log-settings"]) &&
-           f(settings.ModSettings, node["mods"]) && f(settings.UserDatabase, node["user-database"]);
+    return f(settings.ModEnabled, node["mod-enabled"]) && f(settings.ModDefaultEnabled, node["mod-default-enabled"]) &&
+           f(settings.LogSettings, node["log-settings"]) && f(settings.ModSettings, node["mods"]) &&
+           f(settings.UserDatabase, node["user-database"]);
   }
 };
 
