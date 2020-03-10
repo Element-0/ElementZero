@@ -67,12 +67,10 @@ TClasslessInstanceHook(
   original(this, player, content);
 }
 
-enum class Key { Prefix, Postfix };
-
 class SetCustomNameCommand : public Command {
 public:
   enum class Sig { Set } _sig;
-  Key key;
+  enum class Key { Prefix, Postfix } key;
   CommandSelector<Player> selector;
   std::string str = "";
   SetCustomNameCommand() { selector.setIncludeDeadPlayers(true); }
@@ -113,6 +111,7 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     commands::addEnum<Sig>(registry, "custom-name-set", {{"set", Sig::Set}});
+    commands::addEnum<Key>(registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}});
     registry->registerOverload<SetCustomNameCommand>(
         "custom-name", mandatory<CommandParameterDataType::ENUM>(&SetCustomNameCommand::_sig, "set", "custom-name-set"),
         mandatory<CommandParameterDataType::ENUM>(&SetCustomNameCommand::key, "key", "custom-name-key"),
@@ -123,8 +122,6 @@ public:
 class ClearCustomNameCommand : public Command {
 public:
   enum class Sig { Clear } _sig;
-  Key key;
-  bool key_set = false;
   CommandSelector<Player> selector;
   ClearCustomNameCommand() { selector.setIncludeDeadPlayers(true); }
 
@@ -134,10 +131,7 @@ public:
     auto &playerdb = Mod::PlayerDatabase::GetInstance().GetData();
     for (auto player : selector.results(origin)) {
       auto it = playerdb.find(player);
-      static SQLite::Statement prefix_stmt{*database, "UPDATE OR IGNORE custom_name SET prefix='' WHERE uuid = ?"};
-      static SQLite::Statement postfix_stmt{*database, "UPDATE OR IGNORE custom_name SET postfix='' WHERE uuid = ?"};
-      static SQLite::Statement all_stmt{*database, "DELETE FROM custom_name WHERE uuid = ?"};
-      auto &stmt = key_set ? all_stmt : key == Key::Prefix ? prefix_stmt : postfix_stmt;
+      static SQLite::Statement stmt{*database, "DELETE FROM custom_name WHERE uuid = ?"};
       BOOST_SCOPE_EXIT_ALL(&) {
         stmt.reset();
         stmt.clearBindings();
@@ -155,17 +149,11 @@ public:
     auto ssig = commands::addEnum<Sig>(registry, "custom-name-clear", {{"clear", Sig::Clear}});
     registry->registerOverload<ClearCustomNameCommand>(
         "custom-name", mandatory<CommandParameterDataType::ENUM>(&ClearCustomNameCommand::_sig, "clear", ssig),
-        mandatory<CommandParameterDataType::ENUM>(
-            &ClearCustomNameCommand::key, "key", "custom-name-key", &ClearCustomNameCommand::key_set),
-        mandatory(&ClearCustomNameCommand::selector, "target"));
-    registry->registerOverload<ClearCustomNameCommand>(
-        "custom-name", mandatory<CommandParameterDataType::ENUM>(&ClearCustomNameCommand::_sig, "clear", ssig),
         mandatory(&ClearCustomNameCommand::selector, "target"));
   }
 };
 
 void registerCustomName(CommandRegistry *registry) {
-  commands::addEnum<Key>(registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}});
   registry->registerCommand(
       "custom-name", "commands.custom-name.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
       CommandFlagNone);
