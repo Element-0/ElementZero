@@ -115,34 +115,38 @@ TClasslessInstanceHook(
     Player *,
     "?_createNewPlayer@ServerNetworkHandler@@AEAAAEAVServerPlayer@@AEBVNetworkIdentifier@@AEBVConnectionRequest@@@Z",
     NetworkIdentifier *id, void *req) {
-
   auto player  = original(this, id, req);
   auto &cert   = player->getCertificate();
   auto uuid    = ExtendedCertificate::getIdentity(cert);
   auto name    = ExtendedCertificate::getIdentityName(cert);
-  auto xuid    = std::stoull(ExtendedCertificate::getXuid(cert));
   auto sadd    = id->getRealAddress();
   auto address = sadd.ToString();
-  LOGV("%s joined (from %d)") % name % address;
-  auto ref = container->emplace(Mod::PlayerEntry{player, name, xuid, uuid, *id});
-  (db.*emitter<"joined"_sig>) (SIG("joined"), *ref.first);
-  static SQLite::Statement stmt_user{*sqldb, "INSERT OR REPLACE INTO user VALUES (?, ?, ?)"};
-  static SQLite::Statement stmt_login{*sqldb, "INSERT INTO login (uuid, address) VALUES (?, ?)"};
-  BOOST_SCOPE_EXIT_ALL() {
-    stmt_user.reset();
-    stmt_user.clearBindings();
-  };
-  stmt_user.bindNoCopy(1, uuid, sizeof uuid);
-  stmt_user.bind(2, (int64_t) xuid);
-  stmt_user.bindNoCopy(3, name);
-  stmt_user.exec();
-  BOOST_SCOPE_EXIT_ALL() {
-    stmt_login.reset();
-    stmt_login.clearBindings();
-  };
-  stmt_login.bindNoCopy(1, uuid, sizeof uuid);
-  stmt_login.bindNoCopy(2, address);
-  stmt_login.exec();
+  try {
+    auto xuid = std::stoull(ExtendedCertificate::getXuid(cert));
+    LOGV("%s joined (from %s)") % name % address;
+    auto ref = container->emplace(Mod::PlayerEntry{player, name, xuid, uuid, *id});
+    (db.*emitter<"joined"_sig>) (SIG("joined"), *ref.first);
+    static SQLite::Statement stmt_user{*sqldb, "INSERT OR REPLACE INTO user VALUES (?, ?, ?)"};
+    static SQLite::Statement stmt_login{*sqldb, "INSERT INTO login (uuid, address) VALUES (?, ?)"};
+    BOOST_SCOPE_EXIT_ALL() {
+      stmt_user.reset();
+      stmt_user.clearBindings();
+    };
+    stmt_user.bindNoCopy(1, uuid, sizeof uuid);
+    stmt_user.bind(2, (int64_t) xuid);
+    stmt_user.bindNoCopy(3, name);
+    stmt_user.exec();
+    BOOST_SCOPE_EXIT_ALL() {
+      stmt_login.reset();
+      stmt_login.clearBindings();
+    };
+    stmt_login.bindNoCopy(1, uuid, sizeof uuid);
+    stmt_login.bindNoCopy(2, address);
+    stmt_login.exec();
+  } catch (...) {
+    LOGV("illegal connection from %s (name: %s)") % address % name;
+    player->kick();
+  }
   return player;
 }
 
