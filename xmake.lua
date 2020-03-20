@@ -59,7 +59,7 @@ on_load (function (target)
 end)
 
 add_requires ("funchook", {configs = {vs_runtime = "MD"}})
-add_requires ("boost", {configs = {vs_runtime = "MD", filesystem = false}})
+add_requires ("boost", {system = false, configs = {vs_runtime = "MD", filesystem = false}})
 add_requires ("sqlite3 3.31.0100", {configs = {vs_runtime = "MD"}})
 add_requires ("sqlite_cpp", {configs = {vs_runtime = "MD"}})
 add_requires ("yaml-cpp", {configs = {vs_runtime = "MD"}})

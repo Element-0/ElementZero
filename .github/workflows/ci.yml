@@ -15,6 +15,8 @@ jobs:
     - uses: actions/checkout@v2
 
     - uses: xmake-io/github-action-setup-xmake@v1.0.2
+      env:
+        XMAKE_GLOBALDIR: "C:\\"
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -34,6 +36,8 @@ jobs:
       run: xmake q -vy chakra_core
     - name: Test msgpack
       run: xmake q -vy msgpack
+    - name: Test boost
+      run: xmake q -vy boost
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
