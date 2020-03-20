@@ -22,6 +22,18 @@ jobs:
 
     - name: Test sqlite_cpp
       run: xmake q -vy sqlite_cpp
+    - name: Test funchook
+      run: xmake q -vy funchook
+    - name: Test sqlite3
+      run: xmake q -vy sqlite3
+    - name: Test yaml-cpp
+      run: xmake q -vy yaml-cpp
+    - name: Test jsoncpp
+      run: xmake q -vy jsoncpp
+    - name: Test chakra_core
+      run: xmake q -vy chakra_core
+    - name: Test msgpack
+      run: xmake q -vy msgpack
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
