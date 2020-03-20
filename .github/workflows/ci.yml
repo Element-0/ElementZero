@@ -74,11 +74,11 @@ jobs:
       shell: bash
     
     - name: Prepare folder structure
-        run: |
-          mkdir -p Dist/Lib
-          mkdir -p Dist/Mods
-          mkdir -p Dist/Deps
-        shell: bash
+      run: |
+        mkdir -p Dist/Lib
+        mkdir -p Dist/Mods
+        mkdir -p Dist/Deps
+      shell: bash
 
     - name: Build
       env:
