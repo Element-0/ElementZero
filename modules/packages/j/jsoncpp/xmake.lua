@@ -6,6 +6,7 @@ package ("jsoncpp")
 
   add_deps ("cmake")
   add_includedirs ("include")
+  add_links ("jsoncpp")
 
   on_install (function (package)
     import("package.tools.cmake").install (

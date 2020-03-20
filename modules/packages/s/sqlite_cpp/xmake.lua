@@ -5,6 +5,7 @@ package ("sqlite_cpp")
   set_urls ("https://github.com/SRombauts/SQLiteCpp.git")
 
   add_deps ("cmake", "sqlite3")
+  add_links ("SQLiteCpp")
   add_includedirs ("include")
 
   on_install (function (package)
@@ -13,7 +14,5 @@ package ("sqlite_cpp")
       {"-DSQLITECPP_RUN_CPPLINT=OFF", "-DSQLITECPP_RUN_CPPCHECK=OFF", "-DSQLITECPP_INTERNAL_SQLITE=OFF"}
     )
     os.cp("**.lib", package:installdir("lib"))
-    os.cp("**.dll", package:installdir("lib"))
-    os.cp("**.exp", package:installdir("lib"))
   end)
 package_end ()

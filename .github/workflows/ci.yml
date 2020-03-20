@@ -14,11 +14,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: codehz/github-action-setup-xmake@v1.1.2
+    - uses: xmake-io/github-action-setup-xmake@v1.0.2
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
+
+    - name: Test sqlite_cpp
+      run: xmake q -vy sqlite_cpp
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
