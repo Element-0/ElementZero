@@ -1,8 +1,6 @@
 set_project "ElementZero"
 set_languages "c++"
 
-add_repositories "repo modules"
-
 add_cxxflags "-DUNICODE"
 add_cxxflags "-D_UNICODE"
 add_cxxflags "-MD"
@@ -58,14 +56,7 @@ on_load (function (target)
   target:add ("defines", target:name() .. "_EXPORTS")
 end)
 
-add_requires ("funchook", {configs = {vs_runtime = "MD"}})
-add_requires ("boost", {system = false, configs = {vs_runtime = "MD", filesystem = false}})
-add_requires ("sqlite3 3.31.0100", {configs = {vs_runtime = "MD"}})
-add_requires ("sqlite_cpp", {configs = {vs_runtime = "MD"}})
-add_requires ("yaml-cpp", {configs = {vs_runtime = "MD"}})
-add_requires ("jsoncpp", {configs = {vs_runtime = "MD"}})
-add_requires ("chakra_core", {configs = {vs_runtime = "MD"}})
-add_requires ("msgpack", {configs = {vs_runtime = "MD"}})
+includes "deps.lua"
 
 includes "ModLoader"
 includes "Base"

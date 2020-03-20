@@ -24,7 +24,14 @@ jobs:
       with:
         arch: x64
 
-    - name: Test require
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      id: dependencies
+      with:
+        path: "C:\\.xmake"
+        key: xmake-${{ hashFiles( 'deps.lua' ) }}
+
+    - name: Install dependencies
       run: xmake q -vy
 
     - name: Cache lib artifacts
@@ -69,9 +76,13 @@ jobs:
       run: |
         xmake -vy
         xmake install
+
+    - name: Package
+      run: |
         cp Lib/bedrock_server_mod.exe Dist
         cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*
+      shell: bash
 
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
