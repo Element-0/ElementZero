@@ -73,34 +73,34 @@ jobs:
         cp bedrock_server_mod.exe ../Lib
       shell: bash
 
-    - name: Build
-      env:
-        XMAKE_GLOBALDIR: "C:\\"
-      run: |
-        xmake -vyD
-        xmake install -vD
+    # - name: Build
+    #   env:
+    #     XMAKE_GLOBALDIR: "C:\\"
+    #   run: |
+    #     xmake -vyD
+    #     xmake install -vD
 
-    - name: Package
-      run: |
-        cp Lib/bedrock_server_mod.exe Dist
-        cp Lib/bedrock_server_mod.lib Dist/Lib
-        tar cvfJ pkg.tar.xz Dist/*
-      shell: bash
+    # - name: Package
+    #   run: |
+    #     cp Lib/bedrock_server_mod.exe Dist
+    #     cp Lib/bedrock_server_mod.lib Dist/Lib
+    #     tar cvfJ pkg.tar.xz Dist/*
+    #   shell: bash
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: dist
-        path: Dist
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v1.0.0
+    #   with:
+    #     name: dist
+    #     path: Dist
 
-    - name: Create a new GitHub release if a new tag is pushed
-      uses: softprops/action-gh-release@v1
-      with:
-        name: v${{ env.GITHUB_TAG_NAME }}
-        prerelease: false
-        draft: true
-        files: pkg.tar.xz
-        body: (empty)
-      if: startsWith(github.ref, 'refs/tags/')
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    # - name: Create a new GitHub release if a new tag is pushed
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     name: v${{ env.GITHUB_TAG_NAME }}
+    #     prerelease: false
+    #     draft: true
+    #     files: pkg.tar.xz
+    #     body: (empty)
+    #   if: startsWith(github.ref, 'refs/tags/')
+    #   env:
+    #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
