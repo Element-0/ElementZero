@@ -42,7 +42,7 @@ before_install (function (target)
           depdll[dll] = true
         else
           if not depdll[dll] then
-            print ("Install dep " .. path.filename(dll))
+            print ("Install " .. name .. " dep " .. path.filename(dll))
             os.cp (dll, deppath)
             depdll[dll] = true
           end
