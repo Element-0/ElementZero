@@ -85,7 +85,7 @@ jobs:
         XMAKE_GLOBALDIR: "C:\\"
       run: |
         xmake -vyD
-        xmake install -vD
+        xmake install -vD -j 1
 
     - name: Package
       run: |
