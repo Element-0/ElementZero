@@ -35,13 +35,14 @@ before_install (function (target)
   for _, name in ipairs(pkgs) do
     for _, dir in ipairs(target:pkg(name):get("linkdirs")) do 
       for _, dll in ipairs(os.files(path.join(dir, "*.dll"))) do
+        if depdll == nil then
+          depdll = {}
+        end
         if not target:values("prefix") then
           print ("Install global dep " .. path.filename(dll))
           os.cp (dll, target:installdir())
+          depdll[dll] = true
         else
-          if depdll == nil then
-            depdll = {}
-          end
           if not depdll[dll] then
             print ("Install dep " .. path.filename(dll))
             os.cp (dll, deppath)

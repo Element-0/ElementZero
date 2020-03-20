@@ -134,6 +134,7 @@ void dllenter() {
   using namespace std::filesystem;
   DEF_LOGGER("Base");
   SetDllDirectory(L"Mods");
+  AddDllDirectory(L"Deps");
   SetConsoleCP(65001);
   SetConsoleOutputCP(65001);
   SetConsoleMode(

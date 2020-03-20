@@ -92,7 +92,7 @@ void loadMods(YAML::Node &cfg_node) {
         subcfg["enabled"] = settings.ModDefaultEnabled;
         if (!settings.ModDefaultEnabled) continue;
       }
-      auto handle = LoadLibrary(next->path().c_str());
+      auto handle = LoadLibraryEx(absolute(next->path()).c_str(), nullptr, LOAD_LIBRARY_SEARCH_USER_DIRS);
       if (!handle) {
         LOGE("Failed to load mod: %s : %s") % next->path() % GetLastErrorAsString();
         continue;
