@@ -22,9 +22,9 @@ on_install (function (target)
   local dll = target:targetfile()
   local lib = path.join(path.directory(dll), path.basename(dll)) .. ".lib"
   local pdb = path.join(path.directory(dll), path.basename(dll)) .. ".pdb"
-  os.cp (dll, res)
+  os.trycp (dll, res)
   os.trycp (lib, libpath)
-  os.cp (pdb, libpath)
+  os.trycp (pdb, libpath)
 end)
 
 before_install (function (target)

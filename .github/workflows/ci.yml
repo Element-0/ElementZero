@@ -32,6 +32,7 @@ jobs:
         XMAKE_GLOBALDIR: "C:\\"
 
     - name: Install dependencies
+      if: steps.dependencies.outputs.cache-hit != 'true'
       run: xmake q -vy
 
     - name: Cache lib artifacts
@@ -76,8 +77,8 @@ jobs:
       env:
         XMAKE_GLOBALDIR: "C:\\"
       run: |
-        xmake -vy
-        xmake install
+        xmake -vyD
+        xmake install -vD
 
     - name: Package
       run: |
