@@ -17,8 +17,6 @@ jobs:
     - uses: codehz/github-action-setup-xmake@v1.2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-      env:
-        XMAKE_GLOBALDIR: "C:\\"
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -30,6 +28,8 @@ jobs:
       with:
         path: "C:\\.xmake"
         key: xmake-${{ hashFiles( 'deps.lua' ) }}
+      env:
+        XMAKE_GLOBALDIR: "C:\\"
 
     - name: Install dependencies
       run: xmake q -vy
@@ -73,6 +73,8 @@ jobs:
       shell: bash
 
     - name: Build
+      env:
+        XMAKE_GLOBALDIR: "C:\\"
       run: |
         xmake -vy
         xmake install
