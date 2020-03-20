@@ -60,7 +60,7 @@ jobs:
 
     - name: Build
       run: |
-        xmake build -v
+        xmake build -vy
         xmake install
         cp Lib/bedrock_server_mod.exe Dist
         cp Lib/bedrock_server_mod.lib Dist/Lib
