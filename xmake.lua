@@ -1,7 +1,7 @@
 set_project "ElementZero"
 set_languages "c++"
 
-add_repositories "repo deps"
+add_repositories "repo modules"
 
 add_cxxflags "-DUNICODE"
 add_cxxflags "-D_UNICODE"
