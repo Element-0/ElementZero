@@ -25,7 +25,7 @@ jobs:
         arch: x64
 
     - name: Test require
-      run: xmake q -y
+      run: xmake q -vy
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
