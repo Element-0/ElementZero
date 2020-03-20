@@ -36,7 +36,7 @@ static_assert(offsetof(NetworkIdentifier, type) == 144);
 namespace std {
 
 template <> struct hash<NetworkIdentifier> {
-  constexpr size_t operator()(const NetworkIdentifier &val) const { return val.getHash(); }
+  size_t operator()(const NetworkIdentifier &val) const { return val.getHash(); }
 };
 
 } // namespace std
@@ -44,7 +44,7 @@ template <> struct hash<NetworkIdentifier> {
 namespace boost {
 
 template <> struct hash<NetworkIdentifier> {
-  constexpr size_t operator()(const NetworkIdentifier &val) const { return val.getHash(); }
+  size_t operator()(const NetworkIdentifier &val) const { return val.getHash(); }
 };
 
 } // namespace boost

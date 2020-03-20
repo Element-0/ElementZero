@@ -344,3 +344,6 @@ Lib/bedrock_server_mod.lib
 *.dll
 Build
 Dist
+
+compile_commands.json
+.vscode

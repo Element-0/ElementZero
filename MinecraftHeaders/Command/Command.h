@@ -13,7 +13,7 @@ protected:
   int unk8;         // 8
   void *unk16;      // 16
   int unk24;        // 24
-  bool b28;         // 28
+  char b28;         // 28
   CommandFlag flag; // 29
   Command() {
     unk24 = -1;
