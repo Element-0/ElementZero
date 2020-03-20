@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: xmake-io/github-action-setup-xmake@v1
+    - uses: codehz/github-action-setup-xmake@master
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
