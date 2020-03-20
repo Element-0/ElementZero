@@ -72,6 +72,13 @@ jobs:
         cp bedrock_server_mod.lib ../Lib
         cp bedrock_server_mod.exe ../Lib
       shell: bash
+    
+    - name: Prepare folder structure
+        run: |
+          mkdir -p Dist/Lib
+          mkdir -p Dist/Mods
+          mkdir -p Dist/Deps
+        shell: bash
 
     - name: Build
       env:
