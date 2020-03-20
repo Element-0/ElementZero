@@ -27,13 +27,13 @@ jobs:
       id: dependencies
       with:
         path: "C:\\.xmake"
-        key: dependencies-${{ hashFiles( 'deps.lua' ) }}
-      env:
-        XMAKE_GLOBALDIR: "C:\\"
+        key: dep-${{ hashFiles( 'deps.lua' ) }}
 
     - name: Install dependencies
       if: steps.dependencies.outputs.cache-hit != 'true'
       run: xmake q -vy
+      env:
+        XMAKE_GLOBALDIR: "C:\\"
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
