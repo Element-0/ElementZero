@@ -209,7 +209,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
       } else {
         static SQLite::Statement insert_temp{*log_database,
                                              "INSERT INTO temp.pending (time, priority, area, source, line, content) "
-                                             "VALUES (date('now'), ?, ?, ?, ?, ?)"};
+                                             "VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
         insert_temp.bind(1, pri);
         insert_temp.bindNoCopy(2, area.data());
         insert_temp.bindNoCopy(3, source);
