@@ -27,6 +27,18 @@ on_install (function (target)
   os.cp (pdb, libpath)
 end)
 
+on_uninstall (function (target)
+  local res = path.join(target:installdir(), target:values("prefix")) .. path._SEP
+  local libpath = path.join(target:installdir(), "Lib") .. path._SEP
+  local dll = path.join(res, path.filename(target:targetfile()))
+  local lib = path.join(libpath, path.basename(target:targetfile()) .. ".lib")
+  local pdb = path.join(libpath, path.basename(target:targetfile()) .. ".pdb")
+
+  os.tryrm(dll)
+  os.tryrm(lib)
+  os.tryrm(pdb)
+end)
+
 before_install (function (target)
   local pkgs = target:info().packages
   local deppath = path.join(target:installdir(), "Deps") .. path._SEP
@@ -55,6 +67,18 @@ end)
 on_load (function (target)
   target:add ("defines", target:name() .. "_EXPORTS")
 end)
+
+task ("auto")
+  on_run (function () 
+    os.exec "xmake"
+    os.exec "xmake install"
+  end)
+  set_menu {
+    usage = "xmake auto",
+    description = "build and install",
+    options = {}
+  }
+task_end ()
 
 includes "deps.lua"
 
