@@ -1,5 +1,6 @@
 function mod (name)
-  target (name or path.filename(os.curdir()))
+  local tname = name or path.filename(os.curdir())
+  target (tname)
     add_files ("*.cpp")
 end
 
