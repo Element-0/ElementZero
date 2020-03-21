@@ -2,7 +2,7 @@
 
 #include "global.h"
 
-static void InitDatabase() {
+void InitDatabase() {
   db = std::make_unique<SQLite::Database>(settings.database, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
   db->exec(
       "CREATE TABLE IF NOT EXISTS transaction_log "

@@ -6,9 +6,9 @@ namespace Json {
 class Value;
 }
 
-class __declspec(dllimport) ITextObject {
+class ITextObject {
 public:
-  virtual ~ITextObject();
+  __declspec(dllimport) virtual ~ITextObject();
   virtual std::string asString() const = 0;
   virtual Json::Value asJsonValue() const = 0;
 };

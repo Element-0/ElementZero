@@ -13,51 +13,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set vcpkg's response file path used as part of cache's key.
-      env:
-        vcpkgResponseFile: ${{ github.workspace }}/vcpkg.txt
-      run: |
-        sed -i 's/VcPkgTriplets/..\\VcPkgTriplets/' $vcpkgResponseFile
-        echo "::set-env name=vcpkgResponseFile::$vcpkgResponseFile"
-      shell: bash
 
-    - name: Cache vcpkg artifacts
-      uses: actions/cache@v1
-      id: cache
+    - uses: codehz/github-action-setup-xmake@v1.2
       with:
-        path: ${{ github.workspace }}/vcpkg
-        key: vcpkg-${{ hashFiles( env.vcpkgResponseFile ) }}
-
-    - name: run-vcpkg
-      uses: lukka/run-vcpkg@v0.9
-      id: runvcpkg
-      if: steps.cache.outputs.cache-hit != 'true'
-      with:
-        vcpkgGitCommitId: master
-        vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
 
-    - name: cache llvm
+    - name: Cache dependencies
       uses: actions/cache@v1
-      id: cachellvm
+      id: dependencies
       with:
-        path: C:/ProgramData/scoop
-        key: scoop-llvm9.0.0
+        path: "C:\\.xmake"
+        key: dep-${{ hashFiles( 'deps.lua' ) }}
 
-    - name: install llvm
-      if: steps.cachellvm.outputs.cache-hit != 'true'
-      run: |
-        Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-        scoop install llvm tar --global
-
-    - name: set environment
-      run: |
-        echo "::set-env name=CC::clang-cl"
-        echo "::set-env name=CXX::clang-cl"
-        echo "::set-env name=PATH::C:/ProgramData/scoop/shims;$env:PATH"
+    - name: Install dependencies
+      if: steps.dependencies.outputs.cache-hit != 'true'
+      run: xmake q -vy
+      env:
+        XMAKE_GLOBALDIR: "C:\\"
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
@@ -96,20 +72,23 @@ jobs:
         cp bedrock_server_mod.lib ../Lib
         cp bedrock_server_mod.exe ../Lib
       shell: bash
+    
+    - name: Prepare folder structure
+      run: |
+        mkdir -p Dist/Lib
+        mkdir -p Dist/Mods
+      shell: bash
 
     - name: Build
+      env:
+        XMAKE_GLOBALDIR: "C:\\"
+      run: xmake -vyD
+    
+    - name: Install
+      run: xmake install -vD
+
+    - name: Package
       run: |
-        cur=$(cygpath -m $(pwd))
-        mkdir Build
-        pushd Build
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
-        -DCMAKE_INSTALL_PREFIX:PATH="$cur/Dist" \
-        -DCMAKE_TOOLCHAIN_FILE="$cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-        ..
-        ninja
-        ninja install
-        popd
         cp Lib/bedrock_server_mod.exe Dist
         cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*

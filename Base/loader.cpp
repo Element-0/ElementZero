@@ -58,6 +58,21 @@ static std::list<WorldInitType> WorldInits;
 static std::list<BeforeUnloadType> UnloadHooks;
 static lc_set LibNameList;
 
+static std::string GetLastErrorAsString() {
+  DWORD errorMessageID = ::GetLastError();
+  if (errorMessageID == 0) return std::string();
+
+  LPSTR messageBuffer = nullptr;
+  size_t size         = FormatMessageA(
+      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, errorMessageID,
+      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &messageBuffer, 0, NULL);
+
+  std::string message(messageBuffer, size);
+
+  LocalFree(messageBuffer);
+  return message;
+}
+
 static void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib);
 
 void loadMods(YAML::Node &cfg_node) {
@@ -77,9 +92,9 @@ void loadMods(YAML::Node &cfg_node) {
         subcfg["enabled"] = settings.ModDefaultEnabled;
         if (!settings.ModDefaultEnabled) continue;
       }
-      auto handle = LoadLibrary(next->path().c_str());
+      auto handle = LoadLibraryEx(absolute(next->path()).c_str(), nullptr, LOAD_LIBRARY_SEARCH_USER_DIRS);
       if (!handle) {
-        LOGE("Failed to load mod: %s") % next->path();
+        LOGE("Failed to load mod: %s : %s") % next->path() % GetLastErrorAsString();
         continue;
       }
       auto name = next->path().filename().string();
