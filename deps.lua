@@ -1,4 +1,4 @@
-add_repositories "repo modules"
+add_repositories "repo https://github.com/codehz/xrepo"
 
 add_requires ("funchook", {system = false, configs = {vs_runtime = "MD"}})
 add_requires ("boost", {system = false, configs = {vs_runtime = "MD", filesystem = false}})
