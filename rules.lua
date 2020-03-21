@@ -5,6 +5,13 @@ rule ("export_name")
   end)
 rule_end ()
 
+rule ("extract_version")
+  on_load (function (target)
+    local version = val("shell git describe --tags --always")
+    target:add ("defines", "EZVERSION=\"" .. version ..  "\"")
+  end)
+rule_end ()
+
 rule ("default_install")
   on_install (function (target)
     local res = path.join(target:installdir(), target:values("prefix")) .. path._SEP
