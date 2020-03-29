@@ -342,5 +342,6 @@ healthchecksdb
 # Custom
 Lib/bedrock_server_mod.lib
 *.dll
-Build
-Dist
+[Bb]uild
+[Dd]ist
+compile_commands.json

@@ -20,6 +20,7 @@ if (NO_INLINE)
 endif ()
 
 add_compile_options (-Wno-c++2a-extensions)
+add_compile_options (/EHsc)
 
 include_directories (Public)
 add_compile_definitions (_UNICODE UNICODE NDEBUG)
@@ -40,7 +41,7 @@ target_link_libraries (BedrockServer INTERFACE bedrock_server_mod)
 
 find_package (SQLiteCpp CONFIG REQUIRED)
 find_package (Boost 1.72.0 REQUIRED)
-find_package(jsoncpp CONFIG REQUIRED)
+find_package (jsoncpp CONFIG REQUIRED)
 find_and_install_package (sqlite3 CONFIG REQUIRED)
 find_and_install_package (yaml-cpp CONFIG REQUIRED)
 find_package (msgpack CONFIG REQUIRED)
