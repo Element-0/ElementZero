@@ -271,6 +271,7 @@ public:
       sys.DelWarp(ent.uuid, name);
       output.success("commands.warp.success.del", {name});
     } break;
+    default: break;
     }
   }
 
