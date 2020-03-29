@@ -2,6 +2,7 @@
 #include <playerdb.h>
 #include <hook.h>
 #include <log.h>
+#include <anticheat.h>
 #include <Net/NetworkIdentifier.h>
 #include <Packet/MobEquipmentPacket.h>
 #include <Packet/ActorFallPacket.h>
@@ -10,6 +11,23 @@
 #include <Item/Item.h>
 
 DEF_LOGGER("BAC");
+
+namespace Mod {
+
+void (AntiCheat::*EmitDetected)(sigt<"detected"_sig>, std::string_view, PlayerEntry const &);
+
+AntiCheat::AntiCheat() { EmitDetected = &AntiCheat::Emit; }
+
+AntiCheat &AntiCheat::GetInstance() {
+  static AntiCheat instance;
+  return instance;
+}
+
+auto &mAntiCheat = AntiCheat::GetInstance();
+
+} // namespace Mod
+
+using namespace Mod;
 
 void dllenter() {}
 void dllexit() {}
@@ -23,6 +41,7 @@ TClasslessInstanceHook(
       original(this, netid, packet);
     } else {
       LOGI("\"%s\"(%d) has been detected using: structure block exploit") % it->name;
+      (mAntiCheat.*EmitDetected)(SIG("detected"), "edit_block", *it);
     }
   }
 }
@@ -36,6 +55,7 @@ TClasslessInstanceHook(
       original(this, netid, packet);
     } else {
       LOGI("\"%s\"(%d) has been detected using: command block exploit") % it->name;
+      (mAntiCheat.*EmitDetected)(SIG("detected"), "edit_block", *it);
     }
   }
 }
@@ -53,6 +73,7 @@ TClasslessInstanceHook(
     if (auto item = stack.getItem(); item) {
       if (!item->getAllowOffhand() || stack.getStackSize() > stack.getMaxStackSize()) {
         LOGI("\"%s\"(%d) has been detected using: offhand") % it->name % it->xuid;
+        (mAntiCheat.*EmitDetected)(SIG("detected"), "offhand", *it);
         return;
       }
     }
@@ -68,6 +89,7 @@ TClasslessInstanceHook(
     auto it  = db.Find(*netid);
     if (!it) return;
     LOGI("\"%s\"(%d) has been detected using: No fall") % it->name % it->xuid;
+    (mAntiCheat.*EmitDetected)(SIG("detected"), "nofall", *it);
     packet->inVoid = true;
   }
   original(this, netid, packet);
@@ -81,10 +103,12 @@ TClasslessInstanceHook(
   if (!it) return;
   if (packet->type != TextPacketType::Chat) {
     LOGI("\"%s\"(%d) has been detected using: chat hack") % it->name % it->xuid;
+    (mAntiCheat.*EmitDetected)(SIG("detected"), "chat_hack", *it);
     return;
   }
   if (packet->source != it->name) {
     LOGI("\"%s\"(%d) has been detected using: fake name") % it->name % it->xuid;
+    (mAntiCheat.*EmitDetected)(SIG("detected"), "fake_name", *it);
     return;
   }
   original(this, netid, packet);
