@@ -7,9 +7,11 @@ boost-format
 boost-multi-index
 boost-scope-exit
 boost-lexical-cast
+websocketpp
 sqlitecpp
 yaml-cpp
 jsoncpp
 chakracore
 msgpack
+flatbuffers
 gsl-lite
