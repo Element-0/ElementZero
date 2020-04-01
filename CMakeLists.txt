@@ -71,7 +71,7 @@ function (mod_link name)
     target_link_libraries (${name} ${ARGN})
 endfunction ()
 
-add_subdirectory ("Deps/ws-gw")
+add_subdirectory ("Deps")
 add_subdirectory ("ModLoader")
 add_subdirectory ("Base")
 add_subdirectory ("BuiltinMods")
