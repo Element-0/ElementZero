@@ -87,48 +87,46 @@ jobs:
         echo "::set-env name=cur::$(cygpath -m $(pwd))"
       shell: bash
 
+    - name: Configure
+      run: |
+        mkdir Build
+        cd Build
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
+          -DCMAKE_INSTALL_PREFIX:PATH="$env:cur/Dist" \
+          -DCMAKE_TOOLCHAIN_FILE="$env:cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+          ..
 
+    - name: Build
+      run: |
+        cd Build
+        ninja
 
-    # - name: Configure
-    #   run: |
-    #     mkdir Build
-    #     cd Build
-    #     cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    #       -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
-    #       -DCMAKE_INSTALL_PREFIX:PATH="$env:cur/Dist" \
-    #       -DCMAKE_TOOLCHAIN_FILE="$env:cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-    #       ..
+    - name: Install
+      run: |
+        cd Build
+        ninja install
 
-    # - name: Build
-    #   run: |
-    #     cd Build
-    #     ninja
+    - name: Packing
+      run: |
+        cp Lib/bedrock_server_mod.exe Dist
+        cp Lib/bedrock_server_mod.lib Dist/Lib
+        tar cvfJ pkg.tar.xz Dist/*
 
-    # - name: Install
-    #   run: |
-    #     cd Build
-    #     ninja install
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: dist
+        path: Dist
 
-    # - name: Packing
-    #   run: |
-    #     cp Lib/bedrock_server_mod.exe Dist
-    #     cp Lib/bedrock_server_mod.lib Dist/Lib
-    #     tar cvfJ pkg.tar.xz Dist/*
-
-    # - name: Upload artifact
-    #   uses: actions/upload-artifact@v1.0.0
-    #   with:
-    #     name: dist
-    #     path: Dist
-
-    # - name: Create a new GitHub release if a new tag is pushed
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     name: v${{ env.GITHUB_TAG_NAME }}
-    #     prerelease: false
-    #     draft: true
-    #     files: pkg.tar.xz
-    #     body: (empty)
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   env:
-    #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Create a new GitHub release if a new tag is pushed
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v${{ env.GITHUB_TAG_NAME }}
+        prerelease: false
+        draft: true
+        files: pkg.tar.xz
+        body: (empty)
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
