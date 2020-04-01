@@ -8,4 +8,8 @@ filter: !blacklist
   - prefix: "?$TSS"
   - regex: "std@@U"
   - name: atexit
+  - name: "??2@YAPEAX_K@Z"
+  - name: "??3@YAXPEAX@Z"
+  - name: "??3@YAXPEAX_K@Z"
+  - name: "?_Facet_Register@std@@YAXPEAV_Facet_base@1@@Z"
   - regex: ".*printf$"
