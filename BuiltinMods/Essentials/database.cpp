@@ -60,12 +60,6 @@ void initDatabase() {
       "CREATE TABLE IF NOT EXISTS custom_name ("
       "uuid BLOB NOT NULL PRIMARY KEY, "
       "prefix TEXT, postfix TEXT)");
-  database->exec(
-      "CREATE TABLE IF NOT EXISTS chat ("
-      "uuid BLOB NOT NULL, "
-      "name TEXT, "
-      "content TEXT, "
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
   database->exec("PRAGMA user_version = 1");
 }
 

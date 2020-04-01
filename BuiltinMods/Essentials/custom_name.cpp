@@ -6,65 +6,21 @@
 
 #include <chat.h>
 
-static void (Mod::Chat::*emitter)(sigt<"chat"_sig>, Player const &, std::string &, bool &);
-
-namespace Mod {
-
-Chat::Chat() { emitter = &Chat::Emit; }
-
-Chat &Chat::GetInstance() {
-  static Chat instance;
-  return instance;
-}
-
-} // namespace Mod
-
-void static logChat(Mod::PlayerEntry const &entry, std::string const &content) {
-  DEF_LOGGER("CHAT");
-  LOGI("[%s] %s") % entry.name % content;
-  static SQLite::Statement stmt{*database, "INSERT INTO chat (uuid, name, content) VALUES (?, ?, ?)"};
+void ChatHandler(
+    Mod::PlayerEntry const &entry, std::string &displayName, std::string &content,
+    Mod::CallbackToken<std::string> &token) {
+  if (token) return;
+  static SQLite::Statement stmt{*database, "SELECT prefix, postfix FROM custom_name WHERE uuid = ?"};
   BOOST_SCOPE_EXIT_ALL() {
     stmt.reset();
     stmt.clearBindings();
   };
   stmt.bindNoCopy(1, entry.uuid, sizeof entry.uuid);
-  stmt.bindNoCopy(2, entry.name);
-  stmt.bindNoCopy(3, content);
-  stmt.exec();
-}
-
-TClasslessInstanceHook(
-    void,
-    "?_displayGameMessage@ServerNetworkHandler@@AEAAXAEBVPlayer@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$"
-    "allocator@D@2@@std@@@Z",
-    Player *player, std::string &content) {
-  DEF_LOGGER("CHAT");
-  bool block = false;
-  (Mod::Chat::GetInstance().*emitter)(SIG("chat"), *player, content, block);
-  if (block) return;
-  auto &playerdb = Mod::PlayerDatabase::GetInstance().GetData();
-  auto it        = playerdb.find(player);
-  if (it != playerdb.end()) {
-    logChat(*it, content);
-    static SQLite::Statement stmt{*database, "SELECT prefix, postfix FROM custom_name WHERE uuid = ?"};
-    BOOST_SCOPE_EXIT_ALL() {
-      stmt.reset();
-      stmt.clearBindings();
-    };
-    stmt.bindNoCopy(1, it->uuid, sizeof it->uuid);
-    if (stmt.executeStep()) {
-      char const *prefix  = stmt.getColumn("prefix");
-      char const *postfix = stmt.getColumn("postfix");
-      auto replaced       = (boost::format("%s%s%s") % prefix % it->name % postfix).str();
-      auto packet = TextPacket::createTextPacket<TextPacketType::Chat>(replaced, content, std::to_string(it->xuid));
-      LocateService<Level>()->forEachPlayer([&](Player const &p) -> bool {
-        p.sendNetworkPacket(packet);
-        return true;
-      });
-      return;
-    }
+  if (stmt.executeStep()) {
+    char const *prefix  = stmt.getColumn("prefix");
+    char const *postfix = stmt.getColumn("postfix");
+    displayName         = (boost::format("%s%s%s") % prefix % displayName % postfix).str();
   }
-  original(this, player, content);
 }
 
 enum class Action { Set, Clear };
@@ -161,4 +117,5 @@ void registerCustomName(CommandRegistry *registry) {
       CommandFlagNone);
   SetCustomNameCommand::setup(registry);
   ClearCustomNameCommand::setup(registry);
+  Mod::Chat::GetInstance().AddListener(SIG("chat"), {Mod::RecursiveEventHandlerAdaptor(ChatHandler)});
 }

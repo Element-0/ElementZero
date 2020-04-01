@@ -127,11 +127,10 @@ void loadMods(YAML::Node &cfg_node) {
 
     LOGV("Analyzing %s") % (std::string const &) lib.keyname;
     for (auto impit = import_desc; impit->Characteristics; impit++) {
-      lc_string name = (char const *) (dllbase + impit->Name);
-      if (LibNameList.count(name) != 0) {
-        LOGV("\tDepends on %s") % (char const *) (dllbase + impit->Name);
-        lib.dependencies.emplace(name);
-      }
+      auto rawname   = (char const *) (dllbase + impit->Name);
+      lc_string name = rawname;
+      LOGV("\tDepends on %s") % rawname;
+      if (LibNameList.count(name) != 0) lib.dependencies.emplace(name);
     }
   }
   while (!LibList.empty()) {

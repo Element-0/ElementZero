@@ -1,22 +1,25 @@
 #pragma once
 
 #include "event.h"
+#include "playerdb.h"
 
-#ifdef Essentials_EXPORTS
-#  define ESSAPI __declspec(dllexport)
+#ifdef ChatAPI_EXPORTS
+#  define CHATAPI __declspec(dllexport)
 #else
-#  define ESSAPI __declspec(dllimport)
+#  define CHATAPI __declspec(dllimport)
 #endif
+
+class Player;
 
 namespace Mod {
 
-class Chat : public EventEmitter<"chat"_sig, Player const &, std::string &, bool &> {
-  ESSAPI Chat();
+class Chat : public RecursiveEventEmitter<"chat"_sig, PlayerEntry const &, std::string &, std::string &, CallbackToken<std::string> &> {
+  CHATAPI Chat();
 
 public:
-  ESSAPI static Chat &GetInstance();
+  CHATAPI static Chat &GetInstance();
 
-  USING_EVENTEMITTER("chat", Player const &, std::string &, bool &);
+  USING_RECEVENTEMITTER("chat", PlayerEntry const &, std::string &, std::string &, CallbackToken<std::string> &);
 };
 
 } // namespace Mod
