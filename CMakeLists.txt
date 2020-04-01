@@ -10,7 +10,7 @@ include (Utility)
 generate_git_version (git_version)
 
 option (NO_INLINE off)
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 20)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_EXTENSIONS ON)
 set (VCPKG_TARGET_TRIPLET "x64-windows-rel")
