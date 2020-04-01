@@ -80,11 +80,10 @@ jobs:
         cp bedrock_server_mod.exe ../Lib
       shell: bash
 
-    - name: set environment
+    - name: Set environment
       run: |
         echo "::set-env name=CC::cl"
         echo "::set-env name=CXX::cl"
-        echo "::set-env name=cur::$(cygpath -m $(pwd))"
       shell: bash
 
     - name: Configure
@@ -93,8 +92,8 @@ jobs:
         cd Build
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
-          -DCMAKE_INSTALL_PREFIX:PATH="$env:cur/Dist" \
-          -DCMAKE_TOOLCHAIN_FILE="$env:cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+          -DCMAKE_INSTALL_PREFIX:PATH="D:/a/ElementZero/ElementZero/Dist" \
+          -DCMAKE_TOOLCHAIN_FILE="D:/a/ElementZero/ElementZero/vcpkg/scripts/buildsystems/vcpkg.cmake" \
           ..
 
     - name: Build
