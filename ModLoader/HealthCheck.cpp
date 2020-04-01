@@ -4,6 +4,8 @@
 #include "hook_init.h"
 #include <filesystem>
 
+#include <WinSock2.h>
+
 void PrintErrorMessage() {
   DWORD errorMessageID = ::GetLastError();
   if (errorMessageID == 0) return;

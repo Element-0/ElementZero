@@ -1,6 +1,7 @@
 #include "loader.h"
 #include "settings.hpp"
 
+#include <exception>
 #include <filesystem>
 #include <list>
 #include <unordered_set>
@@ -52,15 +53,25 @@ struct ModLibrary {
   lc_set dependencies;
 };
 
+template <typename Fn, Fn(ModLibrary::*Field)> struct FnWithName {
+  std::string name;
+  Fn fn;
+
+  FnWithName(ModLibrary const &src) : fn(src.*Field), name(src.keyname) {}
+
+  template <typename... Ps> void operator()(Ps &&... ps) { fn(std::forward<Ps>(ps)...); }
+};
+
 static std::list<ModLibrary> LibList;
-static std::list<PrePostInitType> PostInits;
-static std::list<WorldInitType> WorldInits;
-static std::list<BeforeUnloadType> UnloadHooks;
+static std::list<FnWithName<PrePostInitType, &ModLibrary::postInit>> PostInits;
+static std::list<FnWithName<WorldInitType, &ModLibrary::worldInit>> WorldInits;
+static std::list<FnWithName<BeforeUnloadType, &ModLibrary::beforeUnload>> UnloadHooks;
 static lc_set LibNameList;
 
 static void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib);
 
 void loadMods(YAML::Node &cfg_node) {
+  LOGI("Starting loading mods");
   std::error_code ec;
   for (directory_iterator next("Mods", directory_options::follow_directory_symlink, ec), end; next != end; ++next) {
     if (next->is_regular_file() && next->path().extension() == ".dll") {
@@ -77,6 +88,7 @@ void loadMods(YAML::Node &cfg_node) {
         subcfg["enabled"] = settings.ModDefaultEnabled;
         if (!settings.ModDefaultEnabled) continue;
       }
+      LOGV("Loading %s") % absolute(next->path()).string();
       auto handle = LoadLibrary(next->path().c_str());
       if (!handle) {
         LOGE("Failed to load mod: %s") % next->path();
@@ -94,7 +106,7 @@ void loadMods(YAML::Node &cfg_node) {
       lib.beforeUnload     = (BeforeUnloadType) GetProcAddress(handle, "BeforeUnload");
       LibList.emplace_back(lib);
       LibNameList.emplace(name);
-      LOGV("Loaded %s") % absolute(next->path()).string();
+      LOGI("Loaded  %s") % next->path().filename().string();
     }
   }
   if (ec) {
@@ -113,9 +125,13 @@ void loadMods(YAML::Node &cfg_node) {
     auto import_desc     = (PIMAGE_IMPORT_DESCRIPTOR)(
         dllbase + optional_header->DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
 
+    LOGV("Analyzing %s") % (std::string const &) lib.keyname;
     for (auto impit = import_desc; impit->Characteristics; impit++) {
       lc_string name = (char const *) (dllbase + impit->Name);
-      if (LibNameList.count(name) != 0) lib.dependencies.emplace(name);
+      if (LibNameList.count(name) != 0) {
+        LOGV("\tDepends on %s") % (char const *) (dllbase + impit->Name);
+        lib.dependencies.emplace(name);
+      }
     }
   }
   while (!LibList.empty()) {
@@ -137,28 +153,40 @@ void loadMods(YAML::Node &cfg_node) {
       lib.dependencies = temp;
     }
   }
-  for (auto hook : PostInits) hook();
+  for (auto hook : PostInits) try {
+      hook();
+    } catch (std::exception const &ex) { LOGE("Exception at post init (%s): %s") % hook.name % ex.what(); }
 }
 
 void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib) {
   auto subcfg = cfg_node[lib.keyname];
   LOGI("Init %s") % lib.keyname;
   if (subcfg.IsMap()) {
-    if (lib.applySettings) lib.applySettings(subcfg);
+    if (lib.applySettings) try {
+        lib.applySettings(subcfg);
+      } catch (std::exception const &ex) { LOGE("Exception at apply settings (%s): %s") % lib.keyname % ex.what(); }
   }
   subcfg["enabled"] = true;
-  if (lib.generateSettings) lib.generateSettings(subcfg);
-  if (lib.preInit) lib.preInit();
-  if (lib.postInit) PostInits.emplace_back(lib.postInit);
-  if (lib.worldInit) WorldInits.emplace_back(lib.worldInit);
-  if (lib.beforeUnload) UnloadHooks.emplace_back(lib.beforeUnload);
+  if (lib.generateSettings) try {
+      lib.generateSettings(subcfg);
+    } catch (std::exception const &ex) { LOGE("Exception at generate settings (%s): %s") % lib.keyname % ex.what(); }
+  if (lib.preInit) try {
+      lib.preInit();
+    } catch (std::exception const &ex) { LOGE("Exception at pre init (%s): %s") % lib.keyname % ex.what(); }
+  if (lib.postInit) PostInits.emplace_back(lib);
+  if (lib.worldInit) WorldInits.emplace_back(lib);
+  if (lib.beforeUnload) UnloadHooks.emplace_back(lib);
 }
 
-TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
-  for (auto hook : UnloadHooks) { hook(); }
+TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") try {
+  for (auto hook : UnloadHooks) try {
+      hook();
+    } catch (std::exception const &ex) { LOGE("Exception at unload hook (%s): %s") % hook.name % ex.what(); }
   original(this);
-}
+} catch (std::exception const &ex) { LOGE("Exception at game unload: %s") % ex.what(); }
 
 void worldHook(std::filesystem::path const &path) {
-  for (auto init : WorldInits) init(path);
+  for (auto hook : WorldInits) try {
+      hook(path);
+    } catch (std::exception const &ex) { LOGE("Exception at world hook (%s): %s") % hook.name % ex.what(); }
 }
