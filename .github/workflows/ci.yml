@@ -95,7 +95,7 @@ jobs:
     - name: Build
       run: |
         cd Build
-        ninja
+        ninja -v
 
     - name: Install
       run: |
