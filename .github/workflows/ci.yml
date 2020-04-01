@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: Set vcpkg's response file path used as part of cache's key.
       env:
         vcpkgResponseFile: ${{ github.workspace }}/vcpkg.txt
