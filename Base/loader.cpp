@@ -57,7 +57,7 @@ template <typename Fn, Fn(ModLibrary::*Field)> struct FnWithName {
   std::string name;
   Fn fn;
 
-  FnWithName(ModLibrary const &src) : fn(src.*Field), name(src.keyname) {}
+  FnWithName(ModLibrary const &src) : name(src.keyname), fn(src.*Field) {}
 
   template <typename... Ps> void operator()(Ps &&... ps) { fn(std::forward<Ps>(ps)...); }
 };
