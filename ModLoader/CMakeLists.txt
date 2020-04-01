@@ -23,7 +23,7 @@ else ()
     set (INSTALL_DIR ${PREBUILT_FUNCHOOK})
 endif ()
 
-install (FILES ${INSTALL_DIR}/bin/FuncHook.dll DESTINATION .)
+install (FILES ${INSTALL_DIR}/bin/funchook.dll DESTINATION .)
 
 add_library (ModLoader SHARED dllmain.cpp HealthCheck.cpp hook_impl.cpp forward.cpp)
 set_target_properties (ModLoader PROPERTIES OUTPUT_NAME "Chakra")
