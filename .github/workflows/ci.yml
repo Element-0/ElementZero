@@ -42,24 +42,24 @@ jobs:
       with:
         arch: x64
 
-    - name: cache llvm
-      uses: actions/cache@v1
-      id: cachellvm
-      with:
-        path: C:/ProgramData/scoop
-        key: scoop-llvm9.0.0
+    # - name: cache llvm
+    #   uses: actions/cache@v1
+    #   id: cachellvm
+    #   with:
+    #     path: C:/ProgramData/scoop
+    #     key: scoop-llvm9.0.0
 
-    - name: install llvm
-      if: steps.cachellvm.outputs.cache-hit != 'true'
-      run: |
-        Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-        scoop install llvm tar --global
+    # - name: install llvm
+    #   if: steps.cachellvm.outputs.cache-hit != 'true'
+    #   run: |
+    #     Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+    #     scoop install llvm tar --global
 
-    - name: set environment
-      run: |
-        echo "::set-env name=CC::clang-cl"
-        echo "::set-env name=CXX::clang-cl"
-        echo "::set-env name=PATH::C:/ProgramData/scoop/shims;$env:PATH"
+    # - name: set environment
+    #   run: |
+    #     echo "::set-env name=CC::clang-cl"
+    #     echo "::set-env name=CXX::clang-cl"
+    #     echo "::set-env name=PATH::C:/ProgramData/scoop/shims;$env:PATH"
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
