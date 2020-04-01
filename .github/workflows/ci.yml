@@ -90,11 +90,7 @@ jobs:
       run: |
         mkdir Build
         cd Build
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-          -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
-          -DCMAKE_INSTALL_PREFIX:PATH="D:/a/ElementZero/ElementZero/Dist" \
-          -DCMAKE_TOOLCHAIN_FILE="D:/a/ElementZero/ElementZero/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-          ..
+        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" -DCMAKE_INSTALL_PREFIX:PATH="D:/a/ElementZero/ElementZero/Dist" -DCMAKE_TOOLCHAIN_FILE="D:/a/ElementZero/ElementZero/vcpkg/scripts/buildsystems/vcpkg.cmake" ..
 
     - name: Build
       run: |
