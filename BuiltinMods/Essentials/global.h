@@ -26,7 +26,7 @@ struct Settings {
   bool force_experimental_gameplay = false;
   bool education_feature           = false;
   bool debug_packs                 = false;
-  bool load_scripts                = true;
+  bool load_scripts                = false;
   std::string database             = "essentials.db";
   std::string worldDatabase        = "essentials.db";
 
