@@ -38,29 +38,6 @@ jobs:
         vcpkgGitCommitId: master
         vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
 
-    - uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: x64
-
-    # - name: cache llvm
-    #   uses: actions/cache@v1
-    #   id: cachellvm
-    #   with:
-    #     path: C:/ProgramData/scoop
-    #     key: scoop-llvm9.0.0
-
-    # - name: install llvm
-    #   if: steps.cachellvm.outputs.cache-hit != 'true'
-    #   run: |
-    #     Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-    #     scoop install llvm tar --global
-
-    # - name: set environment
-    #   run: |
-    #     echo "::set-env name=CC::clang-cl"
-    #     echo "::set-env name=CXX::clang-cl"
-    #     echo "::set-env name=PATH::C:/ProgramData/scoop/shims;$env:PATH"
-
     - name: Cache lib artifacts
       uses: actions/cache@v1
       id: libcache
@@ -99,38 +76,57 @@ jobs:
         cp bedrock_server_mod.exe ../Lib
       shell: bash
 
-    - name: Build
+    - name: set environment
       run: |
-        cur=$(cygpath -m $(pwd))
-        mkdir Build
-        pushd Build
-        cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
-        -DCMAKE_INSTALL_PREFIX:PATH="$cur/Dist" \
-        -DCMAKE_TOOLCHAIN_FILE="$cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-        ..
-        ninja
-        ninja install
-        popd
-        cp Lib/bedrock_server_mod.exe Dist
-        cp Lib/bedrock_server_mod.lib Dist/Lib
-        tar cvfJ pkg.tar.xz Dist/*
+        echo "::set-env name=CC::cl"
+        echo "::set-env name=CXX::cl"
+        echo "::set-env name=cur::$(cygpath -m $(pwd))"
       shell: bash
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: dist
-        path: Dist
+    # - uses: ilammy/msvc-dev-cmd@v1
+    #   with:
+    #     arch: x64
 
-    - name: Create a new GitHub release if a new tag is pushed
-      uses: softprops/action-gh-release@v1
-      with:
-        name: v${{ env.GITHUB_TAG_NAME }}
-        prerelease: false
-        draft: true
-        files: pkg.tar.xz
-        body: (empty)
-      if: startsWith(github.ref, 'refs/tags/')
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    # - name: Configure
+    #   run: |
+    #     mkdir Build
+    #     cd Build
+    #     cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    #       -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
+    #       -DCMAKE_INSTALL_PREFIX:PATH="$env:cur/Dist" \
+    #       -DCMAKE_TOOLCHAIN_FILE="$env:cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+    #       ..
+
+    # - name: Build
+    #   run: |
+    #     cd Build
+    #     ninja
+
+    # - name: Install
+    #   run: |
+    #     cd Build
+    #     ninja install
+
+    # - name: Packing
+    #   run: |
+    #     cp Lib/bedrock_server_mod.exe Dist
+    #     cp Lib/bedrock_server_mod.lib Dist/Lib
+    #     tar cvfJ pkg.tar.xz Dist/*
+
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v1.0.0
+    #   with:
+    #     name: dist
+    #     path: Dist
+
+    # - name: Create a new GitHub release if a new tag is pushed
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     name: v${{ env.GITHUB_TAG_NAME }}
+    #     prerelease: false
+    #     draft: true
+    #     files: pkg.tar.xz
+    #     body: (empty)
+    #   if: startsWith(github.ref, 'refs/tags/')
+    #   env:
+    #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
