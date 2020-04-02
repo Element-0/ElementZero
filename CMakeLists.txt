@@ -48,6 +48,7 @@ find_package (jsoncpp CONFIG REQUIRED)
 find_and_install_package (sqlite3 CONFIG REQUIRED)
 find_and_install_package (yaml-cpp CONFIG REQUIRED)
 find_package (msgpack CONFIG REQUIRED)
+find_package (Flatbuffers CONFIG REQUIRED)
 
 function (install_pdb name)
     install (FILES $<TARGET_PDB_FILE:${name}> DESTINATION Lib)
