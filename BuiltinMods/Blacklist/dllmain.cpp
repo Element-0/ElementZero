@@ -189,7 +189,7 @@ static void logIpAddress(
 }
 
 static thread_local NetworkIdentifier *context;
-static thread_local std::optional<std::pair<boolean, BlacklistEntry *>> cached;
+static thread_local std::optional<std::pair<bool, BlacklistEntry *>> cached;
 
 TClasslessInstanceHook(
     void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVLoginPacket@@@Z", NetworkIdentifier &id,
