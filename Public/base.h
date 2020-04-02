@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 #include <Core/mce.h>
 
 #ifdef Base_EXPORTS
@@ -17,6 +19,8 @@ class Level;
 namespace RakNet {
 class RakPeer;
 }
+
+BASEAPI HMODULE GetLoadedMod(char const *name);
 
 BASEAPI mce::UUID const &SessionUUID();
 

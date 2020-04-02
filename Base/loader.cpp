@@ -11,6 +11,7 @@
 
 #include <log.h>
 #include <hook.h>
+#include <base.h>
 
 using namespace std::filesystem;
 
@@ -62,11 +63,18 @@ template <typename Fn, Fn(ModLibrary::*Field)> struct FnWithName {
   template <typename... Ps> void operator()(Ps &&... ps) { fn(std::forward<Ps>(ps)...); }
 };
 
+static std::map<lc_string, HMODULE> LoadedMods;
 static std::list<ModLibrary> LibList;
 static std::list<FnWithName<PrePostInitType, &ModLibrary::postInit>> PostInits;
 static std::list<FnWithName<WorldInitType, &ModLibrary::worldInit>> WorldInits;
 static std::list<FnWithName<BeforeUnloadType, &ModLibrary::beforeUnload>> UnloadHooks;
 static lc_set LibNameList;
+
+HMODULE GetLoadedMod(const char *name) {
+  auto it = LoadedMods.find(name);
+  if (it == LoadedMods.end()) return 0;
+  return it->second;
+}
 
 static void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib);
 
@@ -175,6 +183,7 @@ void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib) {
   if (lib.postInit) PostInits.emplace_back(lib);
   if (lib.worldInit) WorldInits.emplace_back(lib);
   if (lib.beforeUnload) UnloadHooks.emplace_back(lib);
+  LoadedMods.emplace(lib.name, lib.handle);
 }
 
 TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") try {
