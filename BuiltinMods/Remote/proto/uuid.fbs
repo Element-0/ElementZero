@@ -1,0 +1,7 @@
+native_include "uuid_addition.h";
+
+namespace Mod.proto;
+
+struct UUID (native_type:"mce::UUID") {
+  v: [ubyte:16];
+}

@@ -1,39 +1,51 @@
 #include <dllentry.h>
-#include <exception>
+#include <list>
 #include <memory>
-#include <mutex>
-#include <optional>
-#include <stdexcept>
-#include <thread>
 
 #include <log.h>
+#include <utility>
 #include <yaml.h>
-#include <ws-gw.h>
+#include <base.h>
 
 #include <Core/Common.h>
+
+#include "global.h"
 
 DEF_LOGGER("Remote");
 
 void dllenter() {}
 void dllexit() {}
 
-struct Settings {
-  std::string name     = "element-zero";
-  std::string endpoint = "ws://127.0.0.1:8818/";
-
-  template <typename IO> static inline bool io(IO f, Settings &self, YAML::Node &node) {
-    return f(self.name, node["name"]) && f(self.endpoint, node["endpoint"]);
-  }
-} settings;
-
-struct State {
-  WsGw::Service srv{[](auto &inp) -> WsGw::Buffer { throw std::runtime_error{"Not implemented"}; }};
-};
-
+Settings settings;
 std::unique_ptr<State> state;
 
-void PreInit() { state = std::make_unique<State>(); }
+DEFAULT_SETTINGS(settings);
+
+static auto &inits() {
+  static std::vector<std::pair<char const *, void (*)()>> ret;
+  return ret;
+}
+
+void AddInitializer(char const *name, void (*fn)()) {
+  LOGV("Register extension for %s") % name;
+  inits().emplace_back(name, fn);
+}
+
+void PreInit() {
+  state = std::make_unique<State>();
+  AddInitializer("ChatAPI", InitChatHook);
+}
+
 void WorldInit(std::filesystem::path const &) {
+  for (auto [name, fn] : inits()) {
+    auto handle = GetLoadedMod(name);
+    if (handle) {
+      LOGV("Load extension for %s") % name;
+      fn();
+    } else {
+      LOGV("Skip extension for %s") % name;
+    }
+  }
   LOGV("connecting to %s") % settings.endpoint;
   state->srv.Connect(settings.endpoint, {settings.name, "element-zero", Common::getServerVersionString()});
   LOGI("Connected to hub");
