@@ -1,0 +1,4 @@
+Source: funchook
+Version: 1.1.0-0
+Description: Hook function calls by inserting jump instructions at runtime
+Homepage:  https://github.com/kubo/funchook

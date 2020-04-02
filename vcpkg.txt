@@ -1,3 +1,4 @@
+--overlay-ports=ports
 --overlay-triplets=VcPkgTriplets
 --triplet
 x64-windows-rel
@@ -15,3 +16,4 @@ chakracore
 msgpack
 flatbuffers
 gsl-lite
+funchook
