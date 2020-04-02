@@ -71,7 +71,7 @@ static std::list<FnWithName<BeforeUnloadType, &ModLibrary::beforeUnload>> Unload
 static lc_set LibNameList;
 
 HMODULE GetLoadedMod(const char *name) {
-  auto it = LoadedMods.find(name);
+  auto it = LoadedMods.find(lc_string{name});
   if (it == LoadedMods.end()) return 0;
   return it->second;
 }
@@ -99,7 +99,7 @@ void loadMods(YAML::Node &cfg_node) {
       LOGV("Loading %s") % absolute(next->path()).string();
       auto handle = LoadLibrary(next->path().c_str());
       if (!handle) {
-        LOGE("Failed to load mod: %s") % next->path();
+        LOGE("Failed to load mod: %s: %d") % next->path() % ::GetLastError();
         continue;
       }
       auto name = next->path().filename().string();
@@ -183,7 +183,7 @@ void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib) {
   if (lib.postInit) PostInits.emplace_back(lib);
   if (lib.worldInit) WorldInits.emplace_back(lib);
   if (lib.beforeUnload) UnloadHooks.emplace_back(lib);
-  LoadedMods.emplace(lib.name, lib.handle);
+  LoadedMods.emplace(lib.keyname, lib.handle);
 }
 
 TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") try {
