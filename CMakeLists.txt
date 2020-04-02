@@ -19,8 +19,10 @@ if (NO_INLINE)
     add_compile_options (/Ob0)
 endif ()
 
-add_compile_options (-Wno-c++2a-extensions)
-add_compile_options (/EHsc)
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" AND "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")
+    add_compile_options (-Wno-c++2a-extensions)
+endif ()
+add_compile_options (/EHsc /utf-8)
 
 include_directories (Public)
 add_compile_definitions (_UNICODE UNICODE NDEBUG)
