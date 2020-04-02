@@ -20,6 +20,7 @@ jobs:
         vcpkgResponseFile: ${{ github.workspace }}/vcpkg.txt
       run: |
         sed -i 's/VcPkgTriplets/..\\VcPkgTriplets/' $vcpkgResponseFile
+        sed -i 's/=ports/=..\\ports/' $vcpkgResponseFile
         echo "::set-env name=vcpkgResponseFile::$vcpkgResponseFile"
       shell: bash
 
