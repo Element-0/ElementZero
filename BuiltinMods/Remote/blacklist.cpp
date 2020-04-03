@@ -1,16 +1,17 @@
-#include <stdexcept>
 #include <ws-gw.h>
 
 #include <blacklist.h>
 #include <log.h>
+#include <remote.h>
 
 #include "flatbuffers/flatbuffers.h"
 #include "global.h"
 
 #include "proto/blacklist_generated.h"
+#include "remote.h"
 
 void InitBlacklistHook() {
-  state->srv.RegisterHandler("blacklist", [](WsGw::BufferView const &view) -> WsGw::Buffer {
+  Mod::Remote::GetInstance().AddMethod("blacklist", [](WsGw::BufferView const &view) -> WsGw::Buffer {
     using namespace Mod::proto::blacklist;
     using namespace Mod;
     auto &blacklist = Blacklist::GetInstance();

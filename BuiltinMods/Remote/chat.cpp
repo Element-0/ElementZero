@@ -1,6 +1,8 @@
+#include <memory>
+
 #include <chat.h>
 #include <log.h>
-#include <memory>
+#include <remote.h>
 
 #include "global.h"
 
@@ -21,11 +23,12 @@ void InitChatHook() {
 void ChatHandler(
     Mod::PlayerEntry const &entry, std::string &displayName, std::string &content,
     Mod::CallbackToken<std::string> &token) {
+  static auto &instance = Mod::Remote::GetInstance();
   flatbuffers::FlatBufferBuilder builder;
   Mod::proto::ChatEventT event;
   event.from        = entry.uuid;
   event.displayName = displayName;
   event.content     = content;
   builder.Finish(Mod::proto::ChatEvent::Pack(builder, &event));
-  state->srv.Broadcast("chat", builder);
+  instance.Broadcast("chat", builder);
 }

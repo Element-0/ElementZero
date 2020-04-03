@@ -6,6 +6,7 @@
 #include <utility>
 #include <yaml.h>
 #include <base.h>
+#include <remote.h>
 
 #include <Core/Common.h>
 
@@ -56,3 +57,28 @@ void WorldInit(std::filesystem::path const &) {
   state->srv.Connect(settings.endpoint, {settings.name, "element-zero", Common::getServerVersionString()});
   LOGI("Connected to hub");
 }
+
+namespace Mod {
+
+struct RemoteImpl : Remote {
+  void AddMethod(std::string const &name, WsGw::Handler handler) override {
+    if (!state) {
+      LOGW("Skip register method: the Remote module not enabled.");
+      return;
+    }
+    LOGV("Register method %s") % name;
+    state->srv.RegisterHandler(name, handler);
+  }
+
+  void Broadcast(std::string_view name, WsGw::BufferView payload) override {
+    if (!state) return;
+    state->srv.Broadcast(name, payload);
+  }
+};
+
+Remote &Remote::GetInstance() {
+  static RemoteImpl impl;
+  return impl;
+}
+
+} // namespace Mod
