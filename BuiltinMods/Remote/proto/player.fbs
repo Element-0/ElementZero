@@ -17,3 +17,31 @@ union PlayerEvent {
 table PlayerEventPacket {
   event: PlayerEvent;
 }
+
+table PlayerList {
+  players: [PlayerEntity];
+}
+
+table FindXUID {
+  xuid: uint64;
+}
+
+table FindUUID {
+  uuid: UUID (native_inline);
+}
+
+table FindNAME {
+  name: string (required);
+}
+
+union FindPlayer {
+  FindXUID, FindUUID, FindNAME
+}
+
+table FindPlayerPacket {
+  find: FindPlayer;
+}
+
+table FindResult {
+  entity: PlayerEntity;
+}

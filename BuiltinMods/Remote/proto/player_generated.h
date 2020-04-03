@@ -20,6 +20,30 @@ struct PlayerEventPacket;
 struct PlayerEventPacketBuilder;
 struct PlayerEventPacketT;
 
+struct PlayerList;
+struct PlayerListBuilder;
+struct PlayerListT;
+
+struct FindXUID;
+struct FindXUIDBuilder;
+struct FindXUIDT;
+
+struct FindUUID;
+struct FindUUIDBuilder;
+struct FindUUIDT;
+
+struct FindNAME;
+struct FindNAMEBuilder;
+struct FindNAMET;
+
+struct FindPlayerPacket;
+struct FindPlayerPacketBuilder;
+struct FindPlayerPacketT;
+
+struct FindResult;
+struct FindResultBuilder;
+struct FindResultT;
+
 enum class PlayerEvent : uint8_t {
   NONE = 0,
   joined = 1,
@@ -93,6 +117,119 @@ struct PlayerEventUnion {
 
 bool VerifyPlayerEvent(flatbuffers::Verifier &verifier, const void *obj, PlayerEvent type);
 bool VerifyPlayerEventVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
+
+enum class FindPlayer : uint8_t {
+  NONE = 0,
+  FindXUID = 1,
+  FindUUID = 2,
+  FindNAME = 3,
+  MIN = NONE,
+  MAX = FindNAME
+};
+
+inline const FindPlayer (&EnumValuesFindPlayer())[4] {
+  static const FindPlayer values[] = {
+    FindPlayer::NONE,
+    FindPlayer::FindXUID,
+    FindPlayer::FindUUID,
+    FindPlayer::FindNAME
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesFindPlayer() {
+  static const char * const names[5] = {
+    "NONE",
+    "FindXUID",
+    "FindUUID",
+    "FindNAME",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameFindPlayer(FindPlayer e) {
+  if (flatbuffers::IsOutRange(e, FindPlayer::NONE, FindPlayer::FindNAME)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesFindPlayer()[index];
+}
+
+template<typename T> struct FindPlayerTraits {
+  static const FindPlayer enum_value = FindPlayer::NONE;
+};
+
+template<> struct FindPlayerTraits<Mod::proto::FindXUID> {
+  static const FindPlayer enum_value = FindPlayer::FindXUID;
+};
+
+template<> struct FindPlayerTraits<Mod::proto::FindUUID> {
+  static const FindPlayer enum_value = FindPlayer::FindUUID;
+};
+
+template<> struct FindPlayerTraits<Mod::proto::FindNAME> {
+  static const FindPlayer enum_value = FindPlayer::FindNAME;
+};
+
+struct FindPlayerUnion {
+  FindPlayer type;
+  void *value;
+
+  FindPlayerUnion() : type(FindPlayer::NONE), value(nullptr) {}
+  FindPlayerUnion(FindPlayerUnion&& u) FLATBUFFERS_NOEXCEPT :
+    type(FindPlayer::NONE), value(nullptr)
+    { std::swap(type, u.type); std::swap(value, u.value); }
+  FindPlayerUnion(const FindPlayerUnion &);
+  FindPlayerUnion &operator=(const FindPlayerUnion &u)
+    { FindPlayerUnion t(u); std::swap(type, t.type); std::swap(value, t.value); return *this; }
+  FindPlayerUnion &operator=(FindPlayerUnion &&u) FLATBUFFERS_NOEXCEPT
+    { std::swap(type, u.type); std::swap(value, u.value); return *this; }
+  ~FindPlayerUnion() { Reset(); }
+
+  void Reset();
+
+#ifndef FLATBUFFERS_CPP98_STL
+  template <typename T>
+  void Set(T&& val) {
+    using RT = typename std::remove_reference<T>::type;
+    Reset();
+    type = FindPlayerTraits<typename RT::TableType>::enum_value;
+    if (type != FindPlayer::NONE) {
+      value = new RT(std::forward<T>(val));
+    }
+  }
+#endif  // FLATBUFFERS_CPP98_STL
+
+  static void *UnPack(const void *obj, FindPlayer type, const flatbuffers::resolver_function_t *resolver);
+  flatbuffers::Offset<void> Pack(flatbuffers::FlatBufferBuilder &_fbb, const flatbuffers::rehasher_function_t *_rehasher = nullptr) const;
+
+  Mod::proto::FindXUIDT *AsFindXUID() {
+    return type == FindPlayer::FindXUID ?
+      reinterpret_cast<Mod::proto::FindXUIDT *>(value) : nullptr;
+  }
+  const Mod::proto::FindXUIDT *AsFindXUID() const {
+    return type == FindPlayer::FindXUID ?
+      reinterpret_cast<const Mod::proto::FindXUIDT *>(value) : nullptr;
+  }
+  Mod::proto::FindUUIDT *AsFindUUID() {
+    return type == FindPlayer::FindUUID ?
+      reinterpret_cast<Mod::proto::FindUUIDT *>(value) : nullptr;
+  }
+  const Mod::proto::FindUUIDT *AsFindUUID() const {
+    return type == FindPlayer::FindUUID ?
+      reinterpret_cast<const Mod::proto::FindUUIDT *>(value) : nullptr;
+  }
+  Mod::proto::FindNAMET *AsFindNAME() {
+    return type == FindPlayer::FindNAME ?
+      reinterpret_cast<Mod::proto::FindNAMET *>(value) : nullptr;
+  }
+  const Mod::proto::FindNAMET *AsFindNAME() const {
+    return type == FindPlayer::FindNAME ?
+      reinterpret_cast<const Mod::proto::FindNAMET *>(value) : nullptr;
+  }
+};
+
+bool VerifyFindPlayer(flatbuffers::Verifier &verifier, const void *obj, FindPlayer type);
+bool VerifyFindPlayerVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
 struct PlayerEntityT : public flatbuffers::NativeTable {
   typedef PlayerEntity TableType;
@@ -273,6 +410,393 @@ inline flatbuffers::Offset<PlayerEventPacket> CreatePlayerEventPacket(
 
 flatbuffers::Offset<PlayerEventPacket> CreatePlayerEventPacket(flatbuffers::FlatBufferBuilder &_fbb, const PlayerEventPacketT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct PlayerListT : public flatbuffers::NativeTable {
+  typedef PlayerList TableType;
+  std::vector<std::unique_ptr<Mod::proto::PlayerEntityT>> players;
+  PlayerListT() {
+  }
+};
+
+struct PlayerList FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef PlayerListT NativeTableType;
+  typedef PlayerListBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_PLAYERS = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<Mod::proto::PlayerEntity>> *players() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Mod::proto::PlayerEntity>> *>(VT_PLAYERS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_PLAYERS) &&
+           verifier.VerifyVector(players()) &&
+           verifier.VerifyVectorOfTables(players()) &&
+           verifier.EndTable();
+  }
+  PlayerListT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(PlayerListT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<PlayerList> Pack(flatbuffers::FlatBufferBuilder &_fbb, const PlayerListT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct PlayerListBuilder {
+  typedef PlayerList Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_players(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Mod::proto::PlayerEntity>>> players) {
+    fbb_.AddOffset(PlayerList::VT_PLAYERS, players);
+  }
+  explicit PlayerListBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  PlayerListBuilder &operator=(const PlayerListBuilder &);
+  flatbuffers::Offset<PlayerList> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<PlayerList>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<PlayerList> CreatePlayerList(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Mod::proto::PlayerEntity>>> players = 0) {
+  PlayerListBuilder builder_(_fbb);
+  builder_.add_players(players);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<PlayerList> CreatePlayerListDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<Mod::proto::PlayerEntity>> *players = nullptr) {
+  auto players__ = players ? _fbb.CreateVector<flatbuffers::Offset<Mod::proto::PlayerEntity>>(*players) : 0;
+  return Mod::proto::CreatePlayerList(
+      _fbb,
+      players__);
+}
+
+flatbuffers::Offset<PlayerList> CreatePlayerList(flatbuffers::FlatBufferBuilder &_fbb, const PlayerListT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FindXUIDT : public flatbuffers::NativeTable {
+  typedef FindXUID TableType;
+  uint64_t xuid;
+  FindXUIDT()
+      : xuid(0) {
+  }
+};
+
+struct FindXUID FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FindXUIDT NativeTableType;
+  typedef FindXUIDBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_XUID = 4
+  };
+  uint64_t xuid() const {
+    return GetField<uint64_t>(VT_XUID, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint64_t>(verifier, VT_XUID) &&
+           verifier.EndTable();
+  }
+  FindXUIDT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FindXUIDT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FindXUID> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindXUIDT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FindXUIDBuilder {
+  typedef FindXUID Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_xuid(uint64_t xuid) {
+    fbb_.AddElement<uint64_t>(FindXUID::VT_XUID, xuid, 0);
+  }
+  explicit FindXUIDBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  FindXUIDBuilder &operator=(const FindXUIDBuilder &);
+  flatbuffers::Offset<FindXUID> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FindXUID>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FindXUID> CreateFindXUID(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t xuid = 0) {
+  FindXUIDBuilder builder_(_fbb);
+  builder_.add_xuid(xuid);
+  return builder_.Finish();
+}
+
+flatbuffers::Offset<FindXUID> CreateFindXUID(flatbuffers::FlatBufferBuilder &_fbb, const FindXUIDT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FindUUIDT : public flatbuffers::NativeTable {
+  typedef FindUUID TableType;
+  mce::UUID uuid;
+  FindUUIDT() {
+  }
+};
+
+struct FindUUID FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FindUUIDT NativeTableType;
+  typedef FindUUIDBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_UUID = 4
+  };
+  const Mod::proto::UUID *uuid() const {
+    return GetStruct<const Mod::proto::UUID *>(VT_UUID);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<Mod::proto::UUID>(verifier, VT_UUID) &&
+           verifier.EndTable();
+  }
+  FindUUIDT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FindUUIDT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FindUUID> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindUUIDT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FindUUIDBuilder {
+  typedef FindUUID Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_uuid(const Mod::proto::UUID *uuid) {
+    fbb_.AddStruct(FindUUID::VT_UUID, uuid);
+  }
+  explicit FindUUIDBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  FindUUIDBuilder &operator=(const FindUUIDBuilder &);
+  flatbuffers::Offset<FindUUID> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FindUUID>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FindUUID> CreateFindUUID(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const Mod::proto::UUID *uuid = 0) {
+  FindUUIDBuilder builder_(_fbb);
+  builder_.add_uuid(uuid);
+  return builder_.Finish();
+}
+
+flatbuffers::Offset<FindUUID> CreateFindUUID(flatbuffers::FlatBufferBuilder &_fbb, const FindUUIDT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FindNAMET : public flatbuffers::NativeTable {
+  typedef FindNAME TableType;
+  std::string name;
+  FindNAMET() {
+  }
+};
+
+struct FindNAME FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FindNAMET NativeTableType;
+  typedef FindNAMEBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4
+  };
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffsetRequired(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           verifier.EndTable();
+  }
+  FindNAMET *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FindNAMET *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FindNAME> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindNAMET* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FindNAMEBuilder {
+  typedef FindNAME Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(FindNAME::VT_NAME, name);
+  }
+  explicit FindNAMEBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  FindNAMEBuilder &operator=(const FindNAMEBuilder &);
+  flatbuffers::Offset<FindNAME> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FindNAME>(end);
+    fbb_.Required(o, FindNAME::VT_NAME);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FindNAME> CreateFindNAME(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> name = 0) {
+  FindNAMEBuilder builder_(_fbb);
+  builder_.add_name(name);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FindNAME> CreateFindNAMEDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return Mod::proto::CreateFindNAME(
+      _fbb,
+      name__);
+}
+
+flatbuffers::Offset<FindNAME> CreateFindNAME(flatbuffers::FlatBufferBuilder &_fbb, const FindNAMET *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FindPlayerPacketT : public flatbuffers::NativeTable {
+  typedef FindPlayerPacket TableType;
+  Mod::proto::FindPlayerUnion find;
+  FindPlayerPacketT() {
+  }
+};
+
+struct FindPlayerPacket FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FindPlayerPacketT NativeTableType;
+  typedef FindPlayerPacketBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_FIND_TYPE = 4,
+    VT_FIND = 6
+  };
+  Mod::proto::FindPlayer find_type() const {
+    return static_cast<Mod::proto::FindPlayer>(GetField<uint8_t>(VT_FIND_TYPE, 0));
+  }
+  const void *find() const {
+    return GetPointer<const void *>(VT_FIND);
+  }
+  template<typename T> const T *find_as() const;
+  const Mod::proto::FindXUID *find_as_FindXUID() const {
+    return find_type() == Mod::proto::FindPlayer::FindXUID ? static_cast<const Mod::proto::FindXUID *>(find()) : nullptr;
+  }
+  const Mod::proto::FindUUID *find_as_FindUUID() const {
+    return find_type() == Mod::proto::FindPlayer::FindUUID ? static_cast<const Mod::proto::FindUUID *>(find()) : nullptr;
+  }
+  const Mod::proto::FindNAME *find_as_FindNAME() const {
+    return find_type() == Mod::proto::FindPlayer::FindNAME ? static_cast<const Mod::proto::FindNAME *>(find()) : nullptr;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_FIND_TYPE) &&
+           VerifyOffset(verifier, VT_FIND) &&
+           VerifyFindPlayer(verifier, find(), find_type()) &&
+           verifier.EndTable();
+  }
+  FindPlayerPacketT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FindPlayerPacketT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FindPlayerPacket> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindPlayerPacketT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+template<> inline const Mod::proto::FindXUID *FindPlayerPacket::find_as<Mod::proto::FindXUID>() const {
+  return find_as_FindXUID();
+}
+
+template<> inline const Mod::proto::FindUUID *FindPlayerPacket::find_as<Mod::proto::FindUUID>() const {
+  return find_as_FindUUID();
+}
+
+template<> inline const Mod::proto::FindNAME *FindPlayerPacket::find_as<Mod::proto::FindNAME>() const {
+  return find_as_FindNAME();
+}
+
+struct FindPlayerPacketBuilder {
+  typedef FindPlayerPacket Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_find_type(Mod::proto::FindPlayer find_type) {
+    fbb_.AddElement<uint8_t>(FindPlayerPacket::VT_FIND_TYPE, static_cast<uint8_t>(find_type), 0);
+  }
+  void add_find(flatbuffers::Offset<void> find) {
+    fbb_.AddOffset(FindPlayerPacket::VT_FIND, find);
+  }
+  explicit FindPlayerPacketBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  FindPlayerPacketBuilder &operator=(const FindPlayerPacketBuilder &);
+  flatbuffers::Offset<FindPlayerPacket> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FindPlayerPacket>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FindPlayerPacket> CreateFindPlayerPacket(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    Mod::proto::FindPlayer find_type = Mod::proto::FindPlayer::NONE,
+    flatbuffers::Offset<void> find = 0) {
+  FindPlayerPacketBuilder builder_(_fbb);
+  builder_.add_find(find);
+  builder_.add_find_type(find_type);
+  return builder_.Finish();
+}
+
+flatbuffers::Offset<FindPlayerPacket> CreateFindPlayerPacket(flatbuffers::FlatBufferBuilder &_fbb, const FindPlayerPacketT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FindResultT : public flatbuffers::NativeTable {
+  typedef FindResult TableType;
+  std::unique_ptr<Mod::proto::PlayerEntityT> entity;
+  FindResultT() {
+  }
+};
+
+struct FindResult FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FindResultT NativeTableType;
+  typedef FindResultBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ENTITY = 4
+  };
+  const Mod::proto::PlayerEntity *entity() const {
+    return GetPointer<const Mod::proto::PlayerEntity *>(VT_ENTITY);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ENTITY) &&
+           verifier.VerifyTable(entity()) &&
+           verifier.EndTable();
+  }
+  FindResultT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FindResultT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FindResult> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindResultT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FindResultBuilder {
+  typedef FindResult Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_entity(flatbuffers::Offset<Mod::proto::PlayerEntity> entity) {
+    fbb_.AddOffset(FindResult::VT_ENTITY, entity);
+  }
+  explicit FindResultBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  FindResultBuilder &operator=(const FindResultBuilder &);
+  flatbuffers::Offset<FindResult> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FindResult>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FindResult> CreateFindResult(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<Mod::proto::PlayerEntity> entity = 0) {
+  FindResultBuilder builder_(_fbb);
+  builder_.add_entity(entity);
+  return builder_.Finish();
+}
+
+flatbuffers::Offset<FindResult> CreateFindResult(flatbuffers::FlatBufferBuilder &_fbb, const FindResultT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 inline PlayerEntityT *PlayerEntity::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   std::unique_ptr<Mod::proto::PlayerEntityT> _o = std::unique_ptr<Mod::proto::PlayerEntityT>(new PlayerEntityT());
   UnPackTo(_o.get(), _resolver);
@@ -335,6 +859,165 @@ inline flatbuffers::Offset<PlayerEventPacket> CreatePlayerEventPacket(flatbuffer
       _fbb,
       _event_type,
       _event);
+}
+
+inline PlayerListT *PlayerList::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<Mod::proto::PlayerListT> _o = std::unique_ptr<Mod::proto::PlayerListT>(new PlayerListT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void PlayerList::UnPackTo(PlayerListT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = players(); if (_e) { _o->players.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->players[_i] = std::unique_ptr<Mod::proto::PlayerEntityT>(_e->Get(_i)->UnPack(_resolver)); } } }
+}
+
+inline flatbuffers::Offset<PlayerList> PlayerList::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PlayerListT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatePlayerList(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<PlayerList> CreatePlayerList(flatbuffers::FlatBufferBuilder &_fbb, const PlayerListT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PlayerListT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _players = _o->players.size() ? _fbb.CreateVector<flatbuffers::Offset<Mod::proto::PlayerEntity>> (_o->players.size(), [](size_t i, _VectorArgs *__va) { return CreatePlayerEntity(*__va->__fbb, __va->__o->players[i].get(), __va->__rehasher); }, &_va ) : 0;
+  return Mod::proto::CreatePlayerList(
+      _fbb,
+      _players);
+}
+
+inline FindXUIDT *FindXUID::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<Mod::proto::FindXUIDT> _o = std::unique_ptr<Mod::proto::FindXUIDT>(new FindXUIDT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FindXUID::UnPackTo(FindXUIDT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = xuid(); _o->xuid = _e; }
+}
+
+inline flatbuffers::Offset<FindXUID> FindXUID::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindXUIDT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFindXUID(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FindXUID> CreateFindXUID(flatbuffers::FlatBufferBuilder &_fbb, const FindXUIDT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FindXUIDT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _xuid = _o->xuid;
+  return Mod::proto::CreateFindXUID(
+      _fbb,
+      _xuid);
+}
+
+inline FindUUIDT *FindUUID::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<Mod::proto::FindUUIDT> _o = std::unique_ptr<Mod::proto::FindUUIDT>(new FindUUIDT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FindUUID::UnPackTo(FindUUIDT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = uuid(); if (_e) _o->uuid = flatbuffers::UnPack(*_e); }
+}
+
+inline flatbuffers::Offset<FindUUID> FindUUID::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindUUIDT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFindUUID(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FindUUID> CreateFindUUID(flatbuffers::FlatBufferBuilder &_fbb, const FindUUIDT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FindUUIDT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _uuid = flatbuffers::Pack(_o->uuid);
+  return Mod::proto::CreateFindUUID(
+      _fbb,
+      &_uuid);
+}
+
+inline FindNAMET *FindNAME::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<Mod::proto::FindNAMET> _o = std::unique_ptr<Mod::proto::FindNAMET>(new FindNAMET());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FindNAME::UnPackTo(FindNAMET *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+}
+
+inline flatbuffers::Offset<FindNAME> FindNAME::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindNAMET* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFindNAME(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FindNAME> CreateFindNAME(flatbuffers::FlatBufferBuilder &_fbb, const FindNAMET *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FindNAMET* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _fbb.CreateString(_o->name);
+  return Mod::proto::CreateFindNAME(
+      _fbb,
+      _name);
+}
+
+inline FindPlayerPacketT *FindPlayerPacket::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<Mod::proto::FindPlayerPacketT> _o = std::unique_ptr<Mod::proto::FindPlayerPacketT>(new FindPlayerPacketT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FindPlayerPacket::UnPackTo(FindPlayerPacketT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = find_type(); _o->find.type = _e; }
+  { auto _e = find(); if (_e) _o->find.value = Mod::proto::FindPlayerUnion::UnPack(_e, find_type(), _resolver); }
+}
+
+inline flatbuffers::Offset<FindPlayerPacket> FindPlayerPacket::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindPlayerPacketT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFindPlayerPacket(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FindPlayerPacket> CreateFindPlayerPacket(flatbuffers::FlatBufferBuilder &_fbb, const FindPlayerPacketT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FindPlayerPacketT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _find_type = _o->find.type;
+  auto _find = _o->find.Pack(_fbb);
+  return Mod::proto::CreateFindPlayerPacket(
+      _fbb,
+      _find_type,
+      _find);
+}
+
+inline FindResultT *FindResult::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  std::unique_ptr<Mod::proto::FindResultT> _o = std::unique_ptr<Mod::proto::FindResultT>(new FindResultT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FindResult::UnPackTo(FindResultT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = entity(); if (_e) _o->entity = std::unique_ptr<Mod::proto::PlayerEntityT>(_e->UnPack(_resolver)); }
+}
+
+inline flatbuffers::Offset<FindResult> FindResult::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FindResultT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFindResult(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FindResult> CreateFindResult(flatbuffers::FlatBufferBuilder &_fbb, const FindResultT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FindResultT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _entity = _o->entity ? CreatePlayerEntity(_fbb, _o->entity.get(), _rehasher) : 0;
+  return Mod::proto::CreateFindResult(
+      _fbb,
+      _entity);
 }
 
 inline bool VerifyPlayerEvent(flatbuffers::Verifier &verifier, const void *obj, PlayerEvent type) {
@@ -425,6 +1108,117 @@ inline void PlayerEventUnion::Reset() {
   }
   value = nullptr;
   type = PlayerEvent::NONE;
+}
+
+inline bool VerifyFindPlayer(flatbuffers::Verifier &verifier, const void *obj, FindPlayer type) {
+  switch (type) {
+    case FindPlayer::NONE: {
+      return true;
+    }
+    case FindPlayer::FindXUID: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindXUID *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case FindPlayer::FindUUID: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindUUID *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case FindPlayer::FindNAME: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindNAME *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyFindPlayerVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyFindPlayer(
+        verifier,  values->Get(i), types->GetEnum<FindPlayer>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline void *FindPlayerUnion::UnPack(const void *obj, FindPlayer type, const flatbuffers::resolver_function_t *resolver) {
+  switch (type) {
+    case FindPlayer::FindXUID: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindXUID *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case FindPlayer::FindUUID: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindUUID *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case FindPlayer::FindNAME: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindNAME *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    default: return nullptr;
+  }
+}
+
+inline flatbuffers::Offset<void> FindPlayerUnion::Pack(flatbuffers::FlatBufferBuilder &_fbb, const flatbuffers::rehasher_function_t *_rehasher) const {
+  switch (type) {
+    case FindPlayer::FindXUID: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindXUIDT *>(value);
+      return CreateFindXUID(_fbb, ptr, _rehasher).Union();
+    }
+    case FindPlayer::FindUUID: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindUUIDT *>(value);
+      return CreateFindUUID(_fbb, ptr, _rehasher).Union();
+    }
+    case FindPlayer::FindNAME: {
+      auto ptr = reinterpret_cast<const Mod::proto::FindNAMET *>(value);
+      return CreateFindNAME(_fbb, ptr, _rehasher).Union();
+    }
+    default: return 0;
+  }
+}
+
+inline FindPlayerUnion::FindPlayerUnion(const FindPlayerUnion &u) : type(u.type), value(nullptr) {
+  switch (type) {
+    case FindPlayer::FindXUID: {
+      value = new Mod::proto::FindXUIDT(*reinterpret_cast<Mod::proto::FindXUIDT *>(u.value));
+      break;
+    }
+    case FindPlayer::FindUUID: {
+      value = new Mod::proto::FindUUIDT(*reinterpret_cast<Mod::proto::FindUUIDT *>(u.value));
+      break;
+    }
+    case FindPlayer::FindNAME: {
+      value = new Mod::proto::FindNAMET(*reinterpret_cast<Mod::proto::FindNAMET *>(u.value));
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+inline void FindPlayerUnion::Reset() {
+  switch (type) {
+    case FindPlayer::FindXUID: {
+      auto ptr = reinterpret_cast<Mod::proto::FindXUIDT *>(value);
+      delete ptr;
+      break;
+    }
+    case FindPlayer::FindUUID: {
+      auto ptr = reinterpret_cast<Mod::proto::FindUUIDT *>(value);
+      delete ptr;
+      break;
+    }
+    case FindPlayer::FindNAME: {
+      auto ptr = reinterpret_cast<Mod::proto::FindNAMET *>(value);
+      delete ptr;
+      break;
+    }
+    default: break;
+  }
+  value = nullptr;
+  type = FindPlayer::NONE;
 }
 
 }  // namespace proto
