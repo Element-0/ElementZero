@@ -123,6 +123,12 @@ jobs:
         name: dist
         path: Dist
 
+    - name: Upload vcpkg installed
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: vcpkg
+        path: vcpkg/installed/x64-windows-rel
+
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
       with:
