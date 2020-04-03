@@ -1,3 +1,3 @@
 cmake_minimum_required (VERSION 3.8)
 
-add_base_mod (Base SQLiteCpp sqlite3)
+def_mod (Base BASEMOD LINK SQLiteCpp sqlite3)

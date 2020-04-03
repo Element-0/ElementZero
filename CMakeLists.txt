@@ -50,34 +50,36 @@ find_and_install_package (yaml-cpp CONFIG REQUIRED)
 find_package (msgpack CONFIG REQUIRED)
 find_package (Flatbuffers CONFIG REQUIRED)
 
-function (install_pdb name)
+function (def_mod name)
+    cmake_parse_arguments(ARG "BASEMOD" "" "LINK;DELAY_LINK" ${ARGN})
+    file (GLOB_RECURSE srcs
+        CONFIGURE_DEPENDS *.cpp)
+    set (IS_BASEMOD $<BOOL:${ARG_BASEMOD}>)
+    add_library (${name} SHARED ${srcs})
+    target_compile_definitions (${name}
+        PRIVATE MODNAME=${name} $<${IS_BASEMOD}:EZVERSION=\"${git_version}\">)
+    target_link_libraries (${name}
+        Boost::headers
+        yaml-cpp
+        ModLoader
+        BedrockServer
+        $<$<NOT:${IS_BASEMOD}>:Base>
+        ${ARG_LINK}
+        ${ARG_DELAY_LINK})
+    install (TARGETS ${name}
+        RUNTIME DESTINATION Mods
+        ARCHIVE DESTINATION Lib)
     install (FILES $<TARGET_PDB_FILE:${name}> DESTINATION Lib)
+    set_target_properties (${name}
+        PROPERTIES FOLDER $<IF:${IS_BASEMOD},Base,Mods>)
+    if (ARG_DELAY_LINK)
+        target_link_libraries (${name} delayimp)
+        foreach (target ${ARGN})
+            target_link_options (${name} PRIVATE /DELAYLOAD:${target}.dll)
+        endforeach ()
+    endif ()
 endfunction ()
-function (add_mod name)
-    file (GLOB_RECURSE srcs CONFIGURE_DEPENDS *.cpp)
-    add_library (${name} SHARED ${srcs})
-    target_compile_definitions (${name} PRIVATE MODNAME=${name})
-    target_link_libraries (${name} Boost::headers yaml-cpp ModLoader BedrockServer Base ${ARGN})
-    install (TARGETS ${name} RUNTIME DESTINATION Mods ARCHIVE DESTINATION Lib)
-    install_pdb (${name})
-    set_target_properties (${name} PROPERTIES FOLDER Mods)
-endfunction ()
-function (add_base_mod name)
-    file (GLOB_RECURSE srcs CONFIGURE_DEPENDS *.cpp *.hint)
-    add_library (${name} SHARED ${srcs})
-    target_compile_definitions (${name} PRIVATE MODNAME=${name} EZVERSION=\"${git_version}\")
-    target_link_libraries (${name} Boost::headers yaml-cpp ModLoader BedrockServer ${ARGN})
-    install (TARGETS ${name} RUNTIME DESTINATION . ARCHIVE DESTINATION Lib)
-    install_pdb (${name})
-    set_target_properties (${name} PROPERTIES FOLDER Base)
-endfunction ()
-function (delay_load name)
-    target_link_libraries (${name} delayimp)
-    foreach (target ${ARGN})
-        target_link_libraries (${name} ${target})
-        target_link_options (${name} PRIVATE /DELAYLOAD:${target}.dll)
-    endforeach ()
-endfunction ()
+
 
 add_subdirectory ("Deps")
 add_subdirectory ("ModLoader")
