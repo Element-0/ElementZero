@@ -22,5 +22,6 @@ struct State {
 
 extern std::unique_ptr<State> state;
 
+void InitPlayerlistHook();
 void InitChatHook();
 void InitBlacklistHook();

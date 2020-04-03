@@ -37,16 +37,21 @@ void PreInit() {
   AddInitializer("Blacklist", InitBlacklistHook);
 }
 
-void WorldInit(std::filesystem::path const &) {
+void PostInit() {
+  LOGV("Load builtin extension for player list");
+  InitPlayerlistHook();
   for (auto [name, fn] : inits()) {
     auto handle = GetLoadedMod(name);
     if (handle) {
-      LOGV("Load extension for %s") % name;
+      LOGV("Load builtin extension for %s") % name;
       fn();
     } else {
-      LOGV("Skip extension for %s") % name;
+      LOGV("Skip builtin extension for %s: Target mod not loaded") % name;
     }
   }
+}
+
+void WorldInit(std::filesystem::path const &) {
   LOGV("connecting to %s") % settings.endpoint;
   state->srv.Connect(settings.endpoint, {settings.name, "element-zero", Common::getServerVersionString()});
   LOGI("Connected to hub");

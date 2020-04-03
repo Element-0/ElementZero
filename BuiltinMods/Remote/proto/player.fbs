@@ -1,0 +1,19 @@
+include "uuid.fbs";
+
+namespace Mod.proto;
+
+table PlayerEntity {
+  name: string;
+  xuid: uint64;
+  uuid: UUID (native_inline);
+  address: string;
+}
+
+union PlayerEvent {
+  joined: PlayerEntity,
+  left: PlayerEntity
+}
+
+table PlayerEventPacket {
+  event: PlayerEvent;
+}

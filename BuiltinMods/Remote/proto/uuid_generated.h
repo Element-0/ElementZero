@@ -13,16 +13,24 @@ namespace proto {
 
 struct UUID;
 
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(1) UUID FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) UUID FLATBUFFERS_FINAL_CLASS {
  private:
-  uint8_t v_[16];
+  uint64_t low_;
+  uint64_t high_;
 
  public:
   UUID() {
     memset(static_cast<void *>(this), 0, sizeof(UUID));
   }
-  const flatbuffers::Array<uint8_t, 16> *v() const {
-    return reinterpret_cast<const flatbuffers::Array<uint8_t, 16> *>(v_);
+  UUID(uint64_t _low, uint64_t _high)
+      : low_(flatbuffers::EndianScalar(_low)),
+        high_(flatbuffers::EndianScalar(_high)) {
+  }
+  uint64_t low() const {
+    return flatbuffers::EndianScalar(low_);
+  }
+  uint64_t high() const {
+    return flatbuffers::EndianScalar(high_);
   }
 };
 FLATBUFFERS_STRUCT_END(UUID, 16);

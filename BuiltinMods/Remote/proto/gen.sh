@@ -1,2 +1,2 @@
 #!/bin/bash
-flatc --cpp --scoped-enums --gen-object-api *.fbs
+flatc --cpp --ts --scoped-enums --gen-object-api *.fbs
