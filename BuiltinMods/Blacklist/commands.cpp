@@ -124,7 +124,6 @@ public:
   }
 
   void removeEntry(Mod::OfflinePlayerEntry const &entry, CommandOutput &output) {
-    auto &api = Mod::Blacklist::GetInstance();
     bool flag = false;
     flag |= removeXUID(entry.xuid, output);
     flag |= removeUUID(entry.uuid, output);
@@ -142,7 +141,6 @@ public:
     if (target.size() == 36) {
       auto uuid = mce::UUID::fromString(target);
       if (!uuid.empty()) {
-        auto &api = Mod::Blacklist::GetInstance();
         if (auto opt = db.FindOffline(uuid); opt) {
           removeEntry(*opt, output);
         } else {
