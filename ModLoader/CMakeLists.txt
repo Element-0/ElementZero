@@ -1,38 +1,39 @@
 cmake_minimum_required (VERSION 3.15)
 
 if (NOT DEFINED ChakraCore)
-    set (ChakraCore ${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/ChakraCore.dll)
+    find_file (ChakraCore ChakraCore.dll)
 endif ()
 
 if (NOT EXISTS ${ChakraCore})
-    message (FATAL_ERROR "Failed to found ChakraCore.dll, plase install via vcpkg install chakracore:x64-windows")
+    message (FATAL_ERROR "Failed to found ChakraCore.dll, plase install via vcpkg install chakracore:x64-windows-rel")
 endif ()
 
 install (FILES ${ChakraCore} DESTINATION .)
 
-option (PREBUILT_FUNCHOOK "Use prebuilt funchook" "")
-if (NOT PREBUILT_FUNCHOOK)
-    ExternalProject_Add (FuncHook
-        GIT_REPOSITORY https://github.com/kubo/funchook
-        UPDATE_COMMAND ""
-	CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} -DCMAKE_BUILD_TYPE=Release -DFUNCHOOK_BUILD_STATIC=OFF -DFUNCHOOK_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-    )
-
-    ExternalProject_Get_Property (FuncHook INSTALL_DIR)
-else ()
-    set (INSTALL_DIR ${PREBUILT_FUNCHOOK})
+if (NOT DEFINED FUNCHOOK_INC)
+    find_path (FUNCHOOK_INC funchook.h)
+endif ()
+if (NOT DEFINED FUNCHOOK_DLL)
+    find_file (FUNCHOOK_DLL funchook.dll)
+endif ()
+if (NOT DEFINED FUNCHOOK_LIB)
+    find_library (FUNCHOOK_LIB funchook_dll)
 endif ()
 
-install (FILES ${INSTALL_DIR}/bin/funchook.dll DESTINATION .)
+if (NOT EXISTS ${FUNCHOOK_DLL})
+    message (FATAL_ERROR "Failed to found funchook.dll, plase install via vcpkg install funchook:x64-windows-rel")
+endif ()
+
+if (NOT EXISTS ${FUNCHOOK_LIB})
+    message (FATAL_ERROR "Failed to found funchook_dll.lib, plase install via vcpkg install funchook:x64-windows-rel")
+endif ()
+
+install (FILES ${FUNCHOOK_DLL} DESTINATION .)
 
 add_library (ModLoader SHARED dllmain.cpp HealthCheck.cpp hook_impl.cpp forward.cpp)
 set_target_properties (ModLoader PROPERTIES OUTPUT_NAME "Chakra")
-if (NOT PREBUILT_FUNCHOOK)
-    add_dependencies (ModLoader FuncHook)
-endif ()
-target_include_directories (ModLoader PRIVATE ${INSTALL_DIR}/include)
-target_link_directories (ModLoader PRIVATE ${INSTALL_DIR}/lib)
-target_link_libraries (ModLoader PRIVATE Boost::headers funchook_dll)
+target_include_directories (ModLoader PRIVATE ${FUNCHOOK_INC})
+target_link_libraries (ModLoader PRIVATE Boost::headers ${FUNCHOOK_LIB})
 install (TARGETS ModLoader RUNTIME DESTINATION . ARCHIVE DESTINATION Lib)
 install_pdb (ModLoader)
 set_target_properties (ModLoader PROPERTIES FOLDER Base)
