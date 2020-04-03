@@ -23,3 +23,4 @@ struct State {
 extern std::unique_ptr<State> state;
 
 void InitChatHook();
+void InitBlacklistHook();

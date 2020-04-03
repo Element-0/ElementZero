@@ -8,6 +8,6 @@ struct UUID;
 }
 
 namespace flatbuffers {
-Mod::proto::UUID Pack(std::unique_ptr<mce::UUID> const &obj);
-std::unique_ptr<mce::UUID> UnPack(const Mod::proto::UUID &obj);
+Mod::proto::UUID Pack(mce::UUID const &obj);
+mce::UUID UnPack(const Mod::proto::UUID &obj);
 } // namespace flatbuffers

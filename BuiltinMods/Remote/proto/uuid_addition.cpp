@@ -4,14 +4,14 @@
 #include <vcruntime_string.h>
 
 namespace flatbuffers {
-Mod::proto::UUID Pack(std::unique_ptr<mce::UUID> const &obj) {
+Mod::proto::UUID Pack(mce::UUID const &obj) {
   Mod::proto::UUID ret;
-  memcpy(&ret, obj.get(), sizeof ret);
+  memcpy(&ret, &obj, sizeof obj);
   return ret;
 }
-std::unique_ptr<mce::UUID> UnPack(const Mod::proto::UUID &obj) {
-  auto ret = std::make_unique<mce::UUID>();
-  memcpy(ret.get(), &obj, sizeof obj);
-  return std::move(ret);
+mce::UUID UnPack(const Mod::proto::UUID &obj) {
+  mce::UUID ret;
+  memcpy(&ret, &obj, sizeof obj);
+  return ret;
 }
 } // namespace flatbuffers

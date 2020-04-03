@@ -34,6 +34,7 @@ void AddInitializer(char const *name, void (*fn)()) {
 void PreInit() {
   state = std::make_unique<State>();
   AddInitializer("ChatAPI", InitChatHook);
+  AddInitializer("Blacklist", InitBlacklistHook);
 }
 
 void WorldInit(std::filesystem::path const &) {

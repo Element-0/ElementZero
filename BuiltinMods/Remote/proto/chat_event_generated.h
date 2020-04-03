@@ -18,7 +18,7 @@ struct ChatEventT;
 
 struct ChatEventT : public flatbuffers::NativeTable {
   typedef ChatEvent TableType;
-  std::unique_ptr<mce::UUID> from;
+  mce::UUID from;
   std::string displayName;
   std::string content;
   ChatEventT() {

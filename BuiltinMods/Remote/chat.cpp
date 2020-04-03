@@ -23,7 +23,7 @@ void ChatHandler(
     Mod::CallbackToken<std::string> &token) {
   flatbuffers::FlatBufferBuilder builder;
   Mod::proto::ChatEventT event;
-  event.from        = std::make_unique<mce::UUID>(entry.uuid);
+  event.from        = entry.uuid;
   event.displayName = displayName;
   event.content     = content;
   builder.Finish(Mod::proto::ChatEvent::Pack(builder, &event));
