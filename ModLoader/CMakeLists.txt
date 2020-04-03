@@ -1,7 +1,9 @@
 cmake_minimum_required (VERSION 3.15)
 
 if (NOT DEFINED ChakraCore)
-    find_file (ChakraCore ChakraCore.dll)
+    find_file (ChakraCore
+        NAMES ChakraCore.dll
+        HINTS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin")
 endif ()
 
 if (NOT EXISTS ${ChakraCore})
@@ -11,13 +13,19 @@ endif ()
 install (FILES ${ChakraCore} DESTINATION .)
 
 if (NOT DEFINED FUNCHOOK_INC)
-    find_path (FUNCHOOK_INC funchook.h)
+    find_path (FUNCHOOK_INC
+        NAMES funchook.h
+        HINTS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
 endif ()
 if (NOT DEFINED FUNCHOOK_DLL)
-    find_file (FUNCHOOK_DLL funchook.dll)
+    find_file (FUNCHOOK_DLL
+        NAMES funchook.dll
+        HINTS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin")
 endif ()
 if (NOT DEFINED FUNCHOOK_LIB)
-    find_library (FUNCHOOK_LIB funchook_dll)
+    find_library (FUNCHOOK_LIB
+        NAMES funchook_dll
+        HINTS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib")
 endif ()
 
 if (NOT EXISTS ${FUNCHOOK_DLL})
