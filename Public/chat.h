@@ -13,7 +13,8 @@ class Player;
 
 namespace Mod {
 
-class Chat : public RecursiveEventEmitter<"chat"_sig, PlayerEntry const &, std::string &, std::string &, CallbackToken<std::string> &> {
+class Chat : public RecursiveEventEmitter<
+                 "chat"_sig, PlayerEntry const &, std::string &, std::string &, CallbackToken<std::string> &> {
   CHATAPI Chat();
 
 public:

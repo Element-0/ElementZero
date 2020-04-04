@@ -63,7 +63,7 @@ public:
   };
 
 private:
-  std::set<Entry> _set;
+  std::multiset<Entry> _set;
 
 public:
   class Trampoline {
@@ -108,7 +108,7 @@ template <typename Fn> auto RecursiveEventHandlerAdaptor(Fn fn) {
 
 // Be sure to use this macro to make multiple inherited function overloading effective
 #define USING_EVENTEMITTER(sig, ...)                                                                                   \
-private:                                                                                                               \
+protected:                                                                                                             \
   using ::Mod::EventEmitter<sig##_sig, __VA_ARGS__>::Emit;                                                             \
                                                                                                                        \
 public:                                                                                                                \
@@ -116,7 +116,7 @@ public:                                                                         
 
 // Be sure to use this macro to make multiple inherited function overloading effective
 #define USING_RECEVENTEMITTER(sig, ...)                                                                                \
-private:                                                                                                               \
+protected:                                                                                                             \
   using ::Mod::RecursiveEventEmitter<sig##_sig, __VA_ARGS__>::Emit;                                                    \
                                                                                                                        \
 public:                                                                                                                \
