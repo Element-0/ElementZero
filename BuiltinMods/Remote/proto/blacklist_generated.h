@@ -201,7 +201,7 @@ bool VerifyOpVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<f
 
 struct BlacklistOpT : public flatbuffers::NativeTable {
   typedef BlacklistOp TableType;
-  std::vector<Mod::proto::blacklist::OpUnion> ops;
+  Mod::proto::blacklist::OpUnion op;
   BlacklistOpT() {
   }
 };
@@ -210,22 +210,39 @@ struct BlacklistOp FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef BlacklistOpT NativeTableType;
   typedef BlacklistOpBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_OPS_TYPE = 4,
-    VT_OPS = 6
+    VT_OP_TYPE = 4,
+    VT_OP = 6
   };
-  const flatbuffers::Vector<uint8_t> *ops_type() const {
-    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_OPS_TYPE);
+  Mod::proto::blacklist::Op op_type() const {
+    return static_cast<Mod::proto::blacklist::Op>(GetField<uint8_t>(VT_OP_TYPE, 0));
   }
-  const flatbuffers::Vector<flatbuffers::Offset<void>> *ops() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<void>> *>(VT_OPS);
+  const void *op() const {
+    return GetPointer<const void *>(VT_OP);
+  }
+  template<typename T> const T *op_as() const;
+  const Mod::proto::blacklist::AddUUID *op_as_AddUUID() const {
+    return op_type() == Mod::proto::blacklist::Op::AddUUID ? static_cast<const Mod::proto::blacklist::AddUUID *>(op()) : nullptr;
+  }
+  const Mod::proto::blacklist::RemoveUUID *op_as_RemoveUUID() const {
+    return op_type() == Mod::proto::blacklist::Op::RemoveUUID ? static_cast<const Mod::proto::blacklist::RemoveUUID *>(op()) : nullptr;
+  }
+  const Mod::proto::blacklist::AddXUID *op_as_AddXUID() const {
+    return op_type() == Mod::proto::blacklist::Op::AddXUID ? static_cast<const Mod::proto::blacklist::AddXUID *>(op()) : nullptr;
+  }
+  const Mod::proto::blacklist::RemoveXUID *op_as_RemoveXUID() const {
+    return op_type() == Mod::proto::blacklist::Op::RemoveXUID ? static_cast<const Mod::proto::blacklist::RemoveXUID *>(op()) : nullptr;
+  }
+  const Mod::proto::blacklist::AddNAME *op_as_AddNAME() const {
+    return op_type() == Mod::proto::blacklist::Op::AddNAME ? static_cast<const Mod::proto::blacklist::AddNAME *>(op()) : nullptr;
+  }
+  const Mod::proto::blacklist::RemoveNAME *op_as_RemoveNAME() const {
+    return op_type() == Mod::proto::blacklist::Op::RemoveNAME ? static_cast<const Mod::proto::blacklist::RemoveNAME *>(op()) : nullptr;
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_OPS_TYPE) &&
-           verifier.VerifyVector(ops_type()) &&
-           VerifyOffset(verifier, VT_OPS) &&
-           verifier.VerifyVector(ops()) &&
-           VerifyOpVector(verifier, ops(), ops_type()) &&
+           VerifyField<uint8_t>(verifier, VT_OP_TYPE) &&
+           VerifyOffset(verifier, VT_OP) &&
+           VerifyOp(verifier, op(), op_type()) &&
            verifier.EndTable();
   }
   BlacklistOpT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -233,15 +250,39 @@ struct BlacklistOp FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   static flatbuffers::Offset<BlacklistOp> Pack(flatbuffers::FlatBufferBuilder &_fbb, const BlacklistOpT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
+template<> inline const Mod::proto::blacklist::AddUUID *BlacklistOp::op_as<Mod::proto::blacklist::AddUUID>() const {
+  return op_as_AddUUID();
+}
+
+template<> inline const Mod::proto::blacklist::RemoveUUID *BlacklistOp::op_as<Mod::proto::blacklist::RemoveUUID>() const {
+  return op_as_RemoveUUID();
+}
+
+template<> inline const Mod::proto::blacklist::AddXUID *BlacklistOp::op_as<Mod::proto::blacklist::AddXUID>() const {
+  return op_as_AddXUID();
+}
+
+template<> inline const Mod::proto::blacklist::RemoveXUID *BlacklistOp::op_as<Mod::proto::blacklist::RemoveXUID>() const {
+  return op_as_RemoveXUID();
+}
+
+template<> inline const Mod::proto::blacklist::AddNAME *BlacklistOp::op_as<Mod::proto::blacklist::AddNAME>() const {
+  return op_as_AddNAME();
+}
+
+template<> inline const Mod::proto::blacklist::RemoveNAME *BlacklistOp::op_as<Mod::proto::blacklist::RemoveNAME>() const {
+  return op_as_RemoveNAME();
+}
+
 struct BlacklistOpBuilder {
   typedef BlacklistOp Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ops_type(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> ops_type) {
-    fbb_.AddOffset(BlacklistOp::VT_OPS_TYPE, ops_type);
+  void add_op_type(Mod::proto::blacklist::Op op_type) {
+    fbb_.AddElement<uint8_t>(BlacklistOp::VT_OP_TYPE, static_cast<uint8_t>(op_type), 0);
   }
-  void add_ops(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<void>>> ops) {
-    fbb_.AddOffset(BlacklistOp::VT_OPS, ops);
+  void add_op(flatbuffers::Offset<void> op) {
+    fbb_.AddOffset(BlacklistOp::VT_OP, op);
   }
   explicit BlacklistOpBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -257,24 +298,12 @@ struct BlacklistOpBuilder {
 
 inline flatbuffers::Offset<BlacklistOp> CreateBlacklistOp(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> ops_type = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<void>>> ops = 0) {
+    Mod::proto::blacklist::Op op_type = Mod::proto::blacklist::Op::NONE,
+    flatbuffers::Offset<void> op = 0) {
   BlacklistOpBuilder builder_(_fbb);
-  builder_.add_ops(ops);
-  builder_.add_ops_type(ops_type);
+  builder_.add_op(op);
+  builder_.add_op_type(op_type);
   return builder_.Finish();
-}
-
-inline flatbuffers::Offset<BlacklistOp> CreateBlacklistOpDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<uint8_t> *ops_type = nullptr,
-    const std::vector<flatbuffers::Offset<void>> *ops = nullptr) {
-  auto ops_type__ = ops_type ? _fbb.CreateVector<uint8_t>(*ops_type) : 0;
-  auto ops__ = ops ? _fbb.CreateVector<flatbuffers::Offset<void>>(*ops) : 0;
-  return Mod::proto::blacklist::CreateBlacklistOp(
-      _fbb,
-      ops_type__,
-      ops__);
 }
 
 flatbuffers::Offset<BlacklistOp> CreateBlacklistOp(flatbuffers::FlatBufferBuilder &_fbb, const BlacklistOpT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -780,8 +809,8 @@ inline BlacklistOpT *BlacklistOp::UnPack(const flatbuffers::resolver_function_t 
 inline void BlacklistOp::UnPackTo(BlacklistOpT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = ops_type(); if (_e) { _o->ops.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->ops[_i].type = static_cast<Mod::proto::blacklist::Op>(_e->Get(_i)); } } }
-  { auto _e = ops(); if (_e) { _o->ops.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->ops[_i].value = Mod::proto::blacklist::OpUnion::UnPack(_e->Get(_i), ops_type()->GetEnum<Op>(_i), _resolver); } } }
+  { auto _e = op_type(); _o->op.type = _e; }
+  { auto _e = op(); if (_e) _o->op.value = Mod::proto::blacklist::OpUnion::UnPack(_e, op_type(), _resolver); }
 }
 
 inline flatbuffers::Offset<BlacklistOp> BlacklistOp::Pack(flatbuffers::FlatBufferBuilder &_fbb, const BlacklistOpT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -792,12 +821,12 @@ inline flatbuffers::Offset<BlacklistOp> CreateBlacklistOp(flatbuffers::FlatBuffe
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const BlacklistOpT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _ops_type = _o->ops.size() ? _fbb.CreateVector<uint8_t>(_o->ops.size(), [](size_t i, _VectorArgs *__va) { return static_cast<uint8_t>(__va->__o->ops[i].type); }, &_va) : 0;
-  auto _ops = _o->ops.size() ? _fbb.CreateVector<flatbuffers::Offset<void>>(_o->ops.size(), [](size_t i, _VectorArgs *__va) { return __va->__o->ops[i].Pack(*__va->__fbb, __va->__rehasher); }, &_va) : 0;
+  auto _op_type = _o->op.type;
+  auto _op = _o->op.Pack(_fbb);
   return Mod::proto::blacklist::CreateBlacklistOp(
       _fbb,
-      _ops_type,
-      _ops);
+      _op_type,
+      _op);
 }
 
 inline AddUUIDT *AddUUID::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

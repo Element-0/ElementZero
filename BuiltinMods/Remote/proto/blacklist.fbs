@@ -12,7 +12,7 @@ union Op {
 }
 
 table BlacklistOp {
-  ops: [Op];
+  op: Op;
 }
 
 root_type BlacklistOp;
