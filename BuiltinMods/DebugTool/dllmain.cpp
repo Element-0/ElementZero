@@ -35,8 +35,13 @@ TInstanceHook(
     DEF_LOGGER("CommandRegister");
     LOGV("override");
     for (auto &param : ovd.params) {
-      LOGV("\t%c %s[%s] %d(%d) +%d(%d)") % (param.optional ? '+' : '-') % param.name % (param.desc ? param.desc : "") %
-          param.tid.value % (int) param.type % param.offset % param.flag_offset;
+      union {
+        void *pointer;
+        decltype(param.parser) parser;
+      } u;
+      u.parser = param.parser;
+      LOGV("\t%c %s[%s] %d(%d) +%d(%d) @%p") % (param.optional ? '+' : '-') % param.name % (param.desc ? param.desc : "") %
+          param.tid.value % (int) param.type % param.offset % param.flag_offset % u.pointer;
     }
   }
   return original(this, signature, ovd);

@@ -8,7 +8,6 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include <string_view>
 
 class Command;
 class CommandOrigin;
@@ -46,7 +45,7 @@ public:
     bool b84;
 
     inline Signature(
-        std::string_view name, std::string_view desc, CommandPermissionLevel perm, CommandRegistry::Symbol symbol,
+        std::string name, std::string desc, CommandPermissionLevel perm, CommandRegistry::Symbol symbol,
         CommandFlag flag)
         : name(name), desc(desc), perm(perm), main_symbol(symbol), flag(flag) {}
   };
@@ -84,6 +83,19 @@ private:
   __declspec(dllimport) uint64_t getEnumData(CommandRegistry::ParseToken const &) const;
 
 public:
+
+  // 128 std::vector<CommandRegistry::ParseRule>
+  // 152 std::map<uint32_t, CommandRegistry::ParseTable>
+  // 288 std::map<std::string, uint32_t>
+  // 304 std::map<std::string, uint32_t> : enum values
+  // 344 std::map<std::string, Symbol>
+  // 376 std::map<std::string, std::string>
+  // 416 std::map<SemanticConstraint, unsigned char>
+  // 456 std::map<std::pair<uint64_t, uint32_t>, uint32_t> : enum map?
+  // 496 std::map<std::string, uint32_t> : soft enum
+  // 360 Leveldb stuff
+  // 536 CommandRegistry::ParamSymbols
+
   template <typename T> inline static auto getParseFn() { return &CommandRegistry::parse<T>; }
 
   template <typename Type>

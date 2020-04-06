@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "CommandRegistry.h"
@@ -25,8 +24,8 @@ struct CommandParameterData {
   bool optional;                 // 72
   bool pad73;                    // 73
   CommandParameterData(
-      typeid_t<CommandRegistry> tid, ParseFn parser, std::string_view name, CommandParameterDataType type,
-      char const *desc, int offset, bool mand, int flag_offset)
+      typeid_t<CommandRegistry> tid, ParseFn parser, std::string name, CommandParameterDataType type, char const *desc,
+      int offset, bool mand, int flag_offset)
       : tid(tid), parser(parser), name(name), desc(desc), unk56(-1), type(type), offset(offset),
         flag_offset(flag_offset), optional(mand) {}
 };

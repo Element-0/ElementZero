@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 #include "event.h"
 #include <Core/type_id.h>
@@ -52,8 +51,8 @@ template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTyp
 namespace commands {
 
 template <typename T>
-char const *addEnum(
-    CommandRegistry *registry, char const *name, std::initializer_list<std::pair<std::string, T>> const &values) {
+char const *
+addEnum(CommandRegistry *registry, char const *name, std::initializer_list<std::pair<std::string, T>> const &values) {
   registry->addEnumValues<T>(name, Mod::CommandSupport::GetParameterTypeId<T>(), values);
   return name;
 }
@@ -68,7 +67,7 @@ template <typename Command, typename Type> int getOffset(Type Command::*src) {
 }
 
 template <typename Command, typename Type>
-CommandParameterData mandatory(Type Command::*field, std::string_view name, bool Command::*isSet = nullptr) {
+CommandParameterData mandatory(Type Command::*field, std::string name, bool Command::*isSet = nullptr) {
   return {
       Mod::CommandSupport::GetParameterTypeId<Type>(),
       CommandRegistry::getParseFn<Type>(),
@@ -82,7 +81,7 @@ CommandParameterData mandatory(Type Command::*field, std::string_view name, bool
 }
 template <CommandParameterDataType DataType, typename Command, typename Type>
 CommandParameterData
-mandatory(Type Command::*field, std::string_view name, char const *desc = nullptr, bool Command::*isSet = nullptr) {
+mandatory(Type Command::*field, std::string name, char const *desc = nullptr, bool Command::*isSet = nullptr) {
   return {
       Mod::CommandSupport::GetParameterTypeId<Type>(),
       &CommandRegistry::fakeparse<Type>,
@@ -95,7 +94,7 @@ mandatory(Type Command::*field, std::string_view name, char const *desc = nullpt
   };
 }
 template <typename Command, typename Type>
-CommandParameterData optional(Type Command::*field, std::string_view name, bool Command::*isSet = nullptr) {
+CommandParameterData optional(Type Command::*field, std::string name, bool Command::*isSet = nullptr) {
   return {
       Mod::CommandSupport::GetParameterTypeId<Type>(),
       CommandRegistry::getParseFn<Type>(),
@@ -109,7 +108,7 @@ CommandParameterData optional(Type Command::*field, std::string_view name, bool 
 }
 template <CommandParameterDataType DataType, typename Command, typename Type>
 CommandParameterData
-optional(Type Command::*field, std::string_view name, char const *desc = nullptr, bool Command::*isSet = nullptr) {
+optional(Type Command::*field, std::string name, char const *desc = nullptr, bool Command::*isSet = nullptr) {
   return {
       Mod::CommandSupport::GetParameterTypeId<Type>(),
       &CommandRegistry::fakeparse<Type>,
