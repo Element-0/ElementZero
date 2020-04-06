@@ -41,7 +41,7 @@ function (def_mod name)
         ${ARG_LINK}
         ${ARG_DELAY_LINK})
     install (TARGETS ${name}
-        RUNTIME DESTINATION Mods
+        RUNTIME DESTINATION $<IF:${IS_BASEMOD},.,Mods>
         ARCHIVE DESTINATION Lib)
     install_pdb (${name})
     set_target_properties (${name}
