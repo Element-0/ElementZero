@@ -9,8 +9,7 @@ struct Settings {
   bool EnableCommands = true;
 
   template <typename IO> static inline bool io(IO f, Settings &settings, YAML::Node &node) {
-    return f(settings.Database, node["database"]);
-    return f(settings.EnableCommands, node["enable-commands"]);
+    return f(settings.Database, node["database"]) && f(settings.EnableCommands, node["enable-commands"]);
   }
 };
 
