@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <exception>
+#include <initializer_list>
 #include <iostream>
 #include <cstring>
 #include <cstdio>
@@ -34,9 +35,6 @@ template <int length> struct PatchSpan {
   unsigned char data[length];
   using ref_t = char (&)[length];
 
-  // constexpr PatchSpan() noexcept {}
-  // constexpr PatchSpan(ref_t ref) noexcept { memcpy(data, ref, sizeof data); }
-
   constexpr bool operator==(ref_t ref) const noexcept { return memcmp(data, ref, sizeof data) == 0; }
   constexpr bool operator!=(ref_t ref) const noexcept { return memcmp(data, ref, sizeof data) != 0; }
   constexpr bool operator==(PatchSpan ref) const noexcept { return memcmp(data, ref.data, sizeof data) == 0; }
@@ -50,6 +48,14 @@ template <int length> struct PatchSpan {
     char *ptr                   = buffer;
     for (auto ch : data) ptr += sprintf(ptr, "%02X", (unsigned) ch);
     return {buffer};
+  }
+};
+
+struct NopFilled {
+  template <int length> operator PatchSpan<length>() {
+    PatchSpan<length> ret;
+    memset(ret.data, 0x90, length);
+    return ret;
   }
 };
 

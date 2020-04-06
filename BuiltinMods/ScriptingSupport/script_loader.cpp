@@ -1,10 +1,14 @@
-#include "pch.h"
-#include "global.h"
-
-#include <ChakraCore.h>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
+#include <map>
+
+#include <ChakraCore.h>
+
+#include <log.h>
+
+#include "global.h"
+
 
 namespace fs = std::filesystem;
 
