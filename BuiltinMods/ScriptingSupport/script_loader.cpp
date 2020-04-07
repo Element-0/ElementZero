@@ -207,6 +207,5 @@ static JsErrorCode FetchImportedModuleFromScript(
 static JsErrorCode
 MyNotifyModuleReadyCallback(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef exceptionVar) {
   JsValueRef result;
-  LOGV("ready");
   return JsModuleEvaluation(referencingModule, &result);
 }

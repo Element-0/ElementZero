@@ -7,10 +7,7 @@
 
 DEF_LOGGER("Scripting");
 
-THook(bool, "?isScriptingEnabled@ScriptEngine@@SA_NXZ") {
-  LOGV("query");
-  return true;
-}
+THook(bool, "?isScriptingEnabled@ScriptEngine@@SA_NXZ") { return true; }
 
 TClasslessInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ") {
   DEF_LOGGER("ScriptEngine");
