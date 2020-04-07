@@ -4,7 +4,7 @@
 
 #include "../apiset.h"
 
-RegisterQueue queue("console", [](JsObjectWarpper global) {
+static RegisterQueue queue("console", [](JsObjectWarpper global) {
   DEF_LOGGER("ScriptOut");
   JsObjectWarpper console;
   console["log"] = [](JsValueRef callee, bool isConstructCall, JsConvertible::Arguments args) {

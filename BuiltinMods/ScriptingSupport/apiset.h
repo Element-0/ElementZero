@@ -5,12 +5,14 @@
 
 #include "chakra_helper.h"
 
-class RegisterQueue {
-public:
-  inline static std::map<std::string, std::function<void(JsObjectWarpper global)>> &GetList() {
-    static std::map<std::string, std::function<void(JsObjectWarpper global)>> root;
-    return root;
-  }
+struct RegisterQueue {
+  static std::map<std::string, void (*)(JsObjectWarpper global)> &GetList();
 
-  template <typename T> RegisterQueue(char const *name, T t) { RegisterQueue::GetList()[name] = t; }
+  RegisterQueue(char const *name, void (*t)(JsObjectWarpper global));
+};
+
+struct ModuleRegister {
+  static std::map<std::string, void (*)(JsModuleRecord module)> &GetList();
+
+  inline ModuleRegister(char const *name, void (*t)(JsModuleRecord global));
 };
