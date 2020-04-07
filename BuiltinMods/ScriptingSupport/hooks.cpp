@@ -16,6 +16,7 @@ TClasslessInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ") {
   DEF_LOGGER("ScriptEngine");
   LOGV("initialize");
   original(this);
+  initBasicAPI();
   loadCustomScript();
 }
 
