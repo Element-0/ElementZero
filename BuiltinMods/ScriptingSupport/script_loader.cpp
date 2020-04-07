@@ -6,9 +6,12 @@
 #include <ChakraCore.h>
 
 #include <log.h>
+#include <string>
 
+#include "ChakraCommon.h"
+#include "chakra_helper.h"
 #include "global.h"
-
+#include "apiset.h"
 
 namespace fs = std::filesystem;
 
@@ -27,111 +30,72 @@ static JsErrorCode FetchImportedModuleFromScript(
 static JsErrorCode
 MyNotifyModuleReadyCallback(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef exceptionVar);
 
-static JsErrorCode getString(JsValueRef jsv, std::wstring &ws);
-static JsErrorCode copyString(JsValueRef jsv, std::string &ws);
+// static JsErrorCode copyString(JsValueRef jsv, std::string &ws);
 
-static JsErrorCode LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path full) {
+static void LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path full) {
   static JsSourceContext ctx = 0;
   auto cookies               = ctx++;
-  JsErrorCode ec             = JsNoError;
   JsValueRef exception;
 
   JsValueRef real;
   auto str = path.native();
-  ec       = JsCreateStringUtf16((uint16_t const *) str.c_str(), str.size(), &real);
-  if (ec != JsNoError) return ec;
-  ec = JsSetModuleHostInfo(module, JsModuleHostInfo_HostDefined, real);
-  if (ec != JsNoError) return ec;
-  ec = JsSetModuleHostInfo(module, JsModuleHostInfo_Url, real);
-  if (ec != JsNoError) return ec;
+  ThrowError(JsCreateStringUtf16((uint16_t const *) str.c_str(), str.size(), &real));
+  ThrowError(JsSetModuleHostInfo(module, JsModuleHostInfo_HostDefined, real));
+  ThrowError(JsSetModuleHostInfo(module, JsModuleHostInfo_Url, real));
 
   std::ifstream ifs{full};
-  if (!ifs) return JsErrorInvalidArgument;
+  if (!ifs) throw JsErrorInvalidArgument;
   std::string content{std::istreambuf_iterator{ifs}, {}};
 
-  ec = JsParseModuleSource(
+  auto xec = JsParseModuleSource(
       module, cookies, (BYTE *) content.data(), content.size(), JsParseModuleSourceFlags_DataIsUTF8, &exception);
   if (exception) JsSetException(exception);
-  return ec;
+  ThrowError(xec);
 }
 
-static JsErrorCode initRootModule(std::string_view path, JsModuleRecord *requestModule) {
+static void initRootModule(std::string_view path, JsModuleRecord *requestModule) {
   JsValueRef specifier;
-  JsErrorCode ec = JsNoError;
 
-  ec = JsCreateString(path.data(), path.size(), &specifier);
-  if (ec != JsNoError) return ec;
-  ec = JsInitializeModuleRecord(nullptr, specifier, requestModule);
-  if (ec != JsNoError) return ec;
-  ec = JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_FetchImportedModuleCallback, (void *) FetchImportedModule);
-  if (ec != JsNoError) return ec;
-  ec = JsSetModuleHostInfo(
-      *requestModule, JsModuleHostInfo_FetchImportedModuleFromScriptCallback, (void *) FetchImportedModuleFromScript);
-  if (ec != JsNoError) return ec;
-  ec = JsSetModuleHostInfo(
-      *requestModule, JsModuleHostInfo_NotifyModuleReadyCallback, (void *) MyNotifyModuleReadyCallback);
-  if (ec != JsNoError) return ec;
-  ec = JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_Url, specifier);
-  if (ec != JsNoError) return ec;
-  ec = JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_HostDefined, specifier);
-  if (ec != JsNoError) return ec;
-  return ec;
+  ThrowError(JsCreateString(path.data(), path.size(), &specifier));
+  ThrowError(JsInitializeModuleRecord(nullptr, specifier, requestModule));
+  ThrowError(
+      JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_FetchImportedModuleCallback, (void *) FetchImportedModule));
+  ThrowError(JsSetModuleHostInfo(
+      *requestModule, JsModuleHostInfo_FetchImportedModuleFromScriptCallback, (void *) FetchImportedModuleFromScript));
+  ThrowError(JsSetModuleHostInfo(
+      *requestModule, JsModuleHostInfo_NotifyModuleReadyCallback, (void *) MyNotifyModuleReadyCallback));
+  ThrowError(JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_Url, specifier));
+  ThrowError(JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_HostDefined, specifier));
 }
 
-void loadCustomScript() {
+void loadCustomScript() try {
   JsModuleRecord root;
 
   if (!fs::exists("scripts/index.js")) {
-    LOGW("Failed to load scripts/index.js");
+    LOGW("scripts/index.js file not exists, skipping");
     return;
   }
 
-  auto ec = initRootModule("index.js", &root);
-  if (ec != JsNoError) {
+  try {
+    initRootModule("index.js", &root);
+  } catch (JsErrorCode ec) {
     LOGE("Failed to init root module: %d") % ec;
     return;
   }
-  ec = LoadModuleFromFile(root, "index.js", "scripts/index.js");
-  if (ec != JsNoError) {
-    bool hasException;
-    if (JsHasException(&hasException) != JsNoError) return;
-    // Fake while to allow break out
-    while (hasException) {
-      JsValueRef metadata;
-      if (JsGetAndClearExceptionWithMetadata(&metadata) != JsNoError) break;
-      JsPropertyIdRef prop_exception, prop_line, prop_column, prop_url;
-      JsValueRef exception, exception_str, line, column, url;
-      std::string exception_name, url_data;
-      int line_code, column_code;
-      if (JsGetPropertyIdFromName(L"exception", &prop_exception) != JsNoError) break;
-      if (JsGetPropertyIdFromName(L"line", &prop_line) != JsNoError) break;
-      if (JsGetPropertyIdFromName(L"column", &prop_column) != JsNoError) break;
-      if (JsGetPropertyIdFromName(L"url", &prop_url) != JsNoError) break;
-      if (JsGetProperty(metadata, prop_exception, &exception) != JsNoError) break;
-      if (JsGetProperty(metadata, prop_line, &line) != JsNoError) break;
-      if (JsGetProperty(metadata, prop_column, &column) != JsNoError) break;
-      if (JsGetProperty(metadata, prop_url, &url) != JsNoError) break;
-      if (JsConvertValueToString(exception, &exception_str) != JsNoError) break;
-      if (copyString(exception_str, exception_name) != JsNoError) break;
-      if (JsNumberToInt(line, &line_code) != JsNoError) break;
-      if (JsNumberToInt(column, &column_code) != JsNoError) break;
-      if (copyString(url, url_data) != JsNoError) break;
-      LOGE("Exception %s from %s[%d:%d]") % exception_name % url_data % line_code % column_code;
-      break;
-    }
-    LOGE("Failed to load root module: %s") % hasException;
-    return;
-  }
-}
-
-static JsErrorCode getString(JsValueRef jsv, std::wstring &ws) {
-  wchar_t const *buffer;
-  size_t length;
-  auto ec = JsStringToPointer(jsv, &buffer, &length);
-  if (ec != JsNoError) return ec;
-  ws = std::wstring(buffer, length);
-  return ec;
-}
+  LoadModuleFromFile(root, "index.js", "scripts/index.js");
+  bool hasException;
+  if (JsHasException(&hasException) != JsNoError) return;
+  // Fake while to allow break out
+  try {
+    auto metadata  = JsObjectWarpper::FromCurrentException();
+    auto exception = metadata["exception"].ToString();
+    auto line      = metadata["line"].get<int>();
+    auto column    = metadata["column"].get<int>();
+    auto url       = metadata["url"].get<std::string>();
+    LOGE("Exception %s from %s[%d:%d]") % exception % url % line % column;
+  } catch (...) {}
+  LOGE("Failed to load root module: %s") % hasException;
+} catch (JsErrorCode ec) { LOGE("Failed to load: %d") % ec; }
 
 static JsErrorCode copyString(JsValueRef jsv, std::string &ws) {
   char buffer[2048];
@@ -143,11 +107,9 @@ static JsErrorCode copyString(JsValueRef jsv, std::string &ws) {
 }
 
 static JsErrorCode resolveModule(JsValueRef specifier, fs::path &path, fs::path &full) {
-  std::wstring addition;
-  JsErrorCode ec = JsNoError;
+  std::wstring addition = FromJs<std::wstring>(specifier);
+  JsErrorCode ec        = JsNoError;
 
-  ec = getString(specifier, addition);
-  if (ec != JsNoError) return ec;
   path /= addition;
   path.make_preferred();
   path = fs::weakly_canonical(path);
@@ -159,20 +121,15 @@ static JsErrorCode
 FetchModule(JsModuleRecord referencingModule, JsValueRef specifier, JsModuleRecord *dependentModuleRecord) {
   fs::path base;
   fs::path full;
-  JsErrorCode ec = JsNoError;
 
   if (referencingModule) {
     JsValueRef baseref;
-    ec = JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_HostDefined, &baseref);
-    if (ec != JsNoError) return ec;
-    std::wstring buf;
-    ec = getString(baseref, buf);
-    if (ec != JsNoError) return ec;
-    base = buf;
-    base = base.parent_path();
+    ThrowError(JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_HostDefined, &baseref));
+    std::wstring buf = FromJs<std::wstring>(baseref);
+    base             = buf;
+    base             = base.parent_path();
   }
-  ec = resolveModule(specifier, base, full);
-  if (ec != JsNoError) return ec;
+  ThrowError(resolveModule(specifier, base, full));
 
   LOGV("try to load module %s") % base;
 
@@ -181,11 +138,8 @@ FetchModule(JsModuleRecord referencingModule, JsValueRef specifier, JsModuleReco
     return JsNoError;
   }
 
-  ec = JsInitializeModuleRecord(referencingModule, specifier, dependentModuleRecord);
-  if (ec != JsNoError) return ec;
-
-  ec = LoadModuleFromFile(*dependentModuleRecord, base, full);
-  if (ec != JsNoError) return ec;
+  ThrowError(JsInitializeModuleRecord(referencingModule, specifier, dependentModuleRecord));
+  LoadModuleFromFile(*dependentModuleRecord, base, full);
 
   mod_cache[base] = *dependentModuleRecord;
 
