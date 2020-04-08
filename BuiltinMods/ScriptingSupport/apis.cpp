@@ -1,15 +1,9 @@
-#include "ChakraCommon.h"
-#include "global.h"
-#include "chakra_helper.h"
-#include "log.h"
-#include "apiset.h"
 #include <sstream>
-#include <iostream>
 
-// RegisterQueue queue([](auto x) {
-//   printf("boom!\n");
-//   //
-// });
+#include <log.h>
+#include <scriptapi.h>
+
+#include "global.h"
 
 void installConsoleAPI(JsObjectWarpper &global);
 

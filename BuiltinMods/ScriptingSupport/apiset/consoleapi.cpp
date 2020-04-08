@@ -2,7 +2,7 @@
 
 #include "log.h"
 
-#include "../apiset.h"
+#include <scriptapi.h>
 
 static RegisterQueue queue("console", [](JsObjectWarpper global) {
   DEF_LOGGER("ScriptOut");

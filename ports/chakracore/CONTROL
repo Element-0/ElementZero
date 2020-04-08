@@ -1,0 +1,4 @@
+Source: chakracore
+Version: master
+Homepage: https://github.com/Microsoft/ChakraCore
+Description: Core part of the Chakra Javascript engine

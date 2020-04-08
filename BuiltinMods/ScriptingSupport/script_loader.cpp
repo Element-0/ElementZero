@@ -2,16 +2,12 @@
 #include <fstream>
 #include <iterator>
 #include <map>
-
-#include <ChakraCore.h>
-
-#include <log.h>
 #include <string>
 
-#include "ChakraCommon.h"
-#include "chakra_helper.h"
+#include <log.h>
+#include <scriptapi.h>
+
 #include "global.h"
-#include "apiset.h"
 
 namespace fs = std::filesystem;
 
@@ -20,21 +16,23 @@ DEF_LOGGER("ScriptLoader");
 static std::map<fs::path, JsModuleRecord> mod_cache;
 
 static JsErrorCode FetchImportedModule(
-    _In_ JsModuleRecord referencingModule, _In_ JsValueRef specifier,
-    _Outptr_result_maybenull_ JsModuleRecord *dependentModuleRecord);
+    _In_ JsModuleRecord referencingModule, _In_ JsValueRef specifier, _Outptr_result_maybenull_ JsModuleRecord *target);
 
 static JsErrorCode FetchImportedModuleFromScript(
     _In_ JsSourceContext dwReferencingSourceContext, _In_ JsValueRef specifier,
-    _Outptr_result_maybenull_ JsModuleRecord *dependentModuleRecord);
+    _Outptr_result_maybenull_ JsModuleRecord *target);
 
 static JsErrorCode
 MyNotifyModuleReadyCallback(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef exceptionVar);
+static JsErrorCode NativeInitializeImportMetaCallback(JsModuleRecord referencingModule, JsValueRef importMetaVar);
 
-// static JsErrorCode copyString(JsValueRef jsv, std::string &ws);
+JsSourceContext NextContext() {
+  static JsSourceContext ctx = 0;
+  return ctx++;
+}
 
 static void LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path full) {
-  static JsSourceContext ctx = 0;
-  auto cookies               = ctx++;
+  auto cookies = NextContext();
   JsValueRef exception;
 
   JsValueRef real;
@@ -64,6 +62,8 @@ static void initRootModule(std::string_view path, JsModuleRecord *requestModule)
       *requestModule, JsModuleHostInfo_FetchImportedModuleFromScriptCallback, (void *) FetchImportedModuleFromScript));
   ThrowError(JsSetModuleHostInfo(
       *requestModule, JsModuleHostInfo_NotifyModuleReadyCallback, (void *) MyNotifyModuleReadyCallback));
+  ThrowError(JsSetModuleHostInfo(
+      *requestModule, JsModuleHostInfo_InitializeImportMetaCallback, (void *) &NativeInitializeImportMetaCallback));
   ThrowError(JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_Url, specifier));
   ThrowError(JsSetModuleHostInfo(*requestModule, JsModuleHostInfo_HostDefined, specifier));
 }
@@ -86,6 +86,7 @@ void loadCustomScript() try {
   bool hasException;
   if (JsHasException(&hasException) != JsNoError) return;
   // Fake while to allow break out
+  if (!hasException) return;
   try {
     auto metadata  = JsObjectWarpper::FromCurrentException();
     auto exception = metadata["exception"].ToString();
@@ -117,10 +118,37 @@ static JsErrorCode resolveModule(JsValueRef specifier, fs::path &path, fs::path 
   return ec;
 }
 
-static JsErrorCode
-FetchModule(JsModuleRecord referencingModule, JsValueRef specifier, JsModuleRecord *dependentModuleRecord) {
+static void FetchModule(JsModuleRecord referencingModule, JsValueRef specifier, JsModuleRecord *target) {
+  DEF_LOGGER("FetchModule");
   fs::path base;
   fs::path full;
+
+  auto &list = ModuleRegister::GetList();
+
+  auto name = FromJs<std::string>(specifier);
+
+  LOGV("%s") % name;
+
+  if (auto it = list.find(name); it != list.end()) {
+    if (auto it = mod_cache.find(base); it != mod_cache.end()) {
+      *target = it->second;
+      return;
+    }
+    ThrowError(JsInitializeModuleRecord(referencingModule, specifier, target));
+    ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_Url, specifier));
+    auto cookies = NextContext();
+    JsValueRef exception, result;
+    JsObjectWarpper obj;
+    const auto script = it->second(obj);
+    ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_HostDefined, obj.ref));
+    ThrowError(JsParseModuleSource(
+        *target, cookies, (BYTE *) script.data(), script.size(), JsParseModuleSourceFlags_DataIsUTF8, &exception));
+    if (exception) JsSetException(exception);
+    // ThrowError(JsParseModuleSource(*target, cookies, (BYTE *) "", 0, JsParseModuleSourceFlags_DataIsUTF8,
+    // &exception));
+    // ThrowError(JsGetModuleNamespace(*target, &result));
+    return;
+  }
 
   if (referencingModule) {
     JsValueRef baseref;
@@ -134,32 +162,66 @@ FetchModule(JsModuleRecord referencingModule, JsValueRef specifier, JsModuleReco
   LOGV("try to load module %s") % base;
 
   if (auto it = mod_cache.find(base); it != mod_cache.end()) {
-    *dependentModuleRecord = it->second;
-    return JsNoError;
+    *target = it->second;
+    return;
   }
 
-  ThrowError(JsInitializeModuleRecord(referencingModule, specifier, dependentModuleRecord));
-  LoadModuleFromFile(*dependentModuleRecord, base, full);
+  ThrowError(JsInitializeModuleRecord(referencingModule, specifier, target));
+  LoadModuleFromFile(*target, base, full);
 
-  mod_cache[base] = *dependentModuleRecord;
-
-  return JsNoError;
+  mod_cache[base] = *target;
 }
 
 static JsErrorCode FetchImportedModule(
     _In_ JsModuleRecord referencingModule, _In_ JsValueRef specifier,
-    _Outptr_result_maybenull_ JsModuleRecord *dependentModuleRecord) {
-  return FetchModule(referencingModule, specifier, dependentModuleRecord);
+    _Outptr_result_maybenull_ JsModuleRecord *target) try {
+  FetchModule(referencingModule, specifier, target);
+  return JsNoError;
+} catch (JsErrorCode ec) {
+  LOGE("Failed to fetch module %s: %d") % ToJs(specifier) % ec;
+  return ec;
 }
 
 static JsErrorCode FetchImportedModuleFromScript(
     _In_ JsSourceContext dwReferencingSourceContext, _In_ JsValueRef specifier,
-    _Outptr_result_maybenull_ JsModuleRecord *dependentModuleRecord) {
-  return FetchModule(nullptr, specifier, dependentModuleRecord);
+    _Outptr_result_maybenull_ JsModuleRecord *target) try {
+  FetchModule(nullptr, specifier, target);
+  return JsNoError;
+} catch (JsErrorCode ec) {
+  LOGE("Failed to fetch module %s: %d") % ToJs(specifier) % ec;
+  return ec;
 }
 
 static JsErrorCode
 MyNotifyModuleReadyCallback(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef exceptionVar) {
+  if (exceptionVar) return JsNoError;
   JsValueRef result;
   return JsModuleEvaluation(referencingModule, &result);
 }
+
+static JsErrorCode NativeInitializeImportMetaCallback(JsModuleRecord referencingModule, JsValueRef importMetaVar) try {
+  if (!importMetaVar) return JsNoError;
+  JsValueRef defined, url;
+  ThrowError(JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_HostDefined, &defined));
+  ThrowError(JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_Url, &url));
+  JsObjectWarpper wrap{importMetaVar};
+  if (GetJsType(defined) == JsObject) {
+    // Native module
+    wrap["native"] = defined;
+    ThrowError(JsSetModuleHostInfo(referencingModule, JsModuleHostInfo_HostDefined, url));
+  }
+  wrap["url"] = url;
+  return JsNoError;
+} catch (JsErrorCode ec) { return ec; }
+
+// static JsErrorCode
+// NotifyNativeModuleReadyCallback(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef exceptionVar) try {
+//   JsValueRef result, nameref;
+//   ThrowError(JsModuleEvaluation(referencingModule, &result));
+//   JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_HostDefined, &nameref);
+//   auto ns   = JsObjectWarpper::FromModuleRecord(referencingModule);
+//   auto name = FromJs<std::string>(nameref);
+//   LOGV("native");
+//   ModuleRegister::GetList()[name](ns);
+//   return JsNoError;
+// } catch (JsErrorCode ec) { return ec; }

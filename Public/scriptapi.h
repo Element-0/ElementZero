@@ -12,7 +12,7 @@ struct RegisterQueue {
 };
 
 struct ModuleRegister {
-  static std::map<std::string, void (*)(JsModuleRecord module)> &GetList();
+  static std::map<std::string, std::string (*)(JsObjectWarpper module)> &GetList();
 
-  inline ModuleRegister(char const *name, void (*t)(JsModuleRecord global));
+  ModuleRegister(char const *name, std::string (*t)(JsObjectWarpper global));
 };

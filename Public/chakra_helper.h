@@ -144,11 +144,6 @@ struct JsConvertible {
   using FnType         = std::function<JsValueRef(JsValueRef callee, bool isConstructCall, Arguments)>;
   using EnhancedFnType = std::function<JsValueRef(JsValueRef callee, Arguments, JsNativeFunctionInfo *info)>;
 
-  JsConvertible(Raw raw) : ref(raw.ref) {}
-  JsConvertible(int val) : ref(ToJs(val)) {}
-  JsConvertible(double val) : ref(ToJs(val)) {}
-  JsConvertible(char const *val) : ref(ToJs(val)) {}
-
   JsConvertible(JsNativeFunction fn, void *state = nullptr) { ThrowError(JsCreateFunction(fn, state, &ref)); }
 
   JsConvertible(JsNativeFunction fn, char const *name, void *state = nullptr) {
@@ -210,12 +205,16 @@ struct JsObjectWarpper {
     }
 
     template <typename T> JsValueRef operator=(T val) {
-      if constexpr (std::is_same_v<T, JsValueType>) {
+      if constexpr (std::is_same_v<T, JsValueRef>) {
         set(val);
         return val;
       } else if constexpr (std::is_same_v<T, JsObjectWarpper> || std::is_same_v<T, JsConvertible>) {
         set(val.ref);
         return val.ref;
+      } else if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> || std::is_same_v<T, double>) {
+        auto o = ToJs(val);
+        set(o);
+        return o;
       } else {
         JsConvertible o{val};
         set(o.ref);
@@ -237,7 +236,9 @@ struct JsObjectWarpper {
 
     std::string ToString() {
       JsValueRef str;
-      ThrowError(JsConvertValueToString(ref, &str));
+      printf("%p\n", ref);
+      ThrowError(JsConvertValueToString(fetch(), &str));
+      printf("!!!\n");
       return FromJs<std::string>(str);
     }
 
@@ -263,8 +264,13 @@ struct JsObjectWarpper {
     return JsObjectWarpper{ref};
   }
   static JsObjectWarpper FromCurrentException() {
-    JsValueRef ref;
+    JsValueRef ref = nullptr;
     ThrowError(JsGetAndClearExceptionWithMetadata(&ref));
+    return JsObjectWarpper{ref};
+  }
+  static JsObjectWarpper FromModuleRecord(JsModuleRecord mod) {
+    JsValueRef ref = nullptr;
+    ThrowError(JsGetModuleNamespace(mod, &ref));
     return JsObjectWarpper{ref};
   }
 
