@@ -7,37 +7,37 @@
 static RegisterQueue queue("console", [](JsObjectWarpper global) {
   DEF_LOGGER("ScriptOut");
   JsObjectWarpper console;
-  console["log"] = [](JsValueRef callee, bool isConstructCall, JsConvertible::Arguments args) {
+  console["log"] = [](JsValueRef callee, Arguments args) {
     if (!args.empty()) {
       std::stringstream ss;
       for (auto arg : args) {
         JsValueRef str;
         JsConvertValueToString(arg, &str);
-        ss << FromJs<std::string>(str);
+        ss << FromJs<std::string>(str) << " ";
       }
       LOGI("%s") % ss.str();
     }
     return GetUndefined();
   };
-  console["warn"] = [](JsValueRef callee, bool isConstructCall, JsConvertible::Arguments args) {
+  console["warn"] = [](JsValueRef callee, Arguments args) {
     if (!args.empty()) {
       std::stringstream ss;
       for (auto arg : args) {
         JsValueRef str;
         JsConvertValueToString(arg, &str);
-        ss << FromJs<std::string>(str);
+        ss << FromJs<std::string>(str) << " ";
       }
       LOGW("%s") % ss.str();
     }
     return GetUndefined();
   };
-  console["error"] = [](JsValueRef callee, bool isConstructCall, JsConvertible::Arguments args) {
+  console["error"] = [](JsValueRef callee, Arguments args) {
     if (!args.empty()) {
       std::stringstream ss;
       for (auto arg : args) {
         JsValueRef str;
         JsConvertValueToString(arg, &str);
-        ss << FromJs<std::string>(str);
+        ss << FromJs<std::string>(str) << " ";
       }
       LOGE("%s") % ss.str();
     }

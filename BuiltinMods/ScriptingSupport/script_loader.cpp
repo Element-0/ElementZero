@@ -7,6 +7,7 @@
 #include <log.h>
 #include <scriptapi.h>
 
+#include "chakra_helper.h"
 #include "global.h"
 
 namespace fs = std::filesystem;
@@ -29,6 +30,14 @@ static JsErrorCode NativeInitializeImportMetaCallback(JsModuleRecord referencing
 JsSourceContext NextContext() {
   static JsSourceContext ctx = 0;
   return ctx++;
+}
+
+void PrintException(JsObjectWarpper metadata) {
+  auto exception = metadata["exception"].ToString();
+  auto line      = metadata["line"].get<int>();
+  auto column    = metadata["column"].get<int>();
+  auto url       = metadata["url"].get<std::string>();
+  LOGE("Exception %s from %s[%d:%d]") % exception % url % line % column;
 }
 
 static void LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path full) {
@@ -88,12 +97,8 @@ void loadCustomScript() try {
   // Fake while to allow break out
   if (!hasException) return;
   try {
-    auto metadata  = JsObjectWarpper::FromCurrentException();
-    auto exception = metadata["exception"].ToString();
-    auto line      = metadata["line"].get<int>();
-    auto column    = metadata["column"].get<int>();
-    auto url       = metadata["url"].get<std::string>();
-    LOGE("Exception %s from %s[%d:%d]") % exception % url % line % column;
+    auto metadata = JsObjectWarpper::FromCurrentException();
+    PrintException(metadata);
   } catch (...) {}
   LOGE("Failed to load root module: %s") % hasException;
 } catch (JsErrorCode ec) { LOGE("Failed to load: %d") % ec; }
@@ -194,7 +199,10 @@ static JsErrorCode FetchImportedModuleFromScript(
 
 static JsErrorCode
 MyNotifyModuleReadyCallback(_In_opt_ JsModuleRecord referencingModule, _In_opt_ JsValueRef exceptionVar) {
-  if (exceptionVar) return JsNoError;
+  if (exceptionVar) {
+    LOGE("%s") % JsToString(exceptionVar);
+    return JsNoError;
+  }
   JsValueRef result;
   return JsModuleEvaluation(referencingModule, &result);
 }

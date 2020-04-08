@@ -4,12 +4,9 @@
 #include <functional>
 #include <stdexcept>
 #include <string>
-
-#include "ChakraCommon.h"
 #include <cstdint>
 
 #include <ChakraCore.h>
-#include <vcruntime.h>
 
 #define ThrowError(fnret)                                                                                              \
   if (JsErrorCode ec = fnret; ec != JsNoError) throw ec;
@@ -43,6 +40,12 @@ inline JsValueRef operator""_jsp(const wchar_t *str, size_t length) {
 inline JsValueRef ToJs(char const *str) {
   JsValueRef ref;
   ThrowError(JsCreateString(str, strlen(str), &ref));
+  return ref;
+}
+
+inline JsValueRef ToJs(std::string const &str) {
+  JsValueRef ref;
+  ThrowError(JsCreateString(str.data(), str.size(), &ref));
   return ref;
 }
 
@@ -119,6 +122,40 @@ inline JsValueRef GetUndefined() {
   return ret;
 }
 
+inline std::string JsToString(JsValueRef ref) {
+  JsValueRef str;
+  ThrowError(JsConvertValueToString(ref, &str));
+  return FromJs<std::string>(str);
+}
+
+struct Arguments {
+  JsValueRef self;
+  JsValueRef newTarget;
+  bool isConstructCall;
+  JsValueRef *arguments;
+  unsigned short argumentCount;
+
+  Arguments(JsValueRef *arguments, unsigned short argumentCount, JsNativeFunctionInfo *info)
+      : arguments(arguments), argumentCount(argumentCount) {
+    if (info) {
+      self            = info->thisArg;
+      newTarget       = info->newTargetArg;
+      isConstructCall = info->isConstructCall;
+    } else {
+      self = *arguments;
+    }
+  }
+
+  constexpr size_t size() noexcept { return argumentCount - 1; }
+  constexpr auto begin() noexcept { return arguments + 1; }
+  constexpr auto end() noexcept { return arguments + argumentCount; }
+  constexpr bool empty() noexcept { return argumentCount <= 1; }
+  constexpr JsValueRef operator[](unsigned short idx) {
+    if (idx >= argumentCount - 1) throw std::out_of_range{"index"};
+    return arguments[idx + 1];
+  }
+};
+
 struct JsConvertible {
   JsValueRef ref;
 
@@ -126,23 +163,7 @@ struct JsConvertible {
     JsValueRef ref;
   };
 
-  struct Arguments {
-    JsValueRef *arguments;
-    unsigned short argumentCount;
-
-    constexpr auto self() noexcept { return arguments; }
-    constexpr size_t size() noexcept { return argumentCount - 1; }
-    constexpr auto begin() noexcept { return arguments + 1; }
-    constexpr auto end() noexcept { return arguments + argumentCount; }
-    constexpr bool empty() noexcept { return argumentCount <= 1; }
-    constexpr JsValueRef operator[](unsigned short idx) {
-      if (idx >= argumentCount - 1) throw std::out_of_range{"index"};
-      return arguments[idx - 1];
-    }
-  };
-
-  using FnType         = std::function<JsValueRef(JsValueRef callee, bool isConstructCall, Arguments)>;
-  using EnhancedFnType = std::function<JsValueRef(JsValueRef callee, Arguments, JsNativeFunctionInfo *info)>;
+  using FnType = std::function<JsValueRef(JsValueRef callee, Arguments)>;
 
   JsConvertible(JsNativeFunction fn, void *state = nullptr) { ThrowError(JsCreateFunction(fn, state, &ref)); }
 
@@ -154,38 +175,20 @@ struct JsConvertible {
     ThrowError(JsCreateEnhancedFunction(fn, val, state, &ref));
   }
 
-  JsConvertible(FnType fn) {
+  JsConvertible(FnType fn, char const *name = nullptr) {
     auto nfn = new FnType(std::move(fn));
-    ThrowError(JsCreateFunction(
-        [](JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount,
-           void *state) -> JsValueRef {
-          FnType &rfn = *(FnType *) state;
-          return rfn(callee, isConstructCall, {arguments, argumentCount});
-        },
-        nfn, &ref));
-  }
-
-  JsConvertible(FnType fn, char const *name) {
-    auto nfn = new FnType(std::move(fn));
-    ThrowError(JsCreateNamedFunction(
-        ToJs(name),
-        [](JsValueRef callee, bool isConstructCall, JsValueRef *arguments, unsigned short argumentCount,
-           void *state) -> JsValueRef {
-          FnType &rfn = *(FnType *) state;
-          return rfn(callee, isConstructCall, {arguments, argumentCount});
-        },
-        nfn, &ref));
-  }
-
-  JsConvertible(EnhancedFnType fn, JsConvertible val) {
-    auto nfn = new EnhancedFnType(std::move(fn));
     ThrowError(JsCreateEnhancedFunction(
         [](JsValueRef callee, JsValueRef *arguments, unsigned short argumentCount, JsNativeFunctionInfo *info,
            void *state) -> JsValueRef {
-          EnhancedFnType &rfn = *(EnhancedFnType *) state;
-          return rfn(callee, {arguments, argumentCount}, info);
+          FnType &rfn = *(FnType *) state;
+          try {
+            return rfn(callee, {arguments, argumentCount, info});
+          } catch (std::exception const &ex) {
+            JsSetException(ToJs(ex.what()));
+            return GetUndefined();
+          }
         },
-        val, nfn, &ref));
+        name ? ToJs(name) : JS_INVALID_REFERENCE, nfn, &ref));
   }
 
   operator JsValueRef() { return ref; };
@@ -236,9 +239,7 @@ struct JsObjectWarpper {
 
     std::string ToString() {
       JsValueRef str;
-      printf("%p\n", ref);
       ThrowError(JsConvertValueToString(fetch(), &str));
-      printf("!!!\n");
       return FromJs<std::string>(str);
     }
 
@@ -273,8 +274,66 @@ struct JsObjectWarpper {
     ThrowError(JsGetModuleNamespace(mod, &ref));
     return JsObjectWarpper{ref};
   }
+  template <typename T> static JsObjectWarpper FromExternalObject(T *type, JsValueRef prototype = nullptr) {
+    JsValueRef ref          = nullptr;
+    JsFinalizeCallback fini = [](void *ptr) { delete (T *) ptr; };
+    if (prototype) {
+      ThrowError(JsCreateExternalObjectWithPrototype(type, fini, prototype, &ref));
+    } else {
+      ThrowError(JsCreateExternalObject(type, fini, &ref));
+    }
+    return JsObjectWarpper{ref};
+  }
 
-  PropProxy operator[](char const *name) { return {ref, ToJs(name)}; }
+  template <typename T> T *GetExternalData() {
+    void *temp;
+    ThrowError(JsGetExternalData(ref, &temp));
+    return (T *) temp;
+  }
 
-  operator JsValueRef() { return ref; }
+  PropProxy operator[](char const *name) const { return {ref, ToJs(name)}; }
+
+  struct PropertyDesc {
+    std::function<JsValueRef(JsObjectWarpper)> get;
+    std::function<void(JsObjectWarpper, JsValueRef)> set;
+
+    PropertyDesc(
+        std::function<JsValueRef(JsObjectWarpper)> get, std::function<JsValueRef(JsObjectWarpper, JsValueRef)> set)
+        : get(get), set(set) {}
+
+    template <typename T> PropertyDesc(JsValueRef (T::*tget)(), void (T::*tset)(JsValueRef) = nullptr) {
+      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return (obj.GetExternalData<T>()->*tget)(); };
+      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(rhs); };
+    }
+    template <typename T, typename R> PropertyDesc(R (T::*tget)(), void (T::*tset)(R) = nullptr) {
+      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs((obj.GetExternalData<T>()->*tget)()); };
+      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(FromJs<R>(rhs)); };
+    }
+
+    JsValueRef toObject() {
+      JsObjectWarpper ret;
+      ret["configurable"] = false;
+      ret["enumerable"]   = true;
+      if (get)
+        ret["get"] = [get = this->get](JsValueRef callee, Arguments args) -> JsValueRef {
+          JsObjectWarpper self{args.self};
+          return get(self);
+        };
+      if (set)
+        ret["set"] = [set = this->set](JsValueRef callee, Arguments args) -> JsValueRef {
+          JsObjectWarpper self{args.self};
+          set(self, args[0]);
+          return GetUndefined();
+        };
+      return *ret;
+    }
+  };
+
+  bool DefineProperty(JsPropertyIdRef id, PropertyDesc desc) {
+    bool result;
+    ThrowError(JsDefineProperty(ref, id, desc.toObject(), &result));
+    return result;
+  }
+
+  JsValueRef operator*() const { return ref; }
 };
