@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ChakraCommon.h"
 #include <cstdio>
 #include <functional>
 #include <stdexcept>
@@ -70,6 +71,30 @@ inline JsValueRef ToJs(double val) {
 inline JsValueRef ToJs(JsNativeFunction fn) {
   JsValueRef ref;
   ThrowError(JsCreateFunction(fn, nullptr, &ref));
+  return ref;
+}
+
+inline JsPropertyIdRef ToJsP(char const *str) {
+  JsPropertyIdRef ref;
+  ThrowError(JsCreatePropertyId(str, strlen(str), &ref));
+  return ref;
+}
+
+inline JsPropertyIdRef ToJsP(std::string_view str) {
+  JsPropertyIdRef ref;
+  ThrowError(JsCreatePropertyId(str.data(), str.length(), &ref));
+  // JsGetIndexedProperty(JsValueRef object, JsValueRef index, JsValueRef *result)
+  // JsSetIndexedProperty(JsValueRef object, JsValueRef index, JsValueRef value)
+  return ref;
+}
+
+template <typename T, typename F>
+inline JsValueRef ToJsArray(
+    T t, F f = [](auto x) { return ToJs(x); }) {
+  JsValueRef ref;
+  ThrowError(JsCreateArray(t.size(), &ref));
+  int idx = 0;
+  for (auto it : t) ThrowError(JsSetIndexedProperty(ref, ToJs(idx++), f(it)));
   return ref;
 }
 
@@ -189,6 +214,39 @@ struct JsConvertible {
           }
         },
         name ? ToJs(name) : JS_INVALID_REFERENCE, nfn, &ref));
+  }
+
+  template <typename T, typename C, typename... PS> JsConvertible(T (C::*fn)(PS...), char const *name = nullptr) {
+    union {
+      T (C::*fn)(PS...);
+      void *state;
+    } u;
+    u.fn = fn;
+    ThrowError(JsCreateEnhancedFunction(
+        [](JsValueRef callee, JsValueRef *arguments, unsigned short argumentCount, JsNativeFunctionInfo *info,
+           void *state) -> JsValueRef {
+          try {
+            union {
+              T (C::*fn)(PS...);
+              void *state;
+            } u;
+            u.state           = state;
+            T (C::*fn)(PS...) = u.fn;
+            Arguments args{arguments, argumentCount, info};
+            if (args.size() != sizeof...(PS))
+              throw std::runtime_error{"Require " + std::to_string(sizeof...(PS)) + " argument"};
+            JsObjectWarpper xself{args.self};
+            auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
+              using tp = std::tuple<PS...>;
+              return (xself.GetExternalData<C>()->*fn)(FromJs<std::tuple_element_t<I, tp>>(args[I])...);
+            };
+            return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
+          } catch (std::exception const &ex) {
+            JsSetException(ToJs(ex.what()));
+            return GetUndefined();
+          }
+        },
+        name ? ToJs(name) : JS_INVALID_REFERENCE, u.state, &ref));
   }
 
   operator JsValueRef() { return ref; };
