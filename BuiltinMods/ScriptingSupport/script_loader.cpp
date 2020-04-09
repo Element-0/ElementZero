@@ -34,14 +34,6 @@ JsSourceContext NextContext() {
   return ctx++;
 }
 
-void PrintException(JsObjectWarpper metadata) {
-  auto exception = metadata["exception"].ToString();
-  auto line      = metadata["line"].get<int>();
-  auto column    = metadata["column"].get<int>();
-  auto url       = metadata["url"].get<std::string>();
-  LOGE("Exception %s from %s[%d:%d]") % exception % url % line % column;
-}
-
 static void LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path full) {
   auto cookies = NextContext();
   JsValueRef exception;
@@ -59,7 +51,6 @@ static void LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path fu
   auto xec = JsParseModuleSource(
       module, cookies, (BYTE *) content.data(), content.size(), JsParseModuleSourceFlags_DataIsUTF8, &exception);
   if (exception) JsSetException(exception);
-  ThrowError(xec);
 }
 
 static void initRootModule(std::string_view path, JsModuleRecord *requestModule) {
@@ -100,7 +91,10 @@ void loadCustomScript() try {
   if (!hasException) return;
   try {
     auto metadata = JsObjectWarpper::FromCurrentException();
-    PrintException(metadata);
+    LOGE("Exception %s") % metadata["exception"].ToString();
+    LOGE("File: %s") % metadata["url"].ToString();
+    LOGE("Line: %f") % metadata["line"].get<double>();
+    LOGE("Column: %f") % metadata["column"].get<double>();
   } catch (...) {}
   LOGE("Failed to load root module: %s") % hasException;
 } catch (JsErrorCode ec) { LOGE("Failed to load: %d") % ec; }

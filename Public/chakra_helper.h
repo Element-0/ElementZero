@@ -344,21 +344,17 @@ struct JsObjectWarpper {
 
     JsValueRef operator*() { return fetch(); }
 
-    template <typename T> T get() {
-      if constexpr (std::is_same_v<T, JsValueType>) {
-        return ref;
+    template <typename T = JsValueRef> T get() {
+      if constexpr (std::is_same_v<T, JsValueRef>) {
+        return fetch();
       } else if constexpr (std::is_same_v<T, JsObjectWarpper>) {
-        return JsObjectWarpper{ref};
+        return JsObjectWarpper{fetch()};
       } else {
-        return FromJs<T>(ref);
+        return FromJs<T>(fetch());
       }
     }
 
-    std::string ToString() {
-      JsValueRef str;
-      ThrowError(JsConvertValueToString(fetch(), &str));
-      return FromJs<std::string>(str);
-    }
+    std::string ToString() { return JsToString(get<>()); }
 
   private:
     JsValueRef temp;
@@ -376,13 +372,15 @@ struct JsObjectWarpper {
   explicit JsObjectWarpper(JsValueRef ref) : ref(ref) {}
   explicit JsObjectWarpper() { ThrowError(JsCreateObject(&ref)); }
 
+  JsObjectWarpper(JsObjectWarpper const &rhs) : ref(rhs.ref) {}
+
   static JsObjectWarpper FromGlobal() {
     JsValueRef ref;
     ThrowError(JsGetGlobalObject(&ref));
     return JsObjectWarpper{ref};
   }
   static JsObjectWarpper FromCurrentException() {
-    JsValueRef ref = nullptr;
+    JsValueRef ref;
     ThrowError(JsGetAndClearExceptionWithMetadata(&ref));
     return JsObjectWarpper{ref};
   }
