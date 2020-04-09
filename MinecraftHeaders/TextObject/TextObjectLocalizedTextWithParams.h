@@ -1,8 +1,10 @@
 #pragma once
 
-#include "ITextObject.h"
-
 #include <vector>
+#include <memory>
+
+#include "ITextObject.h"
+#include "../dll.h"
 
 class TextObjectLocalizedTextWithParams : public ITextObject {
 public:
@@ -11,8 +13,8 @@ public:
   TextObjectLocalizedTextWithParams(std::string text, std::initializer_list<std::string> params)
       : text(std::move(text)), params(params) {}
 
-  __declspec(dllimport) std::string asString() const;
-  __declspec(dllimport) Json::Value asJsonValue() const;
+  MCAPI std::string asString() const;
+  MCAPI Json::Value asJsonValue() const;
 
   inline static auto build(std::string text, std::initializer_list<std::string> params) {
     return std::make_unique<TextObjectLocalizedTextWithParams>(text, params);

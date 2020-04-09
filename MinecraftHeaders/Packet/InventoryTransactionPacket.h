@@ -1,5 +1,10 @@
 #pragma once
 
+#include <memory>
+#include <unordered_map>
+#include <vector>
+#include <functional>
+
 #include "../Core/NBT.h"
 #include "../Core/Packet.h"
 #include "../Core/ContainerID.h"
@@ -8,11 +13,7 @@
 #include "../Actor/Player.h"
 #include "../Actor/ActorRuntimeID.h"
 #include "../Item/ItemStack.h"
-
-#include <memory>
-#include <unordered_map>
-#include <vector>
-#include <functional>
+#include "../dll.h"
 
 class ReadOnlyBinaryStream;
 class BinaryStream;
@@ -85,7 +86,7 @@ public:
   int count;
   unsigned char flag;
 
-  __declspec(dllimport) InventoryTransactionItemGroup(ItemStack const &, int);
+  MCAPI InventoryTransactionItemGroup(ItemStack const &, int);
   inline ~InventoryTransactionItemGroup() {}
 };
 
@@ -94,19 +95,19 @@ public:
   std::unordered_map<InventorySource, std::vector<InventoryAction>> actions;
   std::vector<InventoryTransactionItemGroup> items;
 
-  __declspec(dllimport) void addAction(InventoryAction const &);
-  __declspec(dllimport) InventoryTransactionError executeFull(Player &, bool) const;
-  __declspec(dllimport) void forceBalanceTransaction();
-  __declspec(dllimport) std::vector<InventoryAction> const &getActions(InventorySource const &) const;
-  __declspec(dllimport)
-      std::function<InventoryTransactionError(Player &, InventoryAction const &, bool)> getVerifyFunction(
-          InventorySource const &) const;
-  __declspec(dllimport) InventoryTransactionError verifyFull(Player &, bool) const;
+  MCAPI void addAction(InventoryAction const &);
+  MCAPI InventoryTransactionError executeFull(Player &, bool) const;
+  MCAPI void forceBalanceTransaction();
+  MCAPI std::vector<InventoryAction> const &getActions(InventorySource const &) const;
+  MCAPI
+  std::function<InventoryTransactionError(Player &, InventoryAction const &, bool)>
+  getVerifyFunction(InventorySource const &) const;
+  MCAPI InventoryTransactionError verifyFull(Player &, bool) const;
 
 private:
-  __declspec(dllimport) void addActionToContent(InventoryAction const &);
-  __declspec(dllimport) void _dropCreatedItems(Player &);
-  __declspec(dllimport) void addItemToContent(ItemStack const &);
+  MCAPI void addActionToContent(InventoryAction const &);
+  MCAPI void _dropCreatedItems(Player &);
+  MCAPI void addItemToContent(ItemStack const &);
 
 public:
   inline InventoryTransaction() {}
@@ -129,10 +130,10 @@ public:
   InventoryTransaction data;
 
   inline virtual ~ComplexInventoryTransaction() {}
-  __declspec(dllimport) virtual void read(ReadOnlyBinaryStream &);
-  __declspec(dllimport) virtual void write(BinaryStream &) const;
-  __declspec(dllimport) virtual InventoryTransactionError handle(Player &, bool) const;
-  __declspec(dllimport) virtual void onTransactionError(Player &, InventoryTransactionError) const;
+  MCAPI virtual void read(ReadOnlyBinaryStream &);
+  MCAPI virtual void write(BinaryStream &) const;
+  MCAPI virtual InventoryTransactionError handle(Player &, bool) const;
+  MCAPI virtual void onTransactionError(Player &, InventoryTransactionError) const;
 };
 
 static_assert(sizeof(ComplexInventoryTransaction) == 104);
@@ -148,10 +149,10 @@ public:
   Vec3 playerPos, clickPos;
 
   inline virtual ~ItemUseInventoryTransaction() {}
-  __declspec(dllimport) virtual void read(ReadOnlyBinaryStream &);
-  __declspec(dllimport) virtual void write(BinaryStream &) const;
-  __declspec(dllimport) virtual InventoryTransactionError handle(Player &, bool) const;
-  __declspec(dllimport) virtual void onTransactionError(Player &, InventoryTransactionError) const;
+  MCAPI virtual void read(ReadOnlyBinaryStream &);
+  MCAPI virtual void write(BinaryStream &) const;
+  MCAPI virtual InventoryTransactionError handle(Player &, bool) const;
+  MCAPI virtual void onTransactionError(Player &, InventoryTransactionError) const;
 };
 
 class ItemUseOnActorInventoryTransaction : public ComplexInventoryTransaction {
@@ -163,10 +164,10 @@ public:
   Vec3 playerPos, clickPos;
 
   inline virtual ~ItemUseOnActorInventoryTransaction() {}
-  __declspec(dllimport) virtual void read(ReadOnlyBinaryStream &);
-  __declspec(dllimport) virtual void write(BinaryStream &) const;
-  __declspec(dllimport) virtual InventoryTransactionError handle(Player &, bool) const;
-  __declspec(dllimport) virtual void onTransactionError(Player &, InventoryTransactionError) const;
+  MCAPI virtual void read(ReadOnlyBinaryStream &);
+  MCAPI virtual void write(BinaryStream &) const;
+  MCAPI virtual InventoryTransactionError handle(Player &, bool) const;
+  MCAPI virtual void onTransactionError(Player &, InventoryTransactionError) const;
 };
 
 class ItemReleaseInventoryTransaction : public ComplexInventoryTransaction {
@@ -177,10 +178,10 @@ public:
   Vec3 playerPos;
 
   inline virtual ~ItemReleaseInventoryTransaction() {}
-  __declspec(dllimport) virtual void read(ReadOnlyBinaryStream &);
-  __declspec(dllimport) virtual void write(BinaryStream &) const;
-  __declspec(dllimport) virtual InventoryTransactionError handle(Player &, bool) const;
-  __declspec(dllimport) virtual void onTransactionError(Player &, InventoryTransactionError) const;
+  MCAPI virtual void read(ReadOnlyBinaryStream &);
+  MCAPI virtual void write(BinaryStream &) const;
+  MCAPI virtual InventoryTransactionError handle(Player &, bool) const;
+  MCAPI virtual void onTransactionError(Player &, InventoryTransactionError) const;
 };
 
 class InventoryTransactionPacket : public Packet {
@@ -188,8 +189,8 @@ public:
   std::unique_ptr<ComplexInventoryTransaction> transaction;
 
   inline ~InventoryTransactionPacket() {}
-  __declspec(dllimport) virtual MinecraftPacketIds getId() const;
-  __declspec(dllimport) virtual std::string getName() const;
-  __declspec(dllimport) virtual void write(BinaryStream &) const;
-  __declspec(dllimport) virtual PacketReadResult read(ReadOnlyBinaryStream &);
+  MCAPI virtual MinecraftPacketIds getId() const;
+  MCAPI virtual std::string getName() const;
+  MCAPI virtual void write(BinaryStream &) const;
+  MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };

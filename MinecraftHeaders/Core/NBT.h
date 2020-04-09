@@ -4,11 +4,13 @@
 #include <string>
 #include <vector>
 
+#include "../dll.h"
+
 struct IDataInput;
 struct IDataOutput;
 struct PrintStream;
 
-class __declspec(dllimport) Tag {
+class MCAPI Tag {
 public:
   virtual ~Tag();
   virtual void deleteChildren();
@@ -24,7 +26,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) EndTag : public Tag {
+class MCAPI EndTag : public Tag {
 public:
   virtual ~EndTag();
   virtual void write(IDataOutput &) const;
@@ -35,7 +37,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) DoubleTag : public Tag {
+class MCAPI DoubleTag : public Tag {
 public:
   double value;
   virtual ~DoubleTag();
@@ -52,13 +54,13 @@ public:
   size_t m_cap, m_size;
   std::unique_ptr<unsigned char[]> m_data;
 
-  template <typename T> __declspec(dllimport) T *alloc(unsigned long);
-  __declspec(dllimport) TagMemoryChunk copy() const;
-  __declspec(dllimport) bool operator!=(TagMemoryChunk const &) const;
+  template <typename T> MCAPI T *alloc(unsigned long);
+  MCAPI TagMemoryChunk copy() const;
+  MCAPI bool operator!=(TagMemoryChunk const &) const;
   inline size_t size() const { return m_size; }
 };
 
-class __declspec(dllimport) ByteArrayTag : public Tag {
+class MCAPI ByteArrayTag : public Tag {
 public:
   TagMemoryChunk value;
   virtual ~ByteArrayTag();
@@ -70,7 +72,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) CompoundTag : public Tag {
+class MCAPI CompoundTag : public Tag {
 public:
   std::map<std::string, std::unique_ptr<Tag>> value;
   virtual ~CompoundTag();
@@ -83,7 +85,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) ListTag : public Tag {
+class MCAPI ListTag : public Tag {
 public:
   std::vector<std::unique_ptr<Tag>> value;
   size_t unk;
@@ -99,7 +101,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) FloatTag : public Tag {
+class MCAPI FloatTag : public Tag {
 public:
   float value;
   virtual ~FloatTag();
@@ -111,7 +113,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) ByteTag : public Tag {
+class MCAPI ByteTag : public Tag {
 public:
   unsigned char value;
   virtual ~ByteTag();
@@ -123,7 +125,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) ShortTag : public Tag {
+class MCAPI ShortTag : public Tag {
 public:
   short value;
   virtual ~ShortTag();
@@ -135,7 +137,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) Int64Tag : public Tag {
+class MCAPI Int64Tag : public Tag {
 public:
   int64_t value;
   virtual ~Int64Tag();
@@ -147,7 +149,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) IntArrayTag : public Tag {
+class MCAPI IntArrayTag : public Tag {
 public:
   TagMemoryChunk value;
   virtual ~IntArrayTag();
@@ -159,7 +161,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) IntTag : public Tag {
+class MCAPI IntTag : public Tag {
 public:
   int32_t value;
   virtual ~IntTag();
@@ -171,7 +173,7 @@ public:
   virtual std::unique_ptr<Tag> copy() const;
 };
 
-class __declspec(dllimport) StringTag : public Tag {
+class MCAPI StringTag : public Tag {
 public:
   std::string value;
   virtual ~StringTag();

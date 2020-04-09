@@ -3,6 +3,7 @@
 #include <string>
 #include "../Core/HashedString.h"
 #include "ActorType.h"
+#include "../dll.h"
 
 class ActorDefinitionIdentifier {
   std::string ns;             // 0
@@ -23,11 +24,11 @@ public:
   inline void setIdentifier(std::string const &id) { identifier = id; }
   inline void setInitEvent(std::string const &e) { event = e; }
 
-  __declspec(dllimport) ActorDefinitionIdentifier(ActorDefinitionIdentifier const &);
-  __declspec(dllimport) ActorDefinitionIdentifier(ActorDefinitionIdentifier &&);
-  __declspec(dllimport) ActorDefinitionIdentifier(std::string, std::string, std::string);
-  __declspec(dllimport) ActorDefinitionIdentifier(std::string const &);
-  __declspec(dllimport) ActorDefinitionIdentifier(ActorType);
-  __declspec(dllimport) ActorDefinitionIdentifier &operator=(ActorDefinitionIdentifier const &);
-  __declspec(dllimport) bool operator==(ActorDefinitionIdentifier const &);
+  MCAPI ActorDefinitionIdentifier(ActorDefinitionIdentifier const &);
+  MCAPI ActorDefinitionIdentifier(ActorDefinitionIdentifier &&);
+  MCAPI ActorDefinitionIdentifier(std::string, std::string, std::string);
+  MCAPI ActorDefinitionIdentifier(std::string const &);
+  MCAPI ActorDefinitionIdentifier(ActorType);
+  MCAPI ActorDefinitionIdentifier &operator=(ActorDefinitionIdentifier const &);
+  MCAPI bool operator==(ActorDefinitionIdentifier const &);
 };

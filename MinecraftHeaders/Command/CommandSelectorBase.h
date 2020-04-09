@@ -4,11 +4,13 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+
 #include "../Math/Vec3.h"
 #include "../Math/BlockPos.h"
 #include "CommandPosition.h"
 #include "InvertableFilter.h"
 #include "../Actor/ActorDefinitionIdentifier.h"
+#include "../dll.h"
 
 class CommandOrigin;
 class Actor;
@@ -44,15 +46,15 @@ public:
   inline void setIncludeDeadPlayers(bool value) { includeDeadPlayers = value; }
   inline void setResultCount(uint64_t value) { resultCount = value; }
 
-  __declspec(dllimport) void addFilter(std::function<bool(CommandOrigin const &, Actor const &)>);
-  __declspec(dllimport) void addTypeFilter(InvertableFilter<std::string> const &);
-  __declspec(dllimport) CommandSelectorBase();
-  __declspec(dllimport) void setBox(BlockPos);
-  __declspec(dllimport) void setPosition(CommandPosition);
-  __declspec(dllimport) void setRadiusMin(float);
-  __declspec(dllimport) void setRadiusMax(float);
-  __declspec(dllimport) bool compile(CommandOrigin const &, std::string &);
+  MCAPI void addFilter(std::function<bool(CommandOrigin const &, Actor const &)>);
+  MCAPI void addTypeFilter(InvertableFilter<std::string> const &);
+  MCAPI CommandSelectorBase();
+  MCAPI void setBox(BlockPos);
+  MCAPI void setPosition(CommandPosition);
+  MCAPI void setRadiusMin(float);
+  MCAPI void setRadiusMax(float);
+  MCAPI bool compile(CommandOrigin const &, std::string &);
 
 protected:
-  __declspec(dllimport) CommandSelectorBase(bool isPlayer);
+  MCAPI CommandSelectorBase(bool isPlayer);
 };

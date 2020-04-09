@@ -1,14 +1,16 @@
 #pragma once
 
-#include "NetworkIdentifier.h"
 #include <hook.h>
+
+#include "NetworkIdentifier.h"
+#include "../dll.h"
 
 class Player;
 
 class ServerNetworkHandler {
 public:
-  __declspec(dllimport) void disconnectClient(NetworkIdentifier const &, std::string const &reason, bool hide);
-  __declspec(dllimport) void updateServerAnnouncement();
+  MCAPI void disconnectClient(NetworkIdentifier const &, std::string const &reason, bool hide);
+  MCAPI void updateServerAnnouncement();
 
   void forceDisconnectClient(Player *player, bool hide) {
     CallServerClassMethod<void>("?_onPlayerLeft@ServerNetworkHandler@@AEAAXPEAVServerPlayer@@_N@Z", this, player, hide);

@@ -1,10 +1,12 @@
 #pragma once
 
+#include "../dll.h"
+
 class Level;
 class ServerNetworkHandler;
 
 class Minecraft {
 public:
-  __declspec(dllimport) Level *getLevel() const;
-  __declspec(dllimport) ServerNetworkHandler *getServerNetworkHandler();
+  MCAPI Level *getLevel() const;
+  MCAPI ServerNetworkHandler *getServerNetworkHandler();
 };

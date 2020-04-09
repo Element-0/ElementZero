@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "CommandOutputParameter.h"
+#include "../dll.h"
 
 class Actor;
 
@@ -13,8 +14,8 @@ class Actor;
 class CommandOutput {
 public:
   BASEAPI void success();
-  __declspec(dllimport) void success(std::string const &, std::vector<CommandOutputParameter> const &params = {});
-  __declspec(dllimport) void error(std::string const &, std::vector<CommandOutputParameter> const &params = {});
-  __declspec(dllimport) void addToResultList(std::string const &, Actor const &);
+  MCAPI void success(std::string const &, std::vector<CommandOutputParameter> const &params = {});
+  MCAPI void error(std::string const &, std::vector<CommandOutputParameter> const &params = {});
+  MCAPI void addToResultList(std::string const &, Actor const &);
   template <typename T> void set(char const *name, T value);
 };

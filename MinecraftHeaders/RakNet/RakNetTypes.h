@@ -1,8 +1,11 @@
 #pragma once
 
-#include "../Core/mce.h"
 #include <string>
+
 #include <WinSock2.h>
+
+#include "../Core/mce.h"
+#include "../dll.h"
 
 namespace RakNet {
 
@@ -12,17 +15,17 @@ using RPCIndex     = unsigned char;
 
 struct SystemAddress {
 public:
-  __declspec(dllimport) SystemAddress();
+  MCAPI SystemAddress();
 
   unsigned short type;
   char filler[0x7e];
   unsigned unk128;
 
-  __declspec(dllimport) SystemAddress &operator=(SystemAddress const &);
-  __declspec(dllimport) bool operator==(SystemAddress const &) const;
+  MCAPI SystemAddress &operator=(SystemAddress const &);
+  MCAPI bool operator==(SystemAddress const &) const;
 
 private:
-  __declspec(dllimport) void ToString_New(bool writePort, char *dest, char portDelineator) const;
+  MCAPI void ToString_New(bool writePort, char *dest, char portDelineator) const;
 
 public:
   inline std::string ToString(bool withPort = true) {
@@ -32,7 +35,7 @@ public:
   }
 };
 
-struct __declspec(dllimport) RakNetGUID {
+struct MCAPI RakNetGUID {
   RakNetGUID();
   uint64_t g;
   SystemIndex systemIndex;

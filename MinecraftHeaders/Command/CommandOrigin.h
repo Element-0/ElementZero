@@ -7,6 +7,7 @@
 #include "../Math/Vec3.h"
 #include "../Core/mce.h"
 #include "CommandPermissionLevel.h"
+#include "../dll.h"
 
 enum class CommandOriginType : char {
   Player           = 0,
@@ -35,7 +36,7 @@ class Value;
 
 class CommandOrigin {
 public:
-  __declspec(dllimport) virtual ~CommandOrigin();
+  MCAPI virtual ~CommandOrigin();
   virtual std::string const &getRequestId() const            = 0;
   virtual std::string getName() const                        = 0;
   virtual BlockPos getBlockPosition() const                  = 0;
@@ -45,22 +46,22 @@ public:
   virtual Actor *getEntity() const                           = 0;
   virtual CommandPermissionLevel getPermissionsLevel() const = 0;
   virtual std::unique_ptr<CommandOrigin> clone() const       = 0;
-  __declspec(dllimport) virtual std::optional<BlockPos> getCursorHitBlockPos() const;
-  __declspec(dllimport) virtual std::optional<Vec3> getCursorHitPos() const;
-  __declspec(dllimport) virtual bool hasChatPerms() const;
-  __declspec(dllimport) virtual bool hasTellPerms() const;
-  __declspec(dllimport) virtual bool canUseAbility(AbilitiesIndex) const;
-  __declspec(dllimport) virtual bool isWorldBuilder() const;
-  __declspec(dllimport) virtual bool canUseCommandsWithoutCheatsEnabled() const;
-  __declspec(dllimport) virtual bool isSelectorExpansionAllowed() const;
-  __declspec(dllimport) virtual NetworkIdentifier const &getSourceId() const;
-  __declspec(dllimport) virtual unsigned chargetSourceSubId() const;
-  __declspec(dllimport) virtual CommandOrigin const &getOutputReceiver() const;
+  MCAPI virtual std::optional<BlockPos> getCursorHitBlockPos() const;
+  MCAPI virtual std::optional<Vec3> getCursorHitPos() const;
+  MCAPI virtual bool hasChatPerms() const;
+  MCAPI virtual bool hasTellPerms() const;
+  MCAPI virtual bool canUseAbility(AbilitiesIndex) const;
+  MCAPI virtual bool isWorldBuilder() const;
+  MCAPI virtual bool canUseCommandsWithoutCheatsEnabled() const;
+  MCAPI virtual bool isSelectorExpansionAllowed() const;
+  MCAPI virtual NetworkIdentifier const &getSourceId() const;
+  MCAPI virtual unsigned chargetSourceSubId() const;
+  MCAPI virtual CommandOrigin const &getOutputReceiver() const;
   virtual CommandOriginType getOriginType() const = 0;
-  __declspec(dllimport) virtual CommandOriginData toCommandOriginData() const;
-  __declspec(dllimport) virtual mce::UUID const &getUUID() const;
-  __declspec(dllimport) virtual void handleCommandOutputCallback(Json::Value &&) const;
+  MCAPI virtual CommandOriginData toCommandOriginData() const;
+  MCAPI virtual mce::UUID const &getUUID() const;
+  MCAPI virtual void handleCommandOutputCallback(Json::Value &&) const;
 
 protected:
-  __declspec(dllimport) virtual void _setUUID(mce::UUID const &);
+  MCAPI virtual void _setUUID(mce::UUID const &);
 };

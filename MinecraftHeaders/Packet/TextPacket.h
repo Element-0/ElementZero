@@ -1,12 +1,14 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
+#include <hook.h>
+
 #include "../Core/Packet.h"
 #include "../TextObject/TextObjectRoot.h"
 #include "../TextObject/TextObjectLocalizedTextWithParams.h"
-#include <hook.h>
-
-#include <string>
-#include <vector>
+#include "../dll.h"
 
 enum class TextPacketType : char {
   Raw           = 0,
@@ -53,8 +55,8 @@ public:
     pkt.xuid       = xuid;
     return pkt;
   }
-  __declspec(dllimport) static TextPacket
-      createTextObjectMessage(TextObjectRoot const &, std::string const &xuid = "", std::string const &unk2 = "");
+  MCAPI static TextPacket
+  createTextObjectMessage(TextObjectRoot const &, std::string const &xuid = "", std::string const &unk2 = "");
 
   static inline TextPacket
   createTranslatedMessageWithParams(std::string const &text, std::initializer_list<std::string> args = {}) {
@@ -64,8 +66,8 @@ public:
   }
   inline TextPacket() {}
   inline ~TextPacket() {}
-  __declspec(dllimport) virtual MinecraftPacketIds getId() const;
-  __declspec(dllimport) virtual std::string getName() const;
-  __declspec(dllimport) virtual void write(BinaryStream &) const;
-  __declspec(dllimport) virtual PacketReadResult read(ReadOnlyBinaryStream &);
+  MCAPI virtual MinecraftPacketIds getId() const;
+  MCAPI virtual std::string getName() const;
+  MCAPI virtual void write(BinaryStream &) const;
+  MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };

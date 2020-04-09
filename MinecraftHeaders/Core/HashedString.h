@@ -3,6 +3,8 @@
 #include <string>
 #include <cstdint>
 
+#include "../dll.h"
+
 class HashedString {
   uint64_t hash;
   std::string str;
@@ -10,10 +12,10 @@ class HashedString {
 public:
   std::string const &getString() const { return str; }
 
-  __declspec(dllimport) HashedString(HashedString const &rhs);
-  __declspec(dllimport) HashedString(HashedString &&rhs);
-  __declspec(dllimport) HashedString(char const *rhs);
-  __declspec(dllimport) HashedString(std::string const &rhs);
-  __declspec(dllimport) bool operator==(HashedString const &rhs) const;
-  __declspec(dllimport) bool operator!=(HashedString const &rhs) const;
+  MCAPI HashedString(HashedString const &rhs);
+  MCAPI HashedString(HashedString &&rhs);
+  MCAPI HashedString(char const *rhs);
+  MCAPI HashedString(std::string const &rhs);
+  MCAPI bool operator==(HashedString const &rhs) const;
+  MCAPI bool operator!=(HashedString const &rhs) const;
 };

@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "../dll.h"
+
 namespace Common {
-__declspec(dllimport) std::string getServerVersionString();
+MCAPI std::string getServerVersionString();
 }

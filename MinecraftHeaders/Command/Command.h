@@ -2,6 +2,7 @@
 
 #include <string>
 #include "CommandFlag.h"
+#include "../dll.h"
 
 class CommandRegistry;
 class CommandOrigin;
@@ -21,11 +22,11 @@ protected:
   }
 
 public:
-  __declspec(dllimport) virtual ~Command();
+  MCAPI virtual ~Command();
   virtual void execute(CommandOrigin const &, CommandOutput &) = 0;
 
 protected:
   //??$checkHasTargets@VActor@@@Command@@KA_NAEBV?$CommandSelectorResults@VActor@@@@AEAVCommandOutput@@@Z
   template <typename T>
-  __declspec(dllimport) static bool checkHasTargets(CommandSelectorResults<T> const &, CommandOutput &);
+  MCAPI static bool checkHasTargets(CommandSelectorResults<T> const &, CommandOutput &);
 };

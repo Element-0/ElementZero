@@ -1,13 +1,14 @@
 #pragma once
 
+#include <vector>
+#include <memory>
+#include <string>
+
 #include "CommandFlag.h"
 #include "CommandVersion.h"
 #include "CommandPermissionLevel.h"
 #include "../Core/type_id.h"
-
-#include <vector>
-#include <memory>
-#include <string>
+#include "../dll.h"
 
 class Command;
 class CommandOrigin;
@@ -56,31 +57,31 @@ public:
   };
 #pragma endregion struct definition
 
-  __declspec(dllimport) void registerCommand(
+  MCAPI void registerCommand(
       std::string const &, char const *, CommandPermissionLevel, CommandFlag, CommandFlag);
-  __declspec(dllimport) void registerAlias(std::string const &, std::string const &);
+  MCAPI void registerAlias(std::string const &, std::string const &);
 
 private:
-  __declspec(dllimport) Signature const *findCommand(std::string const &) const;
-  __declspec(dllimport) void registerOverloadInternal(Signature &, Overload &);
+  MCAPI Signature const *findCommand(std::string const &) const;
+  MCAPI void registerOverloadInternal(Signature &, Overload &);
 
   template <typename Type>
-  __declspec(dllimport) bool parse(
+  MCAPI bool parse(
       void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
 
-  __declspec(dllimport) Symbol addEnumValuesInternal(
+  MCAPI Symbol addEnumValuesInternal(
       std::string const &, std::vector<std::pair<uint64_t, uint64_t>> const &, typeid_t<CommandRegistry>,
       bool (CommandRegistry::*)(
           void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
           std::vector<std::string> &) const);
 
-  __declspec(dllimport) Symbol addEnumValuesInternal(
+  MCAPI Symbol addEnumValuesInternal(
       std::string const &, std::vector<std::pair<std::string, uint64_t>> const &, typeid_t<CommandRegistry>,
       bool (CommandRegistry::*)(
           void *, CommandRegistry::ParseToken const &, CommandOrigin const &, int, std::string &,
           std::vector<std::string> &) const);
-  __declspec(dllimport) unsigned addEnumValues(std::string const &, std::vector<std::string> const &);
-  __declspec(dllimport) uint64_t getEnumData(CommandRegistry::ParseToken const &) const;
+  MCAPI unsigned addEnumValues(std::string const &, std::vector<std::string> const &);
+  MCAPI uint64_t getEnumData(CommandRegistry::ParseToken const &) const;
 
 public:
 

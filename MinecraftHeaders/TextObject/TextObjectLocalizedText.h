@@ -1,12 +1,13 @@
 #pragma once
 
 #include "ITextObject.h"
+#include "../dll.h"
 
-class __declspec(dllimport) TextObjectLocalizedText : public ITextObject {
+class TextObjectLocalizedText : public ITextObject {
   std::string text;
 
 public:
-  TextObjectLocalizedText(std::string);
-  std::string asString() const;
-  Json::Value asJsonValue() const;
+  MCAPI TextObjectLocalizedText(std::string);
+  MCAPI std::string asString() const;
+  MCAPI Json::Value asJsonValue() const;
 };

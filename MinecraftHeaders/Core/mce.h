@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <string>
 
+#include "../dll.h"
+
 namespace mce {
 
 class UUID {
@@ -23,9 +25,9 @@ public:
 
   inline operator char const *() const { return (char const *) this; }
 
-  __declspec(dllimport) std::string asString() const;
-  __declspec(dllimport) static UUID fromString(std::string const &source);
-  __declspec(dllimport) static UUID EMPTY;
+  MCAPI std::string asString() const;
+  MCAPI static UUID fromString(std::string const &source);
+  MCAPI static UUID EMPTY;
 
   inline bool empty() const noexcept { return a == 0 && b == 0; }
 };

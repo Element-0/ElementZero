@@ -1,8 +1,11 @@
 #pragma once
+#include <boost/functional/hash.hpp>
+
+#include <hook.h>
+
 #include "../Core/mce.h"
 #include "../RakNet/RakNetTypes.h"
-#include <boost/functional/hash.hpp>
-#include <hook.h>
+#include "../dll.h"
 
 #ifndef BASEAPI
 #  define BASEAPI __declspec(dllimport)
@@ -22,9 +25,9 @@ public:
   uint64_t unk136;
   Type type; // 144
 
-  __declspec(dllimport) bool operator==(NetworkIdentifier const &) const;
-  __declspec(dllimport) uint64_t getHash() const;
-  __declspec(dllimport) std::string getAddress() const;
+  MCAPI bool operator==(NetworkIdentifier const &) const;
+  MCAPI uint64_t getHash() const;
+  MCAPI std::string getAddress() const;
 
   BASEAPI RakNet::SystemAddress getRealAddress() const;
   BASEAPI void kick(std::string const &reason) const;

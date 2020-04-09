@@ -8,6 +8,8 @@
 #include "../Core/AutomaticID.h"
 #include "../Command/CommandPermissionLevel.h"
 
+#include "../dll.h"
+
 class Packet;
 class ServerPlayer;
 class NetworkIdentifier;
@@ -40,5 +42,5 @@ public:
   BASEAPI BlockPos const &getSpawnPosition() const;
   BASEAPI void kick();
 
-  __declspec(dllimport) bool canUseOperatorBlocks() const;
+  MCAPI bool canUseOperatorBlocks() const;
 };

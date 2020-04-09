@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../Core/Packet.h"
 #include <hook.h>
+
+#include "../Core/Packet.h"
+#include "../dll.h"
 
 class TransferPacket : public Packet {
   std::string address;
@@ -10,8 +12,8 @@ class TransferPacket : public Packet {
 public:
   TransferPacket(std::string address, int port) : address(address), port(port) {}
   inline virtual ~TransferPacket() {}
-  __declspec(dllimport) virtual MinecraftPacketIds getId() const;
-  __declspec(dllimport) virtual std::string getName() const;
-  __declspec(dllimport) virtual void write(BinaryStream &) const;
-  __declspec(dllimport) virtual PacketReadResult read(ReadOnlyBinaryStream &);
+  MCAPI virtual MinecraftPacketIds getId() const;
+  MCAPI virtual std::string getName() const;
+  MCAPI virtual void write(BinaryStream &) const;
+  MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };

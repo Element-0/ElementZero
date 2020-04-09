@@ -2,12 +2,13 @@
 
 #include <string>
 #include "../Core/mce.h"
+#include "../dll.h"
 
 class Certificate;
 
 class ExtendedCertificate {
 public:
-  static __declspec(dllimport) std::string getXuid(Certificate const &);
-  static __declspec(dllimport) mce::UUID getIdentity(Certificate const &);
-  static __declspec(dllimport) std::string getIdentityName(Certificate const &);
+  static MCAPI std::string getXuid(Certificate const &);
+  static MCAPI mce::UUID getIdentity(Certificate const &);
+  static MCAPI std::string getIdentityName(Certificate const &);
 };

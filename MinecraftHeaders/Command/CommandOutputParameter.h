@@ -6,6 +6,7 @@
 #include "../Math/BlockPos.h"
 #include "../Math/Vec3.h"
 #include "../Actor/Actor.h"
+#include "../dll.h"
 
 class Player;
 
@@ -14,11 +15,11 @@ class CommandOutputParameter {
   int type;
 
 public:
-  __declspec(dllimport) CommandOutputParameter(std::string const &);
-  __declspec(dllimport) CommandOutputParameter(int);
-  __declspec(dllimport) CommandOutputParameter(BlockPos);
-  __declspec(dllimport) CommandOutputParameter(std::vector<Player const *> const &);
-  __declspec(dllimport) CommandOutputParameter(std::vector<std::string> const &);
+  MCAPI CommandOutputParameter(std::string const &);
+  MCAPI CommandOutputParameter(int);
+  MCAPI CommandOutputParameter(BlockPos);
+  MCAPI CommandOutputParameter(std::vector<Player const *> const &);
+  MCAPI CommandOutputParameter(std::vector<std::string> const &);
 
   inline CommandOutputParameter(std::string str, int type) : str(str), type(type) {}
 

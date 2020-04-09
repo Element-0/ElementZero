@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Player.h"
+#include "../dll.h"
 
 class GameMode {
 public:
   Player *player;
 
-  __declspec(dllimport) virtual ~GameMode();
+  MCAPI virtual ~GameMode();
 };

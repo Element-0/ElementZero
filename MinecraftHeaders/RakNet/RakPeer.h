@@ -1,14 +1,15 @@
 #pragma once
 
-#include "RakNetTypes.h"
-
 #include <hook.h>
+
+#include "RakNetTypes.h"
+#include "../dll.h"
 
 namespace RakNet {
 
 class RakPeer {
 public:
-  __declspec(dllimport) RakPeer();
+  MCAPI RakPeer();
 
   inline SystemAddress GetSystemAddressFromGuid(RakNetGUID guid) const {
     return CallServerClassMethod<SystemAddress>(

@@ -4,6 +4,8 @@
 #include <string>
 #include <hook.h>
 
+#include "../dll.h"
+
 class Item;
 class BlockLegacy;
 class CompoundTag;
@@ -16,15 +18,15 @@ class ItemStackBase {
 public:
   char filler[128];
 
-  __declspec(dllimport) virtual ~ItemStackBase();
+  MCAPI virtual ~ItemStackBase();
 
-  __declspec(dllimport) short getId() const;
-  __declspec(dllimport) short getAuxValue() const;
-  __declspec(dllimport) int getIdAux() const;
-  __declspec(dllimport) unsigned char getMaxStackSize() const;
-  __declspec(dllimport) Item const *getItem() const;
-  __declspec(dllimport) std::string getName() const;
-  __declspec(dllimport) std::string getHoverName() const;
+  MCAPI short getId() const;
+  MCAPI short getAuxValue() const;
+  MCAPI int getIdAux() const;
+  MCAPI unsigned char getMaxStackSize() const;
+  MCAPI Item const *getItem() const;
+  MCAPI std::string getName() const;
+  MCAPI std::string getHoverName() const;
   BASEAPI unsigned char getStackSize() const;
 
 protected:
@@ -35,11 +37,11 @@ public:
 };
 class ItemStack : public ItemStackBase {
 public:
-  __declspec(dllimport) ~ItemStack();
+  MCAPI ~ItemStack();
 
 protected:
-  __declspec(dllimport) void reinit(Item const &, int, int);
+  MCAPI void reinit(Item const &, int, int);
 
 public:
-  __declspec(dllimport) void reinit(BlockLegacy const &, int);
+  MCAPI void reinit(BlockLegacy const &, int);
 };
