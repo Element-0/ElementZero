@@ -4,13 +4,13 @@
 #include <fstream>
 #include <iterator>
 
+#include <base.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <Core/Minecraft.h>
 
 #include <hook.h>
-#include <base.h>
 #include <log.h>
 #include <yaml.h>
 #include <dllentry.h>

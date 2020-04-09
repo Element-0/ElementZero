@@ -1,11 +1,11 @@
 #include <memory>
 
+#include <base.h>
 #include <Core/json.h>
 #include <Core/MCRESULT.h>
 #include <Command/CommandContext.h>
 #include <Command/MinecraftCommands.h>
 
-#include <base.h>
 #include <modutils.h>
 #include <scriptapi.h>
 #include <command.h>

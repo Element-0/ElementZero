@@ -1,5 +1,6 @@
 #include <boost/scope_exit.hpp>
 
+#include <base.h>
 #include <Actor/Player.h>
 #include <Math/BlockPos.h>
 #include <Net/NetworkIdentifier.h>
@@ -10,7 +11,6 @@
 #include <playerdb.h>
 #include <command.h>
 #include <hook.h>
-#include <base.h>
 #include <audit.h>
 
 #include "settings.h"
