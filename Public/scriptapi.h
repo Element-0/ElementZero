@@ -5,14 +5,20 @@
 
 #include "chakra_helper.h"
 
-struct RegisterQueue {
-  static std::map<std::string, void (*)(JsObjectWarpper global)> &GetList();
+#ifdef ScriptingSupport_EXPORTS
+#  define SCRIPTAPI __declspec(dllexport)
+#else
+#  define SCRIPTAPI __declspec(dllimport)
+#endif
 
-  RegisterQueue(char const *name, void (*t)(JsObjectWarpper global));
+struct RegisterQueue {
+  SCRIPTAPI static std::map<std::string, void (*)(JsObjectWarpper global)> &GetList();
+
+  SCRIPTAPI RegisterQueue(char const *name, void (*t)(JsObjectWarpper global));
 };
 
 struct ModuleRegister {
-  static std::map<std::string, std::string (*)(JsObjectWarpper module)> &GetList();
+  SCRIPTAPI static std::map<std::string, std::string (*)(JsObjectWarpper module)> &GetList();
 
-  ModuleRegister(char const *name, std::string (*t)(JsObjectWarpper global));
+  SCRIPTAPI ModuleRegister(char const *name, std::string (*t)(JsObjectWarpper global));
 };
