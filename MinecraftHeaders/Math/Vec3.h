@@ -1,6 +1,7 @@
 #pragma once
 
-struct Vec3 {
+class Vec3 {
+public:
   float x, y, z;
   // For ABI
   inline ~Vec3() {}

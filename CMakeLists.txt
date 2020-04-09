@@ -43,9 +43,9 @@ target_link_libraries (BedrockServer INTERFACE bedrock_server_mod)
 
 find_package (SQLiteCpp CONFIG REQUIRED)
 find_package (Boost 1.72.0 REQUIRED)
-find_package (jsoncpp CONFIG REQUIRED)
-find_and_install_package (sqlite3 CONFIG REQUIRED)
-find_and_install_package (yaml-cpp CONFIG REQUIRED)
+find_and_install_package (jsoncpp jsoncpp_lib)
+find_and_install_package (sqlite3 sqlite3)
+find_and_install_package (yaml-cpp yaml-cpp)
 find_package (msgpack CONFIG REQUIRED)
 find_package (Flatbuffers CONFIG REQUIRED)
 

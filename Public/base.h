@@ -13,6 +13,7 @@
 class DedicatedServer;
 class ServiceInstance;
 class Minecraft;
+class MinecraftCommands;
 class AppPlatform;
 class ServerNetworkHandler;
 class Level;
@@ -30,6 +31,7 @@ template <typename T> T *LocateService();
 template <> BASEAPI DedicatedServer *LocateService<DedicatedServer>();
 template <> BASEAPI ServiceInstance *LocateService<ServiceInstance>();
 template <> BASEAPI Minecraft *LocateService<Minecraft>();
+template <> BASEAPI MinecraftCommands *LocateService<MinecraftCommands>();
 template <> BASEAPI ServerNetworkHandler *LocateService<ServerNetworkHandler>();
 template <> BASEAPI Level *LocateService<Level>();
 template <> BASEAPI AppPlatform *LocateService<AppPlatform>();

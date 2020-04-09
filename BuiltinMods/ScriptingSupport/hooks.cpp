@@ -2,6 +2,7 @@
 
 #include <hook.h>
 #include <log.h>
+#include <scriptapi.h>
 
 #include "global.h"
 
@@ -9,10 +10,15 @@ DEF_LOGGER("Scripting");
 
 THook(bool, "?isScriptingEnabled@ScriptEngine@@SA_NXZ") { return true; }
 
-TClasslessInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ") {
+static ScriptEngine *engine;
+
+template <> ScriptEngine *LocateService<ScriptEngine>() { return engine; }
+
+TInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ", ScriptEngine) {
   DEF_LOGGER("ScriptEngine");
   LOGV("initialize");
   original(this);
+  engine = this;
   initBasicAPI();
   loadCustomScript();
 }

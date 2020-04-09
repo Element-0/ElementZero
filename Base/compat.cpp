@@ -60,6 +60,10 @@ template <> ServerNetworkHandler *LocateService<ServerNetworkHandler>() {
   return LocateService<Minecraft>()->getServerNetworkHandler();
 }
 
+template <> MinecraftCommands *LocateService<MinecraftCommands>() { return LocateService<Minecraft>()->getCommands(); }
+
+MinecraftCommands *Minecraft::getCommands() { return direct_access<MinecraftCommands *>(this, 160); }
+
 bool Item::getAllowOffhand() const { return direct_access<char>(this, 258) & 0x40; }
 
 unsigned char ItemStackBase::getStackSize() const { return direct_access<unsigned char>(this, 34); }

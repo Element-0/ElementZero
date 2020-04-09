@@ -21,10 +21,13 @@ enum class CommandOriginType : char {
   Actor            = 8,
   Virtual          = 9,
   GameArgument     = 10,
-  ActorServer      = 11
+  ActorServer      = 11,
+  Precompiled      = 12,
+  GameMaster       = 13,
+  Script           = 14,
 };
 
-class CommandOriginData;
+struct CommandOriginData;
 class Level;
 class Dimension;
 class Actor;
@@ -36,7 +39,7 @@ class Value;
 
 class CommandOrigin {
 public:
-  MCAPI virtual ~CommandOrigin();
+  virtual ~CommandOrigin() {}
   virtual std::string const &getRequestId() const            = 0;
   virtual std::string getName() const                        = 0;
   virtual BlockPos getBlockPosition() const                  = 0;
@@ -55,7 +58,7 @@ public:
   MCAPI virtual bool canUseCommandsWithoutCheatsEnabled() const;
   MCAPI virtual bool isSelectorExpansionAllowed() const;
   MCAPI virtual NetworkIdentifier const &getSourceId() const;
-  MCAPI virtual unsigned chargetSourceSubId() const;
+  MCAPI virtual unsigned char getSourceSubId() const;
   MCAPI virtual CommandOrigin const &getOutputReceiver() const;
   virtual CommandOriginType getOriginType() const = 0;
   MCAPI virtual CommandOriginData toCommandOriginData() const;

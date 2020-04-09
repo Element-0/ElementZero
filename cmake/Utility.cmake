@@ -14,9 +14,9 @@ macro (generate_git_version _out_var)
     endif ()
 endmacro ()
 
-function (find_and_install_package name)
-    find_package (${name} ${ARGN})
-    get_target_property (dll_files ${name} IMPORTED_LOCATION_RELEASE)
+function (find_and_install_package name target)
+    find_package (${name} CONFIG REQUIRED)
+    get_target_property (dll_files ${target} IMPORTED_LOCATION_RELEASE)
     install (FILES ${dll_files} DESTINATION .)
 endfunction ()
 

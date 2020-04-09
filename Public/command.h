@@ -1,9 +1,15 @@
 #pragma once
 
+#include <memory>
 #include <string>
+#include <type_traits>
 
-#include "event.h"
+#include <base.h>
+#include <event.h>
+
 #include <Core/type_id.h>
+#include <Core/Util.h>
+#include <Command/CommandOrigin.h>
 #include <Command/CommandSelector.h>
 #include <Command/CommandRegistry.h>
 #include <Command/CommandParameterData.h>
@@ -45,6 +51,35 @@ template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTyp
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<Json::Value>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<CommandSelector<Actor>>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<CommandSelector<Player>>();
+
+class CustomCommandOrigin : public CommandOrigin {
+public:
+  std::string name;
+  BlockPos pos;
+  Vec3 worldPosition;
+  Dimension *dim;
+  Actor *actor;
+  CommandPermissionLevel level = CommandPermissionLevel::Internal;
+  CommandOriginType type       = CommandOriginType::Script;
+  bool allowSelectorExpansion  = false;
+  std::function<void(Json::Value &&)> callback;
+
+  std::string const &getRequestId() const override { return Util::EMPTY_GUID; }
+  std::string getName() const override { return name; }
+  BlockPos getBlockPosition() const override { return pos; }
+  Vec3 getWorldPosition() const override { return worldPosition; }
+  Level *getLevel() const override { return LocateService<Level>(); }
+  Dimension *getDimension() const override { return dim; }
+  Actor *getEntity() const override { return actor; }
+  CommandPermissionLevel getPermissionsLevel() const override { return level; }
+  std::unique_ptr<CommandOrigin> clone() const override { return std::make_unique<CustomCommandOrigin>(*this); }
+  CommandOriginType getOriginType() const override { return type; }
+  bool canUseCommandsWithoutCheatsEnabled() const override { return true; }
+  bool isSelectorExpansionAllowed() const override { return allowSelectorExpansion; }
+  void handleCommandOutputCallback(Json::Value &&val) const override {
+    if (callback) callback(std::move(val));
+  }
+};
 
 } // namespace Mod
 

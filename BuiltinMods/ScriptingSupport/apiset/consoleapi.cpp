@@ -1,5 +1,6 @@
 #include <sstream>
 
+#include "chakra_helper.h"
 #include "log.h"
 
 #include <scriptapi.h>
@@ -13,9 +14,7 @@ static RegisterQueue queue("console", [](JsObjectWarpper global) {
     if (!args.empty()) {
       std::stringstream ss;
       for (auto arg : args) {
-        JsValueRef str;
-        JsConvertValueToString(arg, &str);
-        ss << FromJs<std::string>(str) << " ";
+        ss << JsToString(arg) << " ";
       }
       LOGI("%s") % ss.str();
     }
@@ -25,9 +24,7 @@ static RegisterQueue queue("console", [](JsObjectWarpper global) {
     if (!args.empty()) {
       std::stringstream ss;
       for (auto arg : args) {
-        JsValueRef str;
-        JsConvertValueToString(arg, &str);
-        ss << FromJs<std::string>(str) << " ";
+        ss << JsToString(arg) << " ";
       }
       LOGW("%s") % ss.str();
     }
@@ -37,9 +34,7 @@ static RegisterQueue queue("console", [](JsObjectWarpper global) {
     if (!args.empty()) {
       std::stringstream ss;
       for (auto arg : args) {
-        JsValueRef str;
-        JsConvertValueToString(arg, &str);
-        ss << FromJs<std::string>(str) << " ";
+        ss << JsToString(arg) << " ";
       }
       LOGE("%s") % ss.str();
     }

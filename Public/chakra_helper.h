@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdio>
+#include <locale>
+#include <codecvt>
 #include <optional>
 #include <functional>
 #include <stdexcept>
@@ -8,6 +10,8 @@
 #include <cstdint>
 
 #include <ChakraCore.h>
+
+#include <modutils.h>
 
 #define ThrowError(fnret)                                                                                              \
   if (JsErrorCode ec = fnret; ec != JsNoError) throw ec;
@@ -39,6 +43,8 @@ inline JsValueRef operator""_jsp(const wchar_t *str, size_t length) {
   ThrowError(JsCreateStringUtf16((const uint16_t *) str, length, &ref));
   return ref;
 }
+
+inline JsValueRef ToJs(JsValueRef ref) { return ref; }
 
 inline JsValueRef ToJs(char const *str) {
   JsValueRef ref;
@@ -111,19 +117,11 @@ template <typename T> inline JsValueRef ToJsArray(T t) {
 
 template <typename Type> Type FromJs(JsValueRef ref);
 
+template <> inline JsValueRef FromJs(JsValueRef ref) { return ref; }
+
 template <> inline bool FromJs(JsValueRef ref) {
   bool val;
   ThrowError(JsBooleanToBool(ref, &val));
-  return val;
-}
-
-template <> inline std::string FromJs(JsValueRef ref) {
-  std::string val;
-  int length;
-  size_t _;
-  ThrowError(JsGetStringLength(ref, &length));
-  val.resize(length);
-  ThrowError(JsCopyString(ref, val.data(), length, &_));
   return val;
 }
 
@@ -132,6 +130,11 @@ template <> inline std::wstring FromJs(JsValueRef ref) {
   size_t length;
   ThrowError(JsStringToPointer(ref, &buffer, &length));
   return std::wstring(buffer, length);
+}
+
+template <> inline std::string FromJs(JsValueRef ref) {
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+  return myconv.to_bytes(FromJs<std::wstring>(ref));
 }
 
 template <> inline int FromJs(JsValueRef ref) {
@@ -154,7 +157,13 @@ inline JsValueType GetJsType(JsValueRef ref) {
 
 inline JsValueRef GetUndefined() {
   JsValueRef ret;
-  JsGetUndefinedValue(&ret);
+  ThrowError(JsGetUndefinedValue(&ret));
+  return ret;
+}
+
+inline JsValueRef GetNullValue() {
+  JsValueRef ret;
+  ThrowError(JsGetNullValue(&ret));
   return ret;
 }
 
@@ -227,6 +236,29 @@ struct JsConvertible {
         name ? ToJs(name) : JS_INVALID_REFERENCE, nfn, &ref));
   }
 
+  template <typename T, typename... PS> JsConvertible(T (*fn)(PS...), char const *name = nullptr) {
+    ThrowError(JsCreateEnhancedFunction(
+        [](JsValueRef callee, JsValueRef *arguments, unsigned short argumentCount, JsNativeFunctionInfo *info,
+           void *state) -> JsValueRef {
+          try {
+            auto fn = (T(*)(PS...)) state;
+            Arguments args{arguments, argumentCount, info};
+            if (args.size() != sizeof...(PS))
+              throw std::runtime_error{"Require " + std::to_string(sizeof...(PS)) + " argument"};
+            JsObjectWarpper xself{args.self};
+            auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
+              using tp = std::tuple<PS...>;
+              return fn(FromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
+            };
+            return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
+          } catch (std::exception const &ex) {
+            JsSetException(ToJs(ex.what()));
+            return GetUndefined();
+          }
+        },
+        name ? ToJs(name) : JS_INVALID_REFERENCE, (void *) fn, &ref));
+  }
+
   template <typename T, typename C, typename... PS> JsConvertible(T (C::*fn)(PS...), char const *name = nullptr) {
     union {
       T (C::*fn)(PS...);
@@ -249,7 +281,8 @@ struct JsConvertible {
             JsObjectWarpper xself{args.self};
             auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
               using tp = std::tuple<PS...>;
-              return (xself.GetExternalData<C>()->*fn)(FromJs<std::tuple_element_t<I, tp>>(args[I])...);
+              return (xself.GetExternalData<C>()->*fn)(
+                  FromJsFromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
             };
             return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
           } catch (std::exception const &ex) {
@@ -408,12 +441,26 @@ struct JsObjectWarpper {
 
   PropProxy operator[](char const *name) const { return {ref, ToJsP(name)}; }
 
-  // bool DefineProperty(JsPropertyIdRef id, PropertyDesc desc) {
-  //   bool result;
-  //   ThrowError(JsDefineProperty(ref, id, desc.toObject(), &result));
-  //   return result;
-  // }
-
   JsValueRef operator*() const { return ref; }
 };
+
+struct ValueHolder {
+  JsValueRef ref;
+
+  ValueHolder() {}
+  ValueHolder(JsValueRef ref) : ref(ref) {
+    if (ref) JsAddRef(ref, nullptr);
+  }
+  ValueHolder(ValueHolder const &rhs) : ref(rhs.ref) {
+    if (ref) JsAddRef(ref, nullptr);
+  }
+  ValueHolder(ValueHolder &&rhs) : ref(rhs.ref) { rhs.ref = nullptr; }
+
+  JsValueRef operator*() { return ref; }
+
+  ~ValueHolder() {
+    if (ref) JsRelease(ref, nullptr);
+  }
+};
+
 } // namespace Mod::Scripting

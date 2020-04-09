@@ -6,8 +6,11 @@
 
 #include <boost/format.hpp>
 
-#include "chakra_helper.h"
-#include "playerdb.h"
+#include <Core/json.h>
+
+#include <base.h>
+#include <chakra_helper.h>
+#include <playerdb.h>
 
 #ifdef ScriptingSupport_EXPORTS
 #  define SCRIPTAPI __declspec(dllexport)
@@ -15,7 +18,14 @@
 #  define SCRIPTAPI __declspec(dllimport)
 #endif
 
+class ScriptEngine;
+
+template <> SCRIPTAPI ScriptEngine *LocateService<ScriptEngine>();
+
 namespace Mod::Scripting {
+
+SCRIPTAPI JsValueRef ToJs(Json::Value entry);
+template <> SCRIPTAPI Json::Value FromJs(JsValueRef ref);
 
 struct RegisterQueue {
   SCRIPTAPI static std::map<std::string, void (*)(JsObjectWarpper global)> &GetList();
@@ -50,10 +60,10 @@ struct PlayerBinding {
         .str();
   }
 
-  SCRIPTAPI static JsObjectWarpper InitProto();
+  SCRIPTAPI static JsValueRef InitProto();
 
   inline static JsObjectWarpper Create(Mod::PlayerEntry entry) {
-    return JsObjectWarpper::FromExternalObject(new PlayerBinding(entry), *InitProto());
+    return JsObjectWarpper::FromExternalObject(new PlayerBinding(entry), InitProto());
   }
 };
 
@@ -61,7 +71,7 @@ inline JsValueRef ToJs(Mod::PlayerEntry entry) { return *PlayerBinding::Create(e
 template <> inline Mod::PlayerEntry FromJs(JsValueRef ref) {
   JsValueRef tmp;
   ThrowError(JsGetPrototype(ref, &tmp));
-  if (tmp == *PlayerBinding::InitProto()) {
+  if (tmp == PlayerBinding::InitProto()) {
     PlayerBinding *bd;
     ThrowError(JsGetExternalData(ref, (void **) &bd));
     if (bd) return bd->entry;
@@ -85,10 +95,10 @@ struct OfflinePlayerBinding {
     return (boost::format("OfflinePlayer { xuid: %d, uuid: %s, name: %s }") % entry.xuid % GetUUID() % GetNAME()).str();
   }
 
-  static JsObjectWarpper InitProto();
+  static JsValueRef InitProto();
 
   inline static JsObjectWarpper Create(Mod::OfflinePlayerEntry entry) {
-    return JsObjectWarpper::FromExternalObject(new OfflinePlayerBinding(entry), *InitProto());
+    return JsObjectWarpper::FromExternalObject(new OfflinePlayerBinding(entry), InitProto());
   }
 };
 
@@ -97,7 +107,7 @@ inline JsValueRef ToJs(Mod::OfflinePlayerEntry entry) { return *OfflinePlayerBin
 template <> inline Mod::OfflinePlayerEntry FromJs(JsValueRef ref) {
   JsValueRef tmp;
   ThrowError(JsGetPrototype(ref, &tmp));
-  if (tmp == *OfflinePlayerBinding::InitProto()) {
+  if (tmp == OfflinePlayerBinding::InitProto()) {
     OfflinePlayerBinding *bd;
     ThrowError(JsGetExternalData(ref, (void **) &bd));
     if (bd) return bd->entry;
