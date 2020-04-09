@@ -83,18 +83,22 @@ inline JsPropertyIdRef ToJsP(char const *str) {
 inline JsPropertyIdRef ToJsP(std::string_view str) {
   JsPropertyIdRef ref;
   ThrowError(JsCreatePropertyId(str.data(), str.length(), &ref));
-  // JsGetIndexedProperty(JsValueRef object, JsValueRef index, JsValueRef *result)
-  // JsSetIndexedProperty(JsValueRef object, JsValueRef index, JsValueRef value)
   return ref;
 }
 
-template <typename T, typename F>
-inline JsValueRef ToJsArray(
-    T t, F f = [](auto x) { return ToJs(x); }) {
+template <typename T, typename F> inline JsValueRef ToJsArray(T t, F f) {
   JsValueRef ref;
   ThrowError(JsCreateArray(t.size(), &ref));
   int idx = 0;
   for (auto it : t) ThrowError(JsSetIndexedProperty(ref, ToJs(idx++), f(it)));
+  return ref;
+}
+
+template <typename T> inline JsValueRef ToJsArray(T t) {
+  JsValueRef ref;
+  ThrowError(JsCreateArray(t.size(), &ref));
+  int idx = 0;
+  for (auto it : t) ThrowError(JsSetIndexedProperty(ref, ToJs(idx++), ToJs(it)));
   return ref;
 }
 
@@ -252,17 +256,62 @@ struct JsConvertible {
   operator JsValueRef() { return ref; };
 };
 
+struct PropertyDesc;
+
 struct JsObjectWarpper {
   JsValueRef ref;
 
+  struct PropertyDesc {
+    std::function<JsValueRef(JsObjectWarpper)> get;
+    std::function<void(JsObjectWarpper, JsValueRef)> set;
+
+    PropertyDesc(std::function<JsValueRef(JsObjectWarpper)> get, std::function<void(JsObjectWarpper, JsValueRef)> set)
+        : get(get), set(set) {}
+
+    template <typename T> PropertyDesc(JsValueRef (T::*tget)(), void (T::*tset)(JsValueRef) = nullptr) {
+      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return (obj.GetExternalData<T>()->*tget)(); };
+      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(rhs); };
+    }
+    template <typename T, typename R> PropertyDesc(R (T::*tget)(), void (T::*tset)(R) = nullptr) {
+      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs((obj.GetExternalData<T>()->*tget)()); };
+      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(FromJs<R>(rhs)); };
+    }
+
+    JsValueRef toObject() {
+      JsObjectWarpper ret;
+      ret["configurable"] = false;
+      ret["enumerable"]   = true;
+      if (get)
+        ret["get"] = [get = this->get](JsValueRef callee, Arguments args) -> JsValueRef {
+          JsObjectWarpper self{args.self};
+          return get(self);
+        };
+      if (set)
+        ret["set"] = [set = this->set](JsValueRef callee, Arguments args) -> JsValueRef {
+          JsObjectWarpper self{args.self};
+          set(self, args[0]);
+          return GetUndefined();
+        };
+      return *ret;
+    }
+  };
+
   struct PropProxy {
-    JsValueRef ref, name;
+    JsValueRef ref;
+    JsPropertyIdRef name;
 
     JsValueType type() { return GetJsType(fetch()); }
 
     void set(JsValueRef rhs) {
-      ThrowError(JsObjectSetProperty(ref, name, rhs, true));
+      ThrowError(JsSetProperty(ref, name, rhs, true));
       temp = nullptr;
+    }
+
+    bool define(PropertyDesc desc) {
+      bool result;
+      ThrowError(JsDefineProperty(ref, name, desc.toObject(), &result));
+      temp = nullptr;
+      return result;
     }
 
     template <typename T> JsValueRef operator=(T val) {
@@ -276,6 +325,9 @@ struct JsObjectWarpper {
         auto o = ToJs(val);
         set(o);
         return o;
+      } else if constexpr (std::is_same_v<T, PropertyDesc>) {
+        define(val);
+        return nullptr;
       } else {
         JsConvertible o{val};
         set(o.ref);
@@ -304,12 +356,12 @@ struct JsObjectWarpper {
   private:
     JsValueRef temp;
 
-    PropProxy(JsValueRef ref, JsValueRef name) : ref(ref), name(name) {}
+    PropProxy(JsValueRef ref, JsPropertyIdRef name) : ref(ref), name(name) {}
 
     friend struct JsObjectWarpper;
 
     JsValueRef fetch() {
-      if (!temp) JsObjectGetProperty(ref, name, &temp);
+      if (!temp) JsGetProperty(ref, name, &temp);
       return temp;
     }
   };
@@ -349,49 +401,13 @@ struct JsObjectWarpper {
     return (T *) temp;
   }
 
-  PropProxy operator[](char const *name) const { return {ref, ToJs(name)}; }
+  PropProxy operator[](char const *name) const { return {ref, ToJsP(name)}; }
 
-  struct PropertyDesc {
-    std::function<JsValueRef(JsObjectWarpper)> get;
-    std::function<void(JsObjectWarpper, JsValueRef)> set;
-
-    PropertyDesc(
-        std::function<JsValueRef(JsObjectWarpper)> get, std::function<JsValueRef(JsObjectWarpper, JsValueRef)> set)
-        : get(get), set(set) {}
-
-    template <typename T> PropertyDesc(JsValueRef (T::*tget)(), void (T::*tset)(JsValueRef) = nullptr) {
-      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return (obj.GetExternalData<T>()->*tget)(); };
-      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(rhs); };
-    }
-    template <typename T, typename R> PropertyDesc(R (T::*tget)(), void (T::*tset)(R) = nullptr) {
-      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs((obj.GetExternalData<T>()->*tget)()); };
-      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(FromJs<R>(rhs)); };
-    }
-
-    JsValueRef toObject() {
-      JsObjectWarpper ret;
-      ret["configurable"] = false;
-      ret["enumerable"]   = true;
-      if (get)
-        ret["get"] = [get = this->get](JsValueRef callee, Arguments args) -> JsValueRef {
-          JsObjectWarpper self{args.self};
-          return get(self);
-        };
-      if (set)
-        ret["set"] = [set = this->set](JsValueRef callee, Arguments args) -> JsValueRef {
-          JsObjectWarpper self{args.self};
-          set(self, args[0]);
-          return GetUndefined();
-        };
-      return *ret;
-    }
-  };
-
-  bool DefineProperty(JsPropertyIdRef id, PropertyDesc desc) {
-    bool result;
-    ThrowError(JsDefineProperty(ref, id, desc.toObject(), &result));
-    return result;
-  }
+  // bool DefineProperty(JsPropertyIdRef id, PropertyDesc desc) {
+  //   bool result;
+  //   ThrowError(JsDefineProperty(ref, id, desc.toObject(), &result));
+  //   return result;
+  // }
 
   JsValueRef operator*() const { return ref; }
 };
