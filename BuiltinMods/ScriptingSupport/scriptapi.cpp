@@ -1,5 +1,7 @@
 #include <scriptapi.h>
 
+using namespace Mod::Scripting;
+
 std::map<std::string, void (*)(JsObjectWarpper global)> &RegisterQueue::GetList() {
   static std::map<std::string, void (*)(JsObjectWarpper global)> root;
   return root;

@@ -5,6 +5,8 @@
 
 #include "global.h"
 
+using namespace Mod::Scripting;
+
 void installConsoleAPI(JsObjectWarpper &global);
 
 void initBasicAPI() {

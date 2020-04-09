@@ -12,6 +12,8 @@
 
 namespace fs = std::filesystem;
 
+using namespace Mod::Scripting;
+
 DEF_LOGGER("ScriptLoader");
 
 static std::map<fs::path, JsModuleRecord> mod_cache;

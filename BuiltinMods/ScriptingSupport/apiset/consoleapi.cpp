@@ -4,6 +4,8 @@
 
 #include <scriptapi.h>
 
+using namespace Mod::Scripting;
+
 static RegisterQueue queue("console", [](JsObjectWarpper global) {
   DEF_LOGGER("ScriptOut");
   JsObjectWarpper console;

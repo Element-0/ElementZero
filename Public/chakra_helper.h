@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ChakraCommon.h"
 #include <cstdio>
+#include <optional>
 #include <functional>
 #include <stdexcept>
 #include <string>
@@ -14,11 +14,13 @@
 #define ReturnError(fnret)                                                                                             \
   if (JsErrorCode ec = fnret; ec != JsNoError) return ec;
 
+namespace Mod::Scripting {
+
 inline JsValueRef operator""_js(char const *str, size_t length) {
   JsValueRef ref;
   ThrowError(JsCreateString(str, length, &ref));
   return ref;
-}
+} // namespace Mod::ScriptinginlineJsValueRefoperator""_js(charconst*str,size_tlength)
 
 inline JsValueRef operator""_js(const wchar_t *str, size_t length) {
   JsValueRef ref;
@@ -72,6 +74,11 @@ inline JsValueRef ToJs(JsNativeFunction fn) {
   JsValueRef ref;
   ThrowError(JsCreateFunction(fn, nullptr, &ref));
   return ref;
+}
+
+template <typename T> inline JsValueRef ToJs(std::optional<T> opt) {
+  if (opt) return ToJs(*opt);
+  return GetUndefined();
 }
 
 inline JsPropertyIdRef ToJsP(char const *str) {
@@ -411,3 +418,4 @@ struct JsObjectWarpper {
 
   JsValueRef operator*() const { return ref; }
 };
+} // namespace Mod::Scripting
