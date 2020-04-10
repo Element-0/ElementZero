@@ -2,8 +2,7 @@
 
 #include <string>
 
-#include <json/value.h>
-
+#include "../Core/json.h"
 #include "../Core/SemVersion.h"
 #include "../Core/NBT.h"
 #include "../Math/BlockPos.h"
