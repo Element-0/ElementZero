@@ -364,7 +364,8 @@ struct JsObjectWarpper {
       return result;
     }
 
-    template <typename T> JsValueRef operator=(T val) {
+    template <typename R> JsValueRef operator=(R &&val) {
+      using T = std::decay_t<R>;
       if constexpr (std::is_same_v<T, JsValueRef>) {
         set(val);
         return val;
@@ -383,7 +384,7 @@ struct JsObjectWarpper {
         set(o);
         return o;
       } else {
-        static_assert(always_false<T>::value, "Failed to assign type");
+        static_assert(always_false<R>::value, "Failed to assign type");
       }
     }
 
