@@ -21,6 +21,7 @@ typedef void (*ApplySettingsType)(YAML::Node const &);
 typedef bool (*GenerateSettingsType)(YAML::Node &);
 typedef void (*PrePostInitType)();
 typedef void (*WorldInitType)(std::filesystem::path const &);
+typedef void (*ServerStartType)();
 typedef void (*BeforeUnloadType)();
 
 class lc_string {
@@ -49,6 +50,7 @@ struct ModLibrary {
   GenerateSettingsType generateSettings;
   PrePostInitType preInit, postInit;
   WorldInitType worldInit;
+  ServerStartType serverStart;
   BeforeUnloadType beforeUnload;
 
   lc_set dependencies;
@@ -67,6 +69,7 @@ static std::map<lc_string, HMODULE> LoadedMods;
 static std::list<ModLibrary> LibList;
 static std::list<FnWithName<PrePostInitType, &ModLibrary::postInit>> PostInits;
 static std::list<FnWithName<WorldInitType, &ModLibrary::worldInit>> WorldInits;
+static std::list<FnWithName<ServerStartType, &ModLibrary::serverStart>> ServerStarts;
 static std::list<FnWithName<BeforeUnloadType, &ModLibrary::beforeUnload>> UnloadHooks;
 static lc_set LibNameList;
 
@@ -111,6 +114,7 @@ void loadMods(YAML::Node &cfg_node) {
       lib.preInit          = (PrePostInitType) GetProcAddress(handle, "PreInit");
       lib.postInit         = (PrePostInitType) GetProcAddress(handle, "PostInit");
       lib.worldInit        = (WorldInitType) GetProcAddress(handle, "WorldInit");
+      lib.serverStart      = (ServerStartType) GetProcAddress(handle, "ServerStart");
       lib.beforeUnload     = (BeforeUnloadType) GetProcAddress(handle, "BeforeUnload");
       LibList.emplace_back(lib);
       LibNameList.emplace(name);
@@ -182,16 +186,24 @@ void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib) {
     } catch (std::exception const &ex) { LOGE("Exception at pre init (%s): %s") % lib.keyname % ex.what(); }
   if (lib.postInit) PostInits.emplace_back(lib);
   if (lib.worldInit) WorldInits.emplace_back(lib);
+  if (lib.serverStart) ServerStarts.emplace_back(lib);
   if (lib.beforeUnload) UnloadHooks.emplace_back(lib);
   LoadedMods.emplace(lib.keyname, lib.handle);
 }
 
-TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") try {
+TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
   for (auto hook : UnloadHooks) try {
       hook();
     } catch (std::exception const &ex) { LOGE("Exception at unload hook (%s): %s") % hook.name % ex.what(); }
   original(this);
-} catch (std::exception const &ex) { LOGE("Exception at game unload: %s") % ex.what(); }
+}
+
+TClasslessInstanceHook(void, "?startServerThread@ServerInstance@@QEAAXXZ") {
+  original(this);
+  for (auto hook : ServerStarts) try {
+      hook();
+    } catch (std::exception const &ex) { LOGE("Exception at unload hook (%s): %s") % hook.name % ex.what(); }
+}
 
 void worldHook(std::filesystem::path const &path) {
   for (auto hook : WorldInits) try {

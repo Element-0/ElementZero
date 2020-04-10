@@ -11,7 +11,7 @@
 #endif
 
 class DedicatedServer;
-class ServiceInstance;
+class ServerInstance;
 class Minecraft;
 class MinecraftCommands;
 class AppPlatform;
@@ -29,7 +29,7 @@ BASEAPI mce::UUID const &SessionUUID();
 template <typename T> T *LocateService();
 
 template <> BASEAPI DedicatedServer *LocateService<DedicatedServer>();
-template <> BASEAPI ServiceInstance *LocateService<ServiceInstance>();
+template <> BASEAPI ServerInstance *LocateService<ServerInstance>();
 template <> BASEAPI Minecraft *LocateService<Minecraft>();
 template <> BASEAPI MinecraftCommands *LocateService<MinecraftCommands>();
 template <> BASEAPI ServerNetworkHandler *LocateService<ServerNetworkHandler>();

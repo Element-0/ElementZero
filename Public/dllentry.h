@@ -21,6 +21,8 @@ extern "C" __declspec(dllexport) void PreInit();
 extern "C" __declspec(dllexport) void PostInit();
 // Called after world path have been resolved
 extern "C" __declspec(dllexport) void WorldInit(std::filesystem::path const &);
+// Called after server started
+extern "C" __declspec(dllexport) void ServerStart();
 // Called before the server is stopped
 extern "C" __declspec(dllexport) void BeforeUnload();
 

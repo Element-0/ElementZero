@@ -1,7 +1,8 @@
-#include <dllentry.h>
+#include <exception>
 #include <list>
 #include <memory>
 
+#include <dllentry.h>
 #include <log.h>
 #include <utility>
 #include <yaml.h>
@@ -69,10 +70,18 @@ void PostInit() {
   }
 }
 
-void WorldInit(std::filesystem::path const &) {
+void ServerStart() {
   LOGV("connecting to %s") % settings.endpoint;
   state->srv.Connect(settings.endpoint, {settings.name, "element-zero", Common::getServerVersionString()});
-  LOGI("Connected to hub");
+  state->srv.OnStop([](std::exception_ptr ep) {
+    if (ep) try {
+        std::rethrow_exception(ep);
+      } catch (std::exception const &ex) { LOGE("Disconnected from gateway %s") % ex.what(); }
+  });
+  LOGI("Connected to gateway");
+  // LocateService<ServerInstance>()->queueForServerThread([] {
+
+  // });
 }
 
 namespace Mod {
