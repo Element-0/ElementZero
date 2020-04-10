@@ -14,7 +14,7 @@ class Level {
 public:
   MCAPI void forEachPlayer(std::function<bool(Player const &)>) const;
   MCAPI void forEachDimension(std::function<bool(Dimension const &)>);
-  __declspec(dllimport) class Actor* fetchEntity(struct ActorUniqueID a0, bool a1) const;
+  MCAPI class Actor* fetchEntity(struct ActorUniqueID a0, bool a1) const;
   BASEAPI uint64_t GetServerTick();
   BASEAPI LevelDataWrapper &GetLevelDataWrapper();
 };
