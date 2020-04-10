@@ -25,9 +25,27 @@ public:
         "?getDimensionId@Actor@@UEBA?AV?$AutomaticID@VDimension@@H@@XZ", this);
   }
 
+  inline bool getAlwaysShowNameTag() const {
+      return CallServerClassMethod<bool>(
+          "?getAlwaysShowNameTag@Actor@@UEBA_NXZ", this);
+  }
+
+  inline enum ActorType getEntityTypeId() const {
+      return CallServerClassMethod<enum ActorType>(
+          "?getEntityTypeId@Actor@@UEBA?AW4ActorType@@XZ", this);
+  }
+
   void teleport(Vec3 const &target, Vec3 const &old, AutomaticID<Dimension, int> dim) {
     CallServerClassMethod<void>(
         "?teleport@TeleportCommand@@AEBAXAEAVActor@@VVec3@@PEAV3@V?$AutomaticID@VDimension@@H@@@Z", this, this,
         target, &old, dim);
   }
+};
+
+class Mob : public Actor {
+public:
+    inline void sendInventory(bool a0) const {
+        return CallServerClassMethod<void>(
+            "?sendInventory@Mob@@UEAAX_N@Z", this, a0);
+    }
 };

@@ -7,8 +7,7 @@
 #include "../Math/BlockPos.h"
 #include "../Core/AutomaticID.h"
 #include "../Command/CommandPermissionLevel.h"
-
-#include "../dll.h"
+#include <vector>
 
 class Packet;
 class ServerPlayer;
@@ -18,7 +17,7 @@ class NetworkIdentifier;
 #  define BASEAPI __declspec(dllimport)
 #endif
 
-class Player : public Actor {
+class Player : public Mob {
 public:
   inline ServerPlayer *asServerPlayer() const noexcept {
     return const_cast<ServerPlayer *>(reinterpret_cast<ServerPlayer const *>(this));
@@ -37,10 +36,29 @@ public:
         "?getCommandPermissionLevel@Player@@UEBA?AW4CommandPermissionLevel@@XZ", this);
   }
 
+  inline float getDestroySpeed(class Block const& a0) const {
+      return CallServerClassMethod<float>(
+          "?getDestroySpeed@Player@@QEBAMAEBVBlock@@@Z", this, &a0);
+  }
+
+  inline bool isCreative() const {
+      return CallServerClassMethod<bool>(
+          "?isCreative@Player@@UEBA_NXZ", this);
+  }
+
+  inline std::vector<class ItemStack const*> getAllHand() const {
+      return CallServerClassMethod<std::vector<class ItemStack const*>>(
+          "?getAllHand@Player@@UEBA?AV?$vector@PEBVItemStack@@V?$allocator@PEBVItemStack@@@std@@@std@@XZ", this);
+  }
+
+  inline class ItemStack const& getCarriedItem() const {
+      return CallServerClassMethod<ItemStack const& >(
+          "?getCarriedItem@Player@@UEBAAEBVItemStack@@XZ", this);
+  }
+
   BASEAPI Certificate &getCertificate();
   BASEAPI NetworkIdentifier const &getNetworkIdentifier() const;
   BASEAPI BlockPos const &getSpawnPosition() const;
   BASEAPI void kick();
 
-  MCAPI bool canUseOperatorBlocks() const;
 };
