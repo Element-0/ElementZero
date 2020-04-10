@@ -18,7 +18,6 @@ static ModuleRegister reg("ez:command", [](JsObjectWarpper native) -> std::strin
     if (GetJsType(cb) != JsFunction) throw std::runtime_error{"require function"};
     auto origin      = std::make_unique<Mod::CustomCommandOrigin>();
     origin->callback = [holder = ValueHolder{cb}](Json::Value &&value) mutable {
-      printf("here\n");
       try {
         auto json         = ToJs(value);
         JsValueRef args[] = {GetUndefined(), json};
