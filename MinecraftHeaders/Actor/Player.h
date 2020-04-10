@@ -61,4 +61,5 @@ public:
   BASEAPI BlockPos const &getSpawnPosition() const;
   BASEAPI void kick();
 
+  MCAPI bool canUseOperatorBlocks() const;
 };
