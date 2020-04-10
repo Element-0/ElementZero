@@ -16,7 +16,7 @@
 #include "proto/command_generated.h"
 
 static RegisterAPI reg("Command", false, [] {
-  Mod::Remote::GetInstance().AddMethod("executeCommand", [](WsGw::Buffer buffer, auto fn) {
+  Mod::Remote::GetInstance().AddMethod("execute_command", [](WsGw::Buffer buffer, auto fn) {
     try {
       using namespace Mod::proto;
       using namespace Mod;
