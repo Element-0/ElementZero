@@ -20,6 +20,8 @@ class Chat : public RecursiveEventEmitter<
 public:
   CHATAPI static Chat &GetInstance();
 
+  CHATAPI void SendBroadcast(std::string const &name, std::string const &);
+
   USING_RECEVENTEMITTER("chat", PlayerEntry const &, std::string &, std::string &, CallbackToken<std::string> &);
 };
 

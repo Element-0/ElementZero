@@ -1,0 +1,8 @@
+namespace Mod.proto;
+
+table Chat {
+  displayName: string;
+  content: string;
+}
+
+root_type Chat;
