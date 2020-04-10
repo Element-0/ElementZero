@@ -17,7 +17,7 @@ struct Settings {
 extern Settings settings;
 
 struct State {
-  WsGw::Service srv{[](auto &inp) -> WsGw::Buffer { throw std::runtime_error{"Not implemented"}; }};
+  WsGw::Service srv{[](auto &inp, auto cb) { cb(std::make_exception_ptr(std::runtime_error{"Not implemented"}), {}); }};
 };
 
 extern std::unique_ptr<State> state;

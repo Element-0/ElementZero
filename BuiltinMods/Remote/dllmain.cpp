@@ -69,6 +69,14 @@ struct RemoteImpl : Remote {
     LOGV("Register method %s") % name;
     state->srv.RegisterHandler(name, handler);
   }
+  void AddMethod(std::string const &name, WsGw::SyncHandler handler) override {
+    if (!state) {
+      LOGW("Skip register method: the Remote module not enabled.");
+      return;
+    }
+    LOGV("Register method %s") % name;
+    state->srv.RegisterHandler(name, handler);
+  }
 
   void Broadcast(std::string_view name, WsGw::BufferView payload) override {
     if (!state) return;

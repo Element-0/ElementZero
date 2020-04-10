@@ -16,6 +16,7 @@ struct Remote {
   static REMOTEAPI Remote &GetInstance();
 
   virtual void AddMethod(std::string const &name, WsGw::Handler handler);
+  virtual void AddMethod(std::string const &name, WsGw::SyncHandler handler);
   virtual void Broadcast(std::string_view name, WsGw::BufferView payload);
 };
 
