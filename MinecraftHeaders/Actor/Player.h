@@ -8,6 +8,7 @@
 #include "../Core/AutomaticID.h"
 #include "../Command/CommandPermissionLevel.h"
 #include <vector>
+#include "../dll.h"
 
 class Packet;
 class ServerPlayer;
