@@ -22,28 +22,45 @@ std::unique_ptr<State> state;
 
 DEFAULT_SETTINGS(settings);
 
-static auto &inits() {
-  static std::vector<std::pair<char const *, void (*)()>> ret;
-  return ret;
+// static auto &inits() {
+//   static std::vector<std::pair<char const *, void (*)()>> ret;
+//   return ret;
+// }
+
+std::map<std::string, void (*)()> &RegisterAPI::GetMap() {
+  static std::map<std::string, void (*)()> temp;
+  return temp;
+}
+std::list<std::pair<std::string, void (*)()>> &RegisterAPI::GetPreloadList() {
+  static std::list<std::pair<std::string, void (*)()>> temp;
+  return temp;
 }
 
-void AddInitializer(char const *name, void (*fn)()) {
-  LOGV("Register extension for %s") % name;
-  inits().emplace_back(name, fn);
+RegisterAPI::RegisterAPI(char const *name, bool check, void (*t)()) {
+  if (check)
+    GetMap().emplace(name, t);
+  else
+    GetPreloadList().emplace_back(name, t);
 }
+
+// void AddInitializer(char const *name, void (*fn)()) {
+//   LOGV("Register extension for %s") % name;
+//   inits().emplace_back(name, fn);
+// }
 
 void PreInit() {
   state = std::make_unique<State>();
-  AddInitializer("ChatAPI", InitChatHook);
-  AddInitializer("Blacklist", InitBlacklistHook);
+  // AddInitializer("ChatAPI", InitChatHook);
+  // AddInitializer("Blacklist", InitBlacklistHook);
 }
 
 void PostInit() {
-  LOGV("Load builtin extension for player list");
-  InitPlayerlistHook();
-  for (auto [name, fn] : inits()) {
-    auto handle = GetLoadedMod(name);
-    if (handle) {
+  for (auto [name, fn] : RegisterAPI::GetPreloadList()) {
+    LOGV("Load builtin extension for %s") % name;
+    fn();
+  }
+  for (auto [name, fn] : RegisterAPI::GetMap()) {
+    if (GetLoadedMod(name.c_str())) {
       LOGV("Load builtin extension for %s") % name;
       fn();
     } else {

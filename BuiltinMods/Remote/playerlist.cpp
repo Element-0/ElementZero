@@ -63,11 +63,11 @@ static WsGw::Buffer FindPlayer(WsGw::BufferView const &view) {
   return builder;
 }
 
-void InitPlayerlistHook() {
+static RegisterAPI reg("Playerlist", false, [] {
   auto &db       = Mod::PlayerDatabase::GetInstance();
   auto &instance = Mod::Remote::GetInstance();
   db.AddListener(SIG("joined"), &OnPlayerChange<Mod::proto::PlayerEvent::joined>);
   db.AddListener(SIG("left"), &OnPlayerChange<Mod::proto::PlayerEvent::left>);
   instance.AddMethod("playerlist", &GetPlayerList);
   instance.AddMethod("findplayer", &FindPlayer);
-}
+});

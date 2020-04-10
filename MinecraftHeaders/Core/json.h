@@ -176,7 +176,7 @@ public:
   MCAPI const Value &operator[](const char *key) const;
   MCAPI Value &operator[](const std::string &key);
   MCAPI const Value &operator[](const std::string &key) const;
-  MCAPI void removeMember(const char *key);
+  MCAPI Value removeMember(const char *key);
   void removeMember(const std::string &key) { removeMember(key.c_str()); }
   MCAPI bool isMember(const char *key) const;
   bool isMember(const std::string &key) const { return isMember(key.c_str()); }

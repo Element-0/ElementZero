@@ -1,0 +1,11 @@
+namespace Mod.proto;
+
+table CommandRequst {
+  name: string;
+  command: string;
+}
+
+table CommandResponse {
+  message: string;
+  extra: string;
+}

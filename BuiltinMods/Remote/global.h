@@ -1,5 +1,7 @@
 #include <string>
 #include <exception>
+#include <map>
+#include <list>
 #include <memory>
 
 #include <ws-gw.h>
@@ -22,6 +24,9 @@ struct State {
 
 extern std::unique_ptr<State> state;
 
-void InitPlayerlistHook();
-void InitChatHook();
-void InitBlacklistHook();
+struct RegisterAPI {
+  static std::map<std::string, void (*)()> &GetMap();
+  static std::list<std::pair<std::string, void (*)()>> &GetPreloadList();
+
+  RegisterAPI(char const *name, bool check, void (*t)());
+};

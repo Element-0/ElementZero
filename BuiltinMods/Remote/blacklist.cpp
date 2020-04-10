@@ -10,7 +10,7 @@
 #include "proto/blacklist_generated.h"
 #include "remote.h"
 
-void InitBlacklistHook() {
+static RegisterAPI reg("Blacklist", true, [] {
   Mod::Remote::GetInstance().AddMethod("blacklist", [](WsGw::BufferView const &view) -> WsGw::Buffer {
     using namespace Mod::proto::blacklist;
     using namespace Mod;
@@ -38,4 +38,4 @@ void InitBlacklistHook() {
     }
     return {};
   });
-}
+});

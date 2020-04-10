@@ -15,10 +15,10 @@ void ChatHandler(
     Mod::PlayerEntry const &entry, std::string &displayName, std::string &content,
     Mod::CallbackToken<std::string> &token);
 
-void InitChatHook() {
+static RegisterAPI reg("ChatAPI", true, [] {
   auto &chat = Mod::Chat::GetInstance();
   chat.AddListener(SIG("chat"), {Mod::RecursiveEventHandlerAdaptor(ChatHandler)});
-}
+});
 
 void ChatHandler(
     Mod::PlayerEntry const &entry, std::string &displayName, std::string &content,
