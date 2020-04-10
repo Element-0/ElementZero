@@ -7,8 +7,10 @@
 #include <log.h>
 #include <scriptapi.h>
 
+#include "base.h"
 #include "chakra_helper.h"
 #include "global.h"
+#include "lazyapi.h"
 
 namespace fs = std::filesystem;
 
@@ -87,7 +89,6 @@ void loadCustomScript() try {
   LoadModuleFromFile(root, "index.js", "scripts/index.js");
   bool hasException;
   if (JsHasException(&hasException) != JsNoError) return;
-  // Fake while to allow break out
   if (!hasException) return;
   try {
     auto metadata = JsObjectWarpper::FromCurrentException();
@@ -119,36 +120,49 @@ static JsErrorCode resolveModule(JsValueRef specifier, fs::path &path, fs::path 
   return ec;
 }
 
+static void LoadBuiltinModule(
+    JsModuleRecord referencingModule, JsValueRef specifier, JsModuleRecord *target, std::string const &name,
+    std::string (*fn)(JsObjectWarpper native)) {
+  ThrowError(JsInitializeModuleRecord(referencingModule, specifier, target));
+  ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_Url, specifier));
+  auto cookies = NextContext();
+  JsValueRef exception, result;
+  JsObjectWarpper obj;
+  const auto script = fn(obj);
+  ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_HostDefined, obj.ref));
+  ThrowError(JsParseModuleSource(
+      *target, cookies, (BYTE *) script.data(), script.size(), JsParseModuleSourceFlags_DataIsUTF8, &exception));
+  if (exception) JsSetException(exception);
+  mod_cache[name] = *target;
+}
+
 static void FetchModule(JsModuleRecord referencingModule, JsValueRef specifier, JsModuleRecord *target) {
   DEF_LOGGER("FetchModule");
   fs::path base;
   fs::path full;
 
-  auto &list = ModuleRegister::GetList();
+  auto &list     = ModuleRegister::GetList();
+  auto &lazylist = LazyModuleRegister::GetList();
 
   auto name = FromJs<std::string>(specifier);
 
   LOGV("%s") % name;
+  if (auto it = mod_cache.find(name); it != mod_cache.end()) {
+    *target = it->second;
+    return;
+  }
 
   if (auto it = list.find(name); it != list.end()) {
-    if (auto it = mod_cache.find(base); it != mod_cache.end()) {
-      *target = it->second;
-      return;
-    }
-    ThrowError(JsInitializeModuleRecord(referencingModule, specifier, target));
-    ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_Url, specifier));
-    auto cookies = NextContext();
-    JsValueRef exception, result;
-    JsObjectWarpper obj;
-    const auto script = it->second(obj);
-    ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_HostDefined, obj.ref));
-    ThrowError(JsParseModuleSource(
-        *target, cookies, (BYTE *) script.data(), script.size(), JsParseModuleSourceFlags_DataIsUTF8, &exception));
-    if (exception) JsSetException(exception);
-    // ThrowError(JsParseModuleSource(*target, cookies, (BYTE *) "", 0, JsParseModuleSourceFlags_DataIsUTF8,
-    // &exception));
-    // ThrowError(JsGetModuleNamespace(*target, &result));
+    LoadBuiltinModule(referencingModule, specifier, target, name, it->second);
     return;
+  }
+  if (auto it = lazylist.find(name); it != lazylist.end()) {
+    if (GetLoadedMod(it->second.first)) {
+      LoadBuiltinModule(referencingModule, specifier, target, name, it->second.second);
+      return;
+    } else {
+      throw JsErrorNotImplemented;
+    }
   }
 
   if (referencingModule) {

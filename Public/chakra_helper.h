@@ -12,6 +12,7 @@
 #include <ChakraCore.h>
 
 #include <modutils.h>
+#include <type_traits>
 
 #define ThrowError(fnret)                                                                                              \
   if (JsErrorCode ec = fnret; ec != JsNoError) throw ec;
@@ -298,6 +299,15 @@ struct JsConvertible {
 
 struct PropertyDesc;
 
+template <typename T, typename = void> struct HasToJs : std::false_type {};
+template <typename T> struct HasToJs<T, std::void_t<decltype(ToJs(std::declval<T>())), JsValueRef>> : std::true_type {};
+
+template <typename T, typename = void> struct HasJsConvertible : std::false_type {};
+template <typename T>
+struct HasJsConvertible<T, std::void_t<decltype(JsConvertible{std::declval<T>()})>> : std::true_type {};
+
+template <class... T> struct always_false : std::false_type {};
+
 struct JsObjectWarpper {
   JsValueRef ref;
 
@@ -361,17 +371,19 @@ struct JsObjectWarpper {
       } else if constexpr (std::is_same_v<T, JsObjectWarpper> || std::is_same_v<T, JsConvertible>) {
         set(val.ref);
         return val.ref;
-      } else if constexpr (std::is_same_v<T, bool> || std::is_same_v<T, int> || std::is_same_v<T, double>) {
-        auto o = ToJs(val);
-        set(o);
-        return o;
       } else if constexpr (std::is_same_v<T, PropertyDesc>) {
         define(val);
         return nullptr;
-      } else {
+      } else if constexpr (HasJsConvertible<T>::value) {
         JsConvertible o{val};
         set(o.ref);
         return o;
+      } else if constexpr (HasToJs<T>::value) {
+        auto o = ToJs(val);
+        set(o);
+        return o;
+      } else {
+        static_assert(always_false<T>::value, "Failed to assign type");
       }
     }
 
@@ -456,7 +468,7 @@ struct ValueHolder {
   }
   ValueHolder(ValueHolder &&rhs) : ref(rhs.ref) { rhs.ref = nullptr; }
 
-  JsValueRef operator*() { return ref; }
+  JsValueRef operator*() const { return ref; }
 
   ~ValueHolder() {
     if (ref) JsRelease(ref, nullptr);
