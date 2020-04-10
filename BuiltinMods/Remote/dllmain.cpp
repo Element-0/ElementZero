@@ -23,11 +23,6 @@ std::unique_ptr<State> state;
 
 DEFAULT_SETTINGS(settings);
 
-// static auto &inits() {
-//   static std::vector<std::pair<char const *, void (*)()>> ret;
-//   return ret;
-// }
-
 std::map<std::string, void (*)()> &RegisterAPI::GetMap() {
   static std::map<std::string, void (*)()> temp;
   return temp;
@@ -44,16 +39,7 @@ RegisterAPI::RegisterAPI(char const *name, bool check, void (*t)()) {
     GetPreloadList().emplace_back(name, t);
 }
 
-// void AddInitializer(char const *name, void (*fn)()) {
-//   LOGV("Register extension for %s") % name;
-//   inits().emplace_back(name, fn);
-// }
-
-void PreInit() {
-  state = std::make_unique<State>();
-  // AddInitializer("ChatAPI", InitChatHook);
-  // AddInitializer("Blacklist", InitBlacklistHook);
-}
+void PreInit() { state = std::make_unique<State>(); }
 
 void PostInit() {
   for (auto [name, fn] : RegisterAPI::GetPreloadList()) {
@@ -79,9 +65,6 @@ void ServerStart() {
       } catch (std::exception const &ex) { LOGE("Disconnected from gateway %s") % ex.what(); }
   });
   LOGI("Connected to gateway");
-  // LocateService<ServerInstance>()->queueForServerThread([] {
-
-  // });
 }
 
 namespace Mod {
