@@ -16,12 +16,13 @@
 #include "proto/command_generated.h"
 
 static RegisterAPI reg("Command", false, [] {
-  Mod::Remote::GetInstance().AddMethod("executeCommand", [](WsGw::Buffer const &buffer, auto fn) {
+  Mod::Remote::GetInstance().AddMethod("executeCommand", [](WsGw::Buffer buffer, auto fn) {
     try {
       using namespace Mod::proto;
       using namespace Mod;
       flatbuffers::Verifier verifier{buffer.data(), buffer.size()};
-      auto req         = flatbuffers::GetRoot<CommandRequst>(buffer.data());
+      auto req = flatbuffers::GetRoot<CommandRequst>(buffer.data());
+      if (!req->Verify(verifier)) throw std::runtime_error{"Failed to parse arguments"};
       auto origin      = std::make_unique<CustomCommandOrigin>();
       origin->name     = req->name()->str();
       origin->callback = [fn](Json::Value &&value) {
@@ -36,6 +37,6 @@ static RegisterAPI reg("Command", false, [] {
       auto ctx    = CommandContext::create(req->command()->str(), std::move(origin));
       auto result = LocateService<MinecraftCommands>()->executeCommand(std::move(ctx), false);
       if (result != MCRESULT_Success) throw std::runtime_error{"failed to execute command"};
-    } catch (...) { fn(std::current_exception(), {}); }
+    } catch (std::exception const &ex) { fn(std::make_exception_ptr(ex), {}); }
   });
 });
