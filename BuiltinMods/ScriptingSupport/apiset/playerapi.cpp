@@ -41,74 +41,64 @@ JsValueRef OfflinePlayerBinding::InitProto() {
 }
 
 static ModuleRegister reg("ez:player", [](JsObjectWarpper native) -> std::string {
-  native["getPlayerByXUID"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    auto xuid = boost::lexical_cast<uint64_t>(JsToString(args[0]));
+  native["getPlayerByXUID"] = +[](JsValueRef ref) {
+    auto xuid = boost::lexical_cast<uint64_t>(JsToString(ref));
     auto &db  = Mod::PlayerDatabase::GetInstance();
     if (auto it = db.Find(xuid); it) return ToJs(*it);
     return GetUndefined();
   };
-  native["getPlayerByUUID"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    auto uuid = mce::UUID::fromString(JsToString(args[0]));
+  native["getPlayerByUUID"] = +[](JsValueRef ref) {
+    auto uuid = mce::UUID::fromString(JsToString(ref));
     auto &db  = Mod::PlayerDatabase::GetInstance();
     if (auto it = db.Find(uuid); it) return ToJs(*it);
     return GetUndefined();
   };
-  native["getPlayerByNAME"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    auto name = JsToString(args[0]);
-    auto &db  = Mod::PlayerDatabase::GetInstance();
+  native["getPlayerByNAME"] = +[](std::string const &name) {
+    auto &db = Mod::PlayerDatabase::GetInstance();
     if (auto it = db.Find(name); it) return ToJs(*it);
     return GetUndefined();
   };
 
-  native["getOfflinePlayerByXUID"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    auto xuid = boost::lexical_cast<uint64_t>(JsToString(args[0]));
+  native["getOfflinePlayerByXUID"] = +[](JsValueRef ref) {
+    auto xuid = boost::lexical_cast<uint64_t>(JsToString(ref));
     auto &db  = Mod::PlayerDatabase::GetInstance();
     if (auto it = db.FindOffline(xuid); it) return ToJs(*it);
     return GetUndefined();
   };
-  native["getOfflinePlayerByUUID"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    auto uuid = mce::UUID::fromString(JsToString(args[0]));
+  native["getOfflinePlayerByUUID"] = +[](JsValueRef ref) {
+    auto uuid = mce::UUID::fromString(JsToString(ref));
     auto &db  = Mod::PlayerDatabase::GetInstance();
     if (auto it = db.FindOffline(uuid); it) return ToJs(*it);
     return GetUndefined();
   };
-  native["getOfflinePlayerByNAME"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    auto name = JsToString(args[0]);
-    auto &db  = Mod::PlayerDatabase::GetInstance();
+  native["getOfflinePlayerByNAME"] = +[](std::string const &name) {
+    auto &db = Mod::PlayerDatabase::GetInstance();
     if (auto it = db.FindOffline(name); it) return ToJs(*it);
     return GetUndefined();
   };
 
-  native["getPlayerList"] = [=](JsValueRef callee, Arguments args) {
+  native["getPlayerList"] = +[]() {
     auto &db = Mod::PlayerDatabase::GetInstance();
     return ToJsArray(db.GetData());
   };
 
-  native["onPlayerJoined"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    if (GetJsType(args[0]) != JsFunction) throw std::runtime_error{"Require function argument"};
+  native["onPlayerJoined"] = +[](JsValueRef ref) {
+    if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
     auto &db = Mod::PlayerDatabase::GetInstance();
-    db.AddListener(SIG("joined"), [=, fn = args[0]](Mod::PlayerEntry const &entry) {
+    db.AddListener(SIG("joined"), [=, fn{ValueHolder{ref}}](Mod::PlayerEntry const &entry) {
       JsValueRef ar[] = {GetUndefined(), ToJs(entry)};
       JsValueRef res;
-      JsCallFunction(fn, ar, 2, &res);
+      JsCallFunction(*fn, ar, 2, &res);
     });
     return GetUndefined();
   };
-  native["onPlayerLeft"] = [=](JsValueRef callee, Arguments args) {
-    if (args.size() != 1) throw std::runtime_error{"Require 1 argument"};
-    if (GetJsType(args[0]) != JsFunction) throw std::runtime_error{"Require function argument"};
+  native["onPlayerLeft"] = +[](JsValueRef ref) {
+    if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
     auto &db = Mod::PlayerDatabase::GetInstance();
-    db.AddListener(SIG("left"), [=, fn = args[0]](Mod::PlayerEntry const &entry) {
+    db.AddListener(SIG("left"), [=, fn{ValueHolder{ref}}](Mod::PlayerEntry const &entry) {
       JsValueRef ar[] = {GetUndefined(), ToJs(entry)};
       JsValueRef res;
-      JsCallFunction(fn, ar, 2, &res);
+      JsCallFunction(*fn, ar, 2, &res);
     });
     return GetUndefined();
   };
