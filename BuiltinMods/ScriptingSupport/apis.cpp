@@ -13,7 +13,6 @@ void initBasicAPI() {
   DEF_LOGGER("ScriptAPI");
   auto global             = JsObjectWarpper::FromGlobal();
   global["isElementZero"] = true;
-  // installConsoleAPI(global);
   for (auto [name, fn] : RegisterQueue::GetList()) {
     LOGV("register %s") % name;
     fn(global);
