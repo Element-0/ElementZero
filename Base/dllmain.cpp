@@ -9,6 +9,7 @@
 #include <boost/format.hpp>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <Core/Minecraft.h>
+#include <Core/mce.h>
 
 #include <hook.h>
 #include <log.h>
