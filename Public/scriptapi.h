@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <optional>
+#include <type_traits>
 
 #include <boost/format.hpp>
 
@@ -68,6 +69,8 @@ struct PlayerBinding {
 };
 
 inline JsValueRef ToJs(Mod::PlayerEntry entry) { return *PlayerBinding::Create(entry); }
+template <> struct HasToJs<Mod::PlayerEntry> : std::true_type {};
+
 template <> inline Mod::PlayerEntry FromJs(JsValueRef ref) {
   JsValueRef tmp;
   ThrowError(JsGetPrototype(ref, &tmp));
@@ -103,6 +106,7 @@ struct OfflinePlayerBinding {
 };
 
 inline JsValueRef ToJs(Mod::OfflinePlayerEntry entry) { return *OfflinePlayerBinding::Create(entry); }
+template <> struct HasToJs<Mod::OfflinePlayerEntry> : std::true_type {};
 
 template <> inline Mod::OfflinePlayerEntry FromJs(JsValueRef ref) {
   JsValueRef tmp;

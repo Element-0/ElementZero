@@ -59,6 +59,12 @@ inline JsValueRef ToJs(std::string const &str) {
   return ref;
 }
 
+inline JsValueRef ToJs(std::string_view sv) {
+  JsValueRef ref;
+  ThrowError(JsCreateString(sv.data(), sv.size(), &ref));
+  return ref;
+}
+
 inline JsValueRef ToJs(bool flag) {
   JsValueRef ref;
   ThrowError(JsBoolToBoolean(flag, &ref));
@@ -174,6 +180,12 @@ inline std::string JsToString(JsValueRef ref) {
   return FromJs<std::string>(str);
 }
 
+inline bool JsToBool(JsValueRef ref) {
+  JsValueRef bol;
+  ThrowError(JsConvertValueToBoolean(ref, &bol));
+  return FromJs<bool>(bol);
+}
+
 struct Arguments {
   JsValueRef self;
   JsValueRef newTarget;
@@ -251,7 +263,12 @@ struct JsConvertible {
               using tp = std::tuple<PS...>;
               return fn(FromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
             };
-            return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
+            if constexpr (std::is_same_v<T, void>) {
+              lfn(std::make_index_sequence<sizeof...(PS)>{});
+              return GetUndefined();
+            } else {
+              return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
+            }
           } catch (std::exception const &ex) {
             JsSetException(ToJs(ex.what()));
             return GetUndefined();
@@ -285,7 +302,12 @@ struct JsConvertible {
               return (xself.GetExternalData<C>()->*fn)(
                   FromJsFromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
             };
-            return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
+            if constexpr (std::is_same_v<T, void>) {
+              lfn(std::make_index_sequence<sizeof...(PS)>{});
+              return GetUndefined();
+            } else {
+              return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
+            }
           } catch (std::exception const &ex) {
             JsSetException(ToJs(ex.what()));
             return GetUndefined();
@@ -300,7 +322,7 @@ struct JsConvertible {
 struct PropertyDesc;
 
 template <typename T, typename = void> struct HasToJs : std::false_type {};
-template <typename T> struct HasToJs<T, std::void_t<decltype(ToJs(std::declval<T>())), JsValueRef>> : std::true_type {};
+template <typename T> struct HasToJs<T, std::void_t<decltype(ToJs(std::declval<T>()))>> : std::true_type {};
 
 template <typename T, typename = void> struct HasJsConvertible : std::false_type {};
 template <typename T>
@@ -384,7 +406,7 @@ struct JsObjectWarpper {
         set(o);
         return o;
       } else {
-        static_assert(always_false<R>::value, "Failed to assign type");
+        static_assert(always_false<T>::value, "Failed to assign type");
       }
     }
 
