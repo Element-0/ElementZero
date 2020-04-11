@@ -1,6 +1,7 @@
 #include <base.h>
 #include <Actor/Player.h>
 #include <Core/Minecraft.h>
+#include <Container/SimpleContainer.h>
 #include <Command/CommandOutput.h>
 #include <Level/Level.h>
 #include <Item/Item.h>
@@ -28,6 +29,10 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
   return *u.target;
 }
 
+#pragma region Player
+
+SimpleContainer &Player::getHandContainer() { return direct_access<SimpleContainer>(this, 1632); }
+
 Certificate &Player::getCertificate() { return *direct_access<Certificate *>(this, 3208); }
 
 BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos const>(this, 7548); }
@@ -35,6 +40,8 @@ BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos
 NetworkIdentifier const &Player::getNetworkIdentifier() const {
   return direct_access<NetworkIdentifier const>(this, 2904);
 }
+
+#pragma endregion
 
 void NetworkIdentifier::kick(std::string const &reason) const {
   LocateService<ServerNetworkHandler>()->disconnectClient(*this, reason, reason.empty());

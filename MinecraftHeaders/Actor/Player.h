@@ -1,13 +1,16 @@
 #pragma once
 
-#include "Actor.h"
+#include <vector>
+
 #include <hook.h>
+
+#include "Actor.h"
 #include "../Core/ExtendedCertificate.h"
+#include "../Container/SimpleContainer.h"
 #include "../Math/Vec3.h"
 #include "../Math/BlockPos.h"
 #include "../Core/AutomaticID.h"
 #include "../Command/CommandPermissionLevel.h"
-#include <vector>
 #include "../dll.h"
 
 class Packet;
@@ -57,6 +60,7 @@ public:
           "?getCarriedItem@Player@@UEBAAEBVItemStack@@XZ", this);
   }
 
+  BASEAPI SimpleContainer &getHandContainer();
   BASEAPI Certificate &getCertificate();
   BASEAPI NetworkIdentifier const &getNetworkIdentifier() const;
   BASEAPI BlockPos const &getSpawnPosition() const;

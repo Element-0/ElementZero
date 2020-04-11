@@ -10,11 +10,11 @@
 #include "ContainerSizeChangeListener.h"
 #include "../Core/NBT.h"
 #include "../Item/ItemStack.h"
-#include "../Actor/Player.h"
 #include "../Math/Vec3.h"
 
 #include "../dll.h"
 
+class Player;
 class BlockSource;
 class ItemDescriptor;
 
