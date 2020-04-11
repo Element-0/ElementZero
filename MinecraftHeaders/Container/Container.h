@@ -27,6 +27,7 @@ public:
   std::string custom_name;
   bool has_custom_name;
 
+  MCAPI Container(ContainerType);
   MCAPI virtual ~Container();
   MCAPI virtual void addContentChangeListener(ContainerContentChangeListener *);
   MCAPI virtual void removeContentChangeListener(ContainerContentChangeListener *);
