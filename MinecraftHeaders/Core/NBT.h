@@ -6,9 +6,9 @@
 
 #include "../dll.h"
 
-struct IDataInput;
-struct IDataOutput;
-struct PrintStream;
+class IDataInput;
+class IDataOutput;
+class PrintStream;
 
 class MCAPI Tag {
 public:
