@@ -23,8 +23,8 @@ private:
   const char *c_str_;
 };
 
-struct ValueConstIterator;
-struct ValueIterator;
+class ValueConstIterator;
+class ValueIterator;
 enum ValueType : char {
   nullValue = 0, ///< 'null' value
   intValue,      ///< signed integer value
