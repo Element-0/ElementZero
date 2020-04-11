@@ -60,6 +60,7 @@ public:
           "?getCarriedItem@Player@@UEBAAEBVItemStack@@XZ", this);
   }
 
+  BASEAPI SimpleContainer &getEquipmentContainer();
   BASEAPI SimpleContainer &getHandContainer();
   BASEAPI Certificate &getCertificate();
   BASEAPI NetworkIdentifier const &getNetworkIdentifier() const;

@@ -31,6 +31,7 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
 
 #pragma region Player
 
+SimpleContainer &Player::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1360); }
 SimpleContainer &Player::getHandContainer() { return direct_access<SimpleContainer>(this, 1632); }
 
 Certificate &Player::getCertificate() { return *direct_access<Certificate *>(this, 3208); }
