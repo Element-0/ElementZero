@@ -2,8 +2,6 @@
 
 #include <Windows.h>
 
-#include <Core/mce.h>
-
 #ifdef Base_EXPORTS
 #  define BASEAPI __declspec(dllexport)
 #else
@@ -19,6 +17,9 @@ class ServerNetworkHandler;
 class Level;
 namespace RakNet {
 class RakPeer;
+}
+namespace mce {
+class UUID;
 }
 
 BASEAPI HMODULE GetLoadedMod(char const *name);
