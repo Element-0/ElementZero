@@ -29,6 +29,7 @@ public:
 
   MCAPI Container(ContainerType);
   MCAPI virtual ~Container();
+  MCAPI virtual void init();
   MCAPI virtual void addContentChangeListener(ContainerContentChangeListener *);
   MCAPI virtual void removeContentChangeListener(ContainerContentChangeListener *);
   virtual ItemStack const &getItem(int) const = 0;
