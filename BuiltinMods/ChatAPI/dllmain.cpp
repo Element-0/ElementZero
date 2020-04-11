@@ -100,7 +100,7 @@ TClasslessInstanceHook(
     void,
     "?_displayGameMessage@ServerNetworkHandler@@AEAAXAEBVPlayer@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$"
     "allocator@D@2@@std@@@Z",
-    Player *player, std::string &content) {
+    Player *player, std::string &content) try {
   DEF_LOGGER("CHAT");
   auto &playerdb = Mod::PlayerDatabase::GetInstance().GetData();
   auto it        = playerdb.find(player);
@@ -119,4 +119,4 @@ TClasslessInstanceHook(
     return true;
   });
   logChat(*it, content);
-}
+} catch (...) {}
