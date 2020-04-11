@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <string>
 #include <hook.h>
 
@@ -47,6 +48,8 @@ public:
   MCAPI void set(int);
   MCAPI void setRepairCost(int);
   MCAPI void setChargedItem(ItemInstance const &, bool);
+  MCAPI void setCustomLore(std::vector<std::string> const &lore);
+  MCAPI void setCustomName(std::string const &name);
   MCAPI void clearChargedItem();
   MCAPI void serializeComponents(IDataOutput &) const;
   MCAPI void deserializeComponents(IDataInput &) const;
