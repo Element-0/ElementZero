@@ -29,7 +29,23 @@ namespace Mod {
 Chat::Chat() { emitter = &Chat::Emit; }
 
 void Chat::SendBroadcast(const std::string &name, const std::string &content) {
-  auto packet = TextPacket::createTextPacket<TextPacketType::Announcement>(name, content, "");
+  auto packet = TextPacket::createTextPacket<TextPacketType::Chat>(name, content, "");
+  LocateService<Level>()->forEachPlayer([&](Player const &p) -> bool {
+    p.sendNetworkPacket(packet);
+    return true;
+  });
+}
+
+void Chat::SendAnnounce(const std::string &content) {
+  auto packet = TextPacket::createTextPacket<TextPacketType::Announcement>(content);
+  LocateService<Level>()->forEachPlayer([&](Player const &p) -> bool {
+    p.sendNetworkPacket(packet);
+    return true;
+  });
+}
+
+void Chat::SendAnnounce(const std::string &content, std::initializer_list<std::string> args) {
+  auto packet = TextPacket::createTranslatedMessageWithParams(content, args);
   LocateService<Level>()->forEachPlayer([&](Player const &p) -> bool {
     p.sendNetworkPacket(packet);
     return true;

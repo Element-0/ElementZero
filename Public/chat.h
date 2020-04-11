@@ -22,6 +22,9 @@ public:
 
   CHATAPI void SendBroadcast(std::string const &name, std::string const &);
 
+  CHATAPI void SendAnnounce(std::string const &);
+  CHATAPI void SendAnnounce(std::string const &, std::initializer_list<std::string> args);
+
   USING_RECEVENTEMITTER("chat", PlayerEntry const &, std::string &, std::string &, CallbackToken<std::string> &);
 };
 
