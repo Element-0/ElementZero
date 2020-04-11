@@ -6,6 +6,7 @@
 #include "../Level/Level.h"
 
 #include "../dll.h"
+#include <memory>
 
 class FillingContainer : public Container {
 public:
@@ -30,6 +31,8 @@ public:
   MCAPI virtual void doDrop(ItemStack &, bool);
   MCAPI virtual int getEmptySlotsCount() const;
   MCAPI virtual void dropAll(int, int, bool);
+
+  MCAPI std::unique_ptr<ListTag> save();
 };
 
 static_assert(offsetof(FillingContainer, data) == 224);
