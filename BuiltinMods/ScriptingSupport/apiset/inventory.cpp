@@ -41,9 +41,9 @@ JsValueRef ScriptItemStack::InitProto() {
 using namespace Mod::Scripting;
 
 static ModuleRegister reg("ez:inventory", [](JsObjectWarpper native) -> std::string {
-  native["getHandItems"] = +[](Mod::PlayerEntry entry) {
+  native["getOffHandItem"] = +[](Mod::PlayerEntry entry) {
     auto &container = entry.player->getHandContainer();
-    return ToJsArray(container.data);
+    return ToJs(container.data[1]);
   };
   native["getEquipmentItems"] = +[](Mod::PlayerEntry entry) {
     auto &container = entry.player->getEquipmentContainer();
@@ -54,7 +54,7 @@ static ModuleRegister reg("ez:inventory", [](JsObjectWarpper native) -> std::str
     return ToJsArray(container.data);
   };
   return R"js(
-    export const getHandItems = import.meta.native.getHandItems;
+    export const getOffHandItem = import.meta.native.getOffHandItem;
     export const getEquipmentItems = import.meta.native.getEquipmentItems;
     export const getInventoryItems = import.meta.native.getInventoryItems;
   )js";
