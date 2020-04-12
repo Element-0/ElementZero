@@ -1,13 +1,12 @@
 #include <stdexcept>
 
-#include "ChakraCommon.h"
-#include "Core/mce.h"
-#include "boost/lexical_cast.hpp"
-#include "chakra_helper.h"
-#include "log.h"
+#include <Core/mce.h>
+#include <boost/lexical_cast.hpp>
+
+#include <chakra_helper.h>
+#include <log.h>
 #include <playerdb.h>
 #include <modutils.h>
-
 #include <scriptapi.h>
 
 using namespace Mod::Scripting;
