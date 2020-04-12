@@ -39,7 +39,7 @@ TClasslessInstanceHook(
     "?buildDescriptionId@ArrowItem@@UEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@"
     "AEBVItemDescriptor@@AEBV?$unique_ptr@VCompoundTag@@U?$default_delete@VCompoundTag@@@std@@@3@@Z",
     ItemDescriptor const &desc, void *tag) {
-  if (desc.aux - 1 > Potion::getLastId()) return "CHEAT";
+  if (desc.aux - 1 >= Potion::getLastId()) return "CHEAT";
   return original(this, desc, tag);
 }
 
