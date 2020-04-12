@@ -1,18 +1,23 @@
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <vector>
 #include <string>
 #include <hook.h>
 
+#include "../Level/Tick.h"
+
 #include "../dll.h"
 
 class Item;
+class Block;
 class BlockLegacy;
 class CompoundTag;
 class IDataOutput;
 class IDataInput;
 class ItemInstance;
+class ItemEnchants;
 
 #ifndef BASEAPI
 #  define BASEAPI __declspec(dllimport)
@@ -20,7 +25,20 @@ class ItemInstance;
 
 class ItemStackBase {
 public:
-  char filler[128];
+  Item *item;
+  std::unique_ptr<CompoundTag> tag;
+  uint64_t block_state;
+  uint16_t aux_value;
+  unsigned char count;
+  bool flag35;
+  std::chrono::steady_clock::time_point time;
+  bool flag48;
+  std::vector<BlockLegacy *> blv56;
+  uint64_t unk80;
+  std::vector<BlockLegacy *> blv88;
+  uint64_t unk112;
+  Tick blocking_tick;
+  std::unique_ptr<ItemInstance> instance;
 
   MCAPI virtual ~ItemStackBase();
 
@@ -31,6 +49,7 @@ public:
   MCAPI Item const *getItem() const;
   MCAPI bool matchesItem(ItemStackBase const &) const;
   MCAPI bool sameItem(int, int) const;
+  MCAPI std::string getRawNameId() const;
   MCAPI std::string getName() const;
   MCAPI std::string getHoverName() const;
   MCAPI bool hasCustomHoverName() const;
@@ -53,19 +72,46 @@ public:
   MCAPI void clearChargedItem();
   MCAPI void serializeComponents(IDataOutput &) const;
   MCAPI void deserializeComponents(IDataInput &) const;
-  BASEAPI unsigned char getStackSize() const;
+  MCAPI ItemEnchants getEnchantsFromUserData() const;
+  inline unsigned char getStackSize() const { return count; }
   MCAPI std::unique_ptr<CompoundTag> save() const;
+  MCAPI std::string toString() const;
+
+  MCAPI bool operator!=(ItemStackBase const &rhs) const;
+  MCAPI operator bool() const;
 
 protected:
   virtual void reinit(Item const &, int, int) = 0;
+  MCAPI ItemStackBase();
+  MCAPI ItemStackBase(Item const &item);
+  MCAPI ItemStackBase(Item const &ite, int);
+  MCAPI ItemStackBase(Item const &ite, int, int);
+  MCAPI ItemStackBase(Item const &ite, int, int, CompoundTag const *);
+  MCAPI ItemStackBase(BlockLegacy const &, int);
+  MCAPI ItemStackBase(Block const &, int, CompoundTag const *);
+  MCAPI ItemStackBase(ItemStackBase const &rhs);
+  MCAPI ItemStackBase &operator=(ItemStackBase const &rhs);
 
 public:
   virtual void reinit(BlockLegacy const &, int) = 0;
 };
 class ItemStack : public ItemStackBase {
 public:
+  MCAPI ItemStack();
+  ItemStack(Item const &item) : ItemStackBase(item) {}
+  MCAPI ItemStack(Item const &, int);
+  ItemStack(Item const &item, int a, int b) : ItemStackBase(item, a, b) {}
+  ItemStack(Item const &item, int a, int b, CompoundTag const *tag) : ItemStackBase(item, a, b, tag) {}
+  ItemStack(BlockLegacy const &block, int a) : ItemStackBase(block, a) {}
+  ItemStack(Block const &block, int a, CompoundTag const *tag) : ItemStackBase(block, a, tag) {}
+  ItemStack(ItemStack const &rhs) : ItemStackBase(rhs) {}
   MCAPI ~ItemStack();
   MCAPI static ItemStack fromTag(CompoundTag const &);
+
+  ItemStack &operator=(ItemStack const &rhs) {
+    ItemStackBase::operator=(rhs);
+    return *this;
+  }
 
 protected:
   MCAPI void reinit(Item const &, int, int);
@@ -73,3 +119,6 @@ protected:
 public:
   MCAPI void reinit(BlockLegacy const &, int);
 };
+
+static_assert(offsetof(ItemStackBase, time) == 40);
+static_assert(sizeof(ItemStackBase) == 136);
