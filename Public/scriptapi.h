@@ -55,7 +55,7 @@ struct PlayerBinding {
   inline Mod::OfflinePlayerEntry ToOffline() { return Mod::OfflinePlayerEntry{entry.name, entry.xuid, entry.uuid}; }
   inline bool alive() { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid).has_value(); }
 
-  inline std::string toString() {
+  inline std::string ToString() {
     return (boost::format("Player { xuid: %d, uuid: %s, name: %s, ip: %s }") % entry.xuid % GetUUID() % GetNAME() %
             GetADDRESS())
         .str();
@@ -94,7 +94,7 @@ struct OfflinePlayerBinding {
 
   inline std::optional<Mod::PlayerEntry> ToOnline() { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid); }
 
-  inline std::string toString() {
+  inline std::string ToString() {
     return (boost::format("OfflinePlayer { xuid: %d, uuid: %s, name: %s }") % entry.xuid % GetUUID() % GetNAME()).str();
   }
 

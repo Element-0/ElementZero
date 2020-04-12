@@ -21,7 +21,7 @@ JsValueRef PlayerBinding::InitProto() {
     PlayerProto["address"]    = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetADDRESS};
     PlayerProto["alive"]      = JsObjectWarpper::PropertyDesc{&PlayerBinding::alive};
     PlayerProto["getOffline"] = &PlayerBinding::ToOffline;
-    PlayerProto["toString"]   = &PlayerBinding::toString;
+    PlayerProto["toString"]   = &PlayerBinding::ToString;
     return PlayerProto.ref;
   });
   return *proto;
@@ -34,7 +34,7 @@ JsValueRef OfflinePlayerBinding::InitProto() {
     OfflinePlayerProto["uuid"]      = JsObjectWarpper::PropertyDesc{&OfflinePlayerBinding::GetUUID};
     OfflinePlayerProto["name"]      = JsObjectWarpper::PropertyDesc{&OfflinePlayerBinding::GetNAME};
     OfflinePlayerProto["getOnline"] = &OfflinePlayerBinding::ToOnline;
-    OfflinePlayerProto["toString"]  = &OfflinePlayerBinding::toString;
+    OfflinePlayerProto["toString"]  = &OfflinePlayerBinding::ToString;
     return OfflinePlayerProto.ref;
   });
   return *proto;
