@@ -202,7 +202,7 @@ TClasslessInstanceHook(void, "?startServerThread@ServerInstance@@QEAAXXZ") {
   original(this);
   for (auto hook : ServerStarts) try {
       hook();
-    } catch (std::exception const &ex) { LOGE("Exception at unload hook (%s): %s") % hook.name % ex.what(); }
+    } catch (std::exception const &ex) { LOGE("Exception at server start hook (%s): %s") % hook.name % ex.what(); }
 }
 
 void worldHook(std::filesystem::path const &path) {
