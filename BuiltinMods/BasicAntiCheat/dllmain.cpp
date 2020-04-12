@@ -8,6 +8,7 @@
 #include <Packet/ActorFallPacket.h>
 #include <Packet/TextPacket.h>
 #include <Item/ItemStack.h>
+#include <Item/Potion.h>
 #include <Item/Item.h>
 
 DEF_LOGGER("BAC");
@@ -31,6 +32,15 @@ using namespace Mod;
 
 void dllenter() {}
 void dllexit() {}
+
+void ServerStart() {
+  GetServerSymbolWithOffset<PatchSpan<1>>(
+      "?buildDescriptionId@ArrowItem@@UEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@"
+      "AEBVItemDescriptor@@AEBV?$unique_ptr@VCompoundTag@@U?$default_delete@VCompoundTag@@@std@@@3@@Z",
+      0x82)
+      ->VerifyPatchFunction({0x3F}, {(unsigned char) (Potion::getLastId() - 1)});
+  LOGV("patched potion: %d") % Potion::getLastId();
+}
 
 TClasslessInstanceHook(
     void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVStructureBlockUpdatePacket@@@Z",
