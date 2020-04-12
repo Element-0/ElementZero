@@ -49,6 +49,10 @@ static ModuleRegister reg("ez:inventory", [](JsObjectWarpper native) -> std::str
     auto &container = entry.player->getEquipmentContainer();
     return ToJsArray(container.data);
   };
+  native["getInventoryItems"] = +[](Mod::PlayerEntry entry) {
+    auto &container = *entry.player->getInventory().invectory;
+    return ToJsArray(container.data);
+  };
   return R"js(
     export const getHandItems = import.meta.native.getHandItems;
     export const getEquipmentItems = import.meta.native.getEquipmentItems;
