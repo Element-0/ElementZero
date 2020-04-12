@@ -16,6 +16,13 @@ declare interface OfflinePlayerEntry {
   toString(): string;
 }
 
+declare type EnchantmentInstance = {
+  type: number;
+  level: number;
+  name(): string;
+  toString(): string;
+};
+
 declare type ItemStack = {
   readonly raw_name: string;
   readonly name: string;
@@ -25,6 +32,8 @@ declare type ItemStack = {
   readonly aux: number;
   readonly count: number;
   readonly max_count: number;
+  readonly enchanted: boolean;
+  readonly enchants: EnchantmentInstance[];
   equals(stack: ItemStack): boolean;
   toString(): string;
 };
