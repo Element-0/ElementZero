@@ -7,6 +7,7 @@
 #include "Actor.h"
 #include "../Core/ExtendedCertificate.h"
 #include "../Container/SimpleContainer.h"
+#include "../Container/PlayerInventoryProxy.h"
 #include "../Math/Vec3.h"
 #include "../Math/BlockPos.h"
 #include "../Core/AutomaticID.h"
@@ -62,6 +63,7 @@ public:
 
   BASEAPI SimpleContainer &getEquipmentContainer();
   BASEAPI SimpleContainer &getHandContainer();
+  BASEAPI PlayerInventoryProxy &getInventory();
   BASEAPI Certificate &getCertificate();
   BASEAPI NetworkIdentifier const &getNetworkIdentifier() const;
   BASEAPI BlockPos const &getSpawnPosition() const;

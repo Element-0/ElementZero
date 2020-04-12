@@ -33,11 +33,9 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
 
 SimpleContainer &Player::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1360); }
 SimpleContainer &Player::getHandContainer() { return direct_access<SimpleContainer>(this, 1632); }
-
+PlayerInventoryProxy &Player::getInventory() { return *direct_access<PlayerInventoryProxy *>(this, 3488); }
 Certificate &Player::getCertificate() { return *direct_access<Certificate *>(this, 3208); }
-
 BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos const>(this, 7548); }
-
 NetworkIdentifier const &Player::getNetworkIdentifier() const {
   return direct_access<NetworkIdentifier const>(this, 2904);
 }
