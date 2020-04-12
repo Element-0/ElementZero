@@ -299,8 +299,7 @@ struct JsConvertible {
             JsObjectWarpper xself{args.self};
             auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
               using tp = std::tuple<PS...>;
-              return (xself.GetExternalData<C>()->*fn)(
-                  FromJsFromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
+              return (xself.GetExternalData<C>()->*fn)(FromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
             };
             if constexpr (std::is_same_v<T, void>) {
               lfn(std::make_index_sequence<sizeof...(PS)>{});
@@ -347,6 +346,13 @@ struct JsObjectWarpper {
     template <typename T, typename R> PropertyDesc(R (T::*tget)(), void (T::*tset)(R) = nullptr) {
       if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs((obj.GetExternalData<T>()->*tget)()); };
       if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(FromJs<R>(rhs)); };
+    }
+    template <typename T, typename R> PropertyDesc(R(T::*field)) {
+      get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
+      set = [=](JsObjectWarpper obj) -> JsValueRef { ((obj.GetExternalData<T>()->*field) = FromJs<R>(rhs); };
+    }
+    template <typename T, typename R> PropertyDesc(R const(T::*field)) {
+      get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
     }
 
     JsValueRef toObject() {
@@ -475,6 +481,8 @@ struct JsObjectWarpper {
   }
 
   PropProxy operator[](char const *name) const { return {ref, ToJsP(name)}; }
+
+  void SetPrototype(JsValueRef target) { JsSetPrototype(ref, target); }
 
   JsValueRef operator*() const { return ref; }
 };

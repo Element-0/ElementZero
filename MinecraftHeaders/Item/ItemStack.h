@@ -54,6 +54,7 @@ public:
   MCAPI void serializeComponents(IDataOutput &) const;
   MCAPI void deserializeComponents(IDataInput &) const;
   BASEAPI unsigned char getStackSize() const;
+  MCAPI std::unique_ptr<CompoundTag> save() const;
 
 protected:
   virtual void reinit(Item const &, int, int) = 0;
@@ -64,6 +65,7 @@ public:
 class ItemStack : public ItemStackBase {
 public:
   MCAPI ~ItemStack();
+  MCAPI static ItemStack fromTag(CompoundTag const &);
 
 protected:
   MCAPI void reinit(Item const &, int, int);

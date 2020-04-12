@@ -98,7 +98,7 @@ struct OfflinePlayerBinding {
     return (boost::format("OfflinePlayer { xuid: %d, uuid: %s, name: %s }") % entry.xuid % GetUUID() % GetNAME()).str();
   }
 
-  static JsValueRef InitProto();
+  SCRIPTAPI static JsValueRef InitProto();
 
   inline static JsObjectWarpper Create(Mod::OfflinePlayerEntry entry) {
     return JsObjectWarpper::FromExternalObject(new OfflinePlayerBinding(entry), InitProto());
@@ -115,6 +115,38 @@ template <> inline Mod::OfflinePlayerEntry FromJs(JsValueRef ref) {
     OfflinePlayerBinding *bd;
     ThrowError(JsGetExternalData(ref, (void **) &bd));
     if (bd) return bd->entry;
+  }
+  throw std::runtime_error{"null data"};
+}
+
+struct ScriptNBT {
+  std::unique_ptr<Tag> storage;
+
+  inline ScriptNBT(std::unique_ptr<Tag> const &tag) : storage(tag->copy()) {}
+
+  inline int type() { return storage->getId(); }
+
+  inline std::string toString() { return storage->toString(); }
+
+  inline bool equals(std::unique_ptr<Tag> const &rhs) { return storage->equals(*rhs); }
+
+  inline JsValueRef clone() { return *ScriptNBT::Create(storage); }
+
+  SCRIPTAPI static JsValueRef InitProto();
+
+  inline static JsObjectWarpper Create(std::unique_ptr<Tag> const &tag) {
+    return JsObjectWarpper::FromExternalObject(new ScriptNBT{tag});
+  }
+};
+inline JsValueRef ToJs(std::unique_ptr<Tag> const &tag) { return *ScriptNBT::Create(tag); }
+template <> struct HasToJs<std::unique_ptr<Tag>> : std::true_type {};
+template <> inline std::unique_ptr<Tag> FromJs(JsValueRef ref) {
+  JsValueRef tmp;
+  ThrowError(JsGetPrototype(ref, &tmp));
+  if (tmp == ScriptNBT::InitProto()) {
+    ScriptNBT *bd;
+    ThrowError(JsGetExternalData(ref, (void **) &bd));
+    if (bd) return bd->storage->copy();
   }
   throw std::runtime_error{"null data"};
 }
