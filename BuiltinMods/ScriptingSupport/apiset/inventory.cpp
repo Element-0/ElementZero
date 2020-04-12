@@ -1,3 +1,4 @@
+#include "boost/format/format_fwd.hpp"
 #include <Item/ItemStack.h>
 #include <chakra_helper.h>
 #include <log.h>
@@ -5,17 +6,16 @@
 
 namespace Mod::Scripting {
 
-struct ScriptItemStack : ScriptNBT {
-  const std::string name, hoverName;
-  const int stackSize, maxStackSize;
-  ScriptItemStack(ItemStack const &stack)
-      : ScriptNBT(stack.save()), name(stack.getName()), hoverName(stack.getHoverName()),
-        stackSize(stack.getStackSize()), maxStackSize(stack.getMaxStackSize()) {}
+struct ScriptItemStack {
+  ItemStack stack;
+  ScriptItemStack(ItemStack const &stack) : stack(stack) {}
+
+  bool Equals(ItemStack const &rhs) { return !(stack != rhs); }
 
   static JsValueRef InitProto();
 
   inline static JsObjectWarpper Create(ItemStack const &stack) {
-    return JsObjectWarpper::FromExternalObject(new ScriptItemStack{stack});
+    return JsObjectWarpper::FromExternalObject(new ScriptItemStack{stack}, InitProto());
   }
 };
 JsValueRef ToJs(ItemStack const &stack) {
@@ -23,14 +23,31 @@ JsValueRef ToJs(ItemStack const &stack) {
   return *ScriptItemStack::Create(stack);
 }
 template <> struct HasToJs<ItemStack> : std::true_type {};
+template <> ItemStack FromJs(JsValueRef ref) {
+  if (GetJsType(ref) == JsNull) return ItemStack{};
+  JsValueRef tmp;
+  ThrowError(JsGetPrototype(ref, &tmp));
+  if (tmp == ScriptItemStack::InitProto()) {
+    ScriptItemStack *bd;
+    ThrowError(JsGetExternalData(ref, (void **) &bd));
+    if (bd) return bd->stack;
+  }
+  throw std::runtime_error{"null data"};
+}
 
 JsValueRef ScriptItemStack::InitProto() {
   static ValueHolder temp = IIFE([] {
     JsObjectWarpper proto;
-    proto.SetPrototype(ScriptNBT::InitProto());
-    proto["name"]       = JsObjectWarpper::PropertyDesc{&ScriptItemStack::name};
-    proto["hover_name"] = JsObjectWarpper::PropertyDesc{&ScriptItemStack::hoverName};
-    proto["stack_size"] = JsObjectWarpper::PropertyDesc{&ScriptItemStack::stackSize};
+    proto["raw_name"]          = JsObjectWarpper::PropertyDesc{&ItemStack::getRawNameId};
+    proto["name"]              = JsObjectWarpper::PropertyDesc{&ItemStack::getName};
+    proto["hover_name"]        = JsObjectWarpper::PropertyDesc{&ItemStack::getHoverName};
+    proto["custom_hover_name"] = JsObjectWarpper::PropertyDesc{&ItemStack::hasCustomHoverName};
+    proto["id"]                = JsObjectWarpper::PropertyDesc{&ItemStack::getId};
+    proto["aux"]               = JsObjectWarpper::PropertyDesc{&ItemStack::getAuxValue};
+    proto["count"]             = JsObjectWarpper::PropertyDesc{&ItemStack::getStackSize};
+    proto["max_count"]         = JsObjectWarpper::PropertyDesc{&ItemStack::getMaxStackSize};
+    proto["equals"]            = &ScriptItemStack::Equals;
+    proto["toString"]          = &ItemStackBase::toString;
     return *proto;
   });
   return *temp;

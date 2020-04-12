@@ -5,7 +5,6 @@
 #include <Command/CommandOutput.h>
 #include <Level/Level.h>
 #include <Item/Item.h>
-#include <Item/ItemStack.h>
 #include <Net/NetworkIdentifier.h>
 #include <Net/ServerNetworkHandler.h>
 #include <RakNet/RakPeer.h>
@@ -71,8 +70,6 @@ template <> MinecraftCommands *LocateService<MinecraftCommands>() { return Locat
 MinecraftCommands *Minecraft::getCommands() { return direct_access<MinecraftCommands *>(this, 160); }
 
 bool Item::getAllowOffhand() const { return direct_access<char>(this, 258) & 0x40; }
-
-unsigned char ItemStackBase::getStackSize() const { return direct_access<unsigned char>(this, 34); }
 
 RakNet::SystemAddress NetworkIdentifier::getRealAddress() const {
   return LocateService<RakNet::RakPeer>()->GetSystemAddressFromGuid(guid);

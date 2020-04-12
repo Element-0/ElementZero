@@ -47,13 +47,13 @@ struct PlayerBinding {
 
   inline PlayerBinding(Mod::PlayerEntry entry) : entry(entry) {}
 
-  inline std::string GetXUID() { return std::to_string(entry.xuid); }
-  inline std::string GetUUID() { return entry.uuid.asString(); }
-  inline std::string GetNAME() { return entry.name; }
-  inline std::string GetADDRESS() { return entry.netid.getRealAddress().ToString(); }
+  inline std::string GetXUID() const { return std::to_string(entry.xuid); }
+  inline std::string GetUUID() const { return entry.uuid.asString(); }
+  inline std::string GetNAME() const { return entry.name; }
+  inline std::string GetADDRESS() const { return entry.netid.getRealAddress().ToString(); }
 
   inline Mod::OfflinePlayerEntry ToOffline() { return Mod::OfflinePlayerEntry{entry.name, entry.xuid, entry.uuid}; }
-  inline bool alive() { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid).has_value(); }
+  inline bool alive() const { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid).has_value(); }
 
   inline std::string ToString() {
     return (boost::format("Player { xuid: %d, uuid: %s, name: %s, ip: %s }") % entry.xuid % GetUUID() % GetNAME() %
@@ -88,9 +88,9 @@ struct OfflinePlayerBinding {
   inline OfflinePlayerBinding() {}
   inline OfflinePlayerBinding(Mod::OfflinePlayerEntry entry) : entry(entry) {}
 
-  inline std::string GetXUID() { return std::to_string(entry.xuid); }
-  inline std::string GetUUID() { return entry.uuid.asString(); }
-  inline std::string GetNAME() { return entry.name; }
+  inline std::string GetXUID() const { return std::to_string(entry.xuid); }
+  inline std::string GetUUID() const { return entry.uuid.asString(); }
+  inline std::string GetNAME() const { return entry.name; }
 
   inline std::optional<Mod::PlayerEntry> ToOnline() { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid); }
 
@@ -124,7 +124,7 @@ struct ScriptNBT {
 
   inline ScriptNBT(std::unique_ptr<Tag> const &tag) : storage(tag->copy()) {}
 
-  inline int type() { return storage->getId(); }
+  inline int type() const { return storage->getId(); }
 
   inline std::string toString() { return storage->toString(); }
 
@@ -135,7 +135,7 @@ struct ScriptNBT {
   SCRIPTAPI static JsValueRef InitProto();
 
   inline static JsObjectWarpper Create(std::unique_ptr<Tag> const &tag) {
-    return JsObjectWarpper::FromExternalObject(new ScriptNBT{tag});
+    return JsObjectWarpper::FromExternalObject(new ScriptNBT{tag}, InitProto());
   }
 };
 inline JsValueRef ToJs(std::unique_ptr<Tag> const &tag) { return *ScriptNBT::Create(tag); }

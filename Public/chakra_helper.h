@@ -110,7 +110,7 @@ template <typename T, typename F> inline JsValueRef ToJsArray(T t, F f) {
   JsValueRef ref;
   ThrowError(JsCreateArray(t.size(), &ref));
   int idx = 0;
-  for (auto it : t) ThrowError(JsSetIndexedProperty(ref, ToJs(idx++), f(it)));
+  for (auto &it : t) ThrowError(JsSetIndexedProperty(ref, ToJs(idx++), f(it)));
   return ref;
 }
 
@@ -118,7 +118,7 @@ template <typename T> inline JsValueRef ToJsArray(T t) {
   JsValueRef ref;
   ThrowError(JsCreateArray(t.size(), &ref));
   int idx = 0;
-  for (auto it : t) ThrowError(JsSetIndexedProperty(ref, ToJs(idx++), ToJs(it)));
+  for (auto &it : t) ThrowError(JsSetIndexedProperty(ref, ToJs(idx++), ToJs(it)));
   return ref;
 }
 
@@ -145,6 +145,18 @@ template <> inline std::string FromJs(JsValueRef ref) {
 }
 
 template <> inline int FromJs(JsValueRef ref) {
+  int val;
+  ThrowError(JsNumberToInt(ref, &val));
+  return val;
+}
+
+template <> inline short FromJs(JsValueRef ref) {
+  int val;
+  ThrowError(JsNumberToInt(ref, &val));
+  return val;
+}
+
+template <> inline unsigned char FromJs(JsValueRef ref) {
   int val;
   ThrowError(JsNumberToInt(ref, &val));
   return val;
@@ -314,6 +326,43 @@ struct JsConvertible {
         },
         name ? ToJs(name) : JS_INVALID_REFERENCE, u.state, &ref));
   }
+  template <typename T, typename C, typename... PS> JsConvertible(T (C::*fn)(PS...) const, char const *name = nullptr) {
+    union {
+      T (C::*fn)(PS...) const;
+      void *state;
+    } u;
+    u.fn = fn;
+    ThrowError(JsCreateEnhancedFunction(
+        [](JsValueRef callee, JsValueRef *arguments, unsigned short argumentCount, JsNativeFunctionInfo *info,
+           void *state) -> JsValueRef {
+          try {
+            union {
+              T (C::*fn)(PS...) const;
+              void *state;
+            } u;
+            u.state                 = state;
+            T (C::*fn)(PS...) const = u.fn;
+            Arguments args{arguments, argumentCount, info};
+            if (args.size() != sizeof...(PS))
+              throw std::runtime_error{"Require " + std::to_string(sizeof...(PS)) + " argument"};
+            JsObjectWarpper xself{args.self};
+            auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
+              using tp = std::tuple<PS...>;
+              return (xself.GetExternalData<C>()->*fn)(FromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
+            };
+            if constexpr (std::is_same_v<T, void>) {
+              lfn(std::make_index_sequence<sizeof...(PS)>{});
+              return GetUndefined();
+            } else {
+              return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
+            }
+          } catch (std::exception const &ex) {
+            JsSetException(ToJs(ex.what()));
+            return GetUndefined();
+          }
+        },
+        name ? ToJs(name) : JS_INVALID_REFERENCE, u.state, &ref));
+  }
 
   operator JsValueRef() { return ref; };
 };
@@ -339,11 +388,11 @@ struct JsObjectWarpper {
     PropertyDesc(std::function<JsValueRef(JsObjectWarpper)> get, std::function<void(JsObjectWarpper, JsValueRef)> set)
         : get(get), set(set) {}
 
-    template <typename T> PropertyDesc(JsValueRef (T::*tget)(), void (T::*tset)(JsValueRef) = nullptr) {
+    template <typename T> PropertyDesc(JsValueRef (T::*tget)() const, void (T::*tset)(JsValueRef) = nullptr) {
       if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return (obj.GetExternalData<T>()->*tget)(); };
       if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(rhs); };
     }
-    template <typename T, typename R> PropertyDesc(R (T::*tget)(), void (T::*tset)(R) = nullptr) {
+    template <typename T, typename R> PropertyDesc(R (T::*tget)() const, void (T::*tset)(R) = nullptr) {
       if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs((obj.GetExternalData<T>()->*tget)()); };
       if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(FromJs<R>(rhs)); };
     }
