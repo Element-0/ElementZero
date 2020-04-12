@@ -8,6 +8,7 @@
 #include <boost/format.hpp>
 
 #include <Core/json.h>
+#include <Item/Enchant.h>
 
 #include <base.h>
 #include <chakra_helper.h>
@@ -147,6 +148,57 @@ template <> inline std::unique_ptr<Tag> FromJs(JsValueRef ref) {
     ScriptNBT *bd;
     ThrowError(JsGetExternalData(ref, (void **) &bd));
     if (bd) return bd->storage->copy();
+  }
+  throw std::runtime_error{"null data"};
+}
+
+struct ScriptEnchantmentInstance {
+  EnchantmentInstance instance;
+
+  inline int GetType() const { return (int) instance.type; }
+
+  ScriptEnchantmentInstance(EnchantmentInstance const &instance) : instance(instance) {}
+
+  static JsValueRef InitProto();
+
+  inline static JsObjectWarpper Create(EnchantmentInstance const &instance) {
+    return JsObjectWarpper::FromExternalObject(new ScriptEnchantmentInstance{instance}, InitProto());
+  }
+};
+
+inline JsValueRef ToJs(EnchantmentInstance const &stack) { return *ScriptEnchantmentInstance::Create(stack); }
+template <> struct HasToJs<EnchantmentInstance> : std::true_type {};
+
+struct ScriptItemStack {
+  ItemStack stack;
+  inline ScriptItemStack(ItemStack const &stack) : stack(stack) {}
+
+  inline JsValueRef GetEnchants() const {
+    auto vec = stack.getEnchantsFromUserData().getAllEnchants();
+    return ToJsArray(vec);
+  }
+
+  inline bool Equals(ItemStack const &rhs) { return !(stack != rhs); }
+
+  static JsValueRef InitProto();
+
+  inline static JsObjectWarpper Create(ItemStack const &stack) {
+    return JsObjectWarpper::FromExternalObject(new ScriptItemStack{stack}, InitProto());
+  }
+};
+inline JsValueRef ToJs(ItemStack const &stack) {
+  if (stack.isNull()) return GetNullValue();
+  return *ScriptItemStack::Create(stack);
+}
+template <> struct HasToJs<ItemStack> : std::true_type {};
+template <> inline ItemStack FromJs(JsValueRef ref) {
+  if (GetJsType(ref) == JsNull) return ItemStack{};
+  JsValueRef tmp;
+  ThrowError(JsGetPrototype(ref, &tmp));
+  if (tmp == ScriptItemStack::InitProto()) {
+    ScriptItemStack *bd;
+    ThrowError(JsGetExternalData(ref, (void **) &bd));
+    if (bd) return bd->stack;
   }
   throw std::runtime_error{"null data"};
 }

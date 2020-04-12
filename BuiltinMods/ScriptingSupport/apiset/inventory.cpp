@@ -1,4 +1,5 @@
 #include "boost/format/format_fwd.hpp"
+#include <Item/Enchant.h>
 #include <Item/ItemStack.h>
 #include <chakra_helper.h>
 #include <log.h>
@@ -6,33 +7,16 @@
 
 namespace Mod::Scripting {
 
-struct ScriptItemStack {
-  ItemStack stack;
-  ScriptItemStack(ItemStack const &stack) : stack(stack) {}
-
-  bool Equals(ItemStack const &rhs) { return !(stack != rhs); }
-
-  static JsValueRef InitProto();
-
-  inline static JsObjectWarpper Create(ItemStack const &stack) {
-    return JsObjectWarpper::FromExternalObject(new ScriptItemStack{stack}, InitProto());
-  }
-};
-JsValueRef ToJs(ItemStack const &stack) {
-  if (stack.isNull()) return GetNullValue();
-  return *ScriptItemStack::Create(stack);
-}
-template <> struct HasToJs<ItemStack> : std::true_type {};
-template <> ItemStack FromJs(JsValueRef ref) {
-  if (GetJsType(ref) == JsNull) return ItemStack{};
-  JsValueRef tmp;
-  ThrowError(JsGetPrototype(ref, &tmp));
-  if (tmp == ScriptItemStack::InitProto()) {
-    ScriptItemStack *bd;
-    ThrowError(JsGetExternalData(ref, (void **) &bd));
-    if (bd) return bd->stack;
-  }
-  throw std::runtime_error{"null data"};
+JsValueRef ScriptEnchantmentInstance::InitProto() {
+  static ValueHolder temp = IIFE([] {
+    JsObjectWarpper proto;
+    proto["type"]     = JsObjectWarpper::PropertyDesc{&ScriptEnchantmentInstance::GetType};
+    proto["name"]     = JsObjectWarpper::PropertyDesc{&EnchantmentInstance::getName};
+    proto["level"]    = JsObjectWarpper::PropertyDesc{&EnchantmentInstance::level};
+    proto["toString"] = &EnchantmentInstance::toString;
+    return *proto;
+  });
+  return *temp;
 }
 
 JsValueRef ScriptItemStack::InitProto() {
@@ -46,6 +30,8 @@ JsValueRef ScriptItemStack::InitProto() {
     proto["aux"]               = JsObjectWarpper::PropertyDesc{&ItemStack::getAuxValue};
     proto["count"]             = JsObjectWarpper::PropertyDesc{&ItemStack::getStackSize};
     proto["max_count"]         = JsObjectWarpper::PropertyDesc{&ItemStack::getMaxStackSize};
+    proto["enchanted"]         = JsObjectWarpper::PropertyDesc{&ItemStack::isEnchanted};
+    proto["enchants"]          = JsObjectWarpper::PropertyDesc{&ScriptItemStack::GetEnchants};
     proto["equals"]            = &ScriptItemStack::Equals;
     proto["toString"]          = &ItemStackBase::toString;
     return *proto;

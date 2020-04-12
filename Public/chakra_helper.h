@@ -398,7 +398,7 @@ struct JsObjectWarpper {
     }
     template <typename T, typename R> PropertyDesc(R(T::*field)) {
       get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
-      set = [=](JsObjectWarpper obj) -> JsValueRef { ((obj.GetExternalData<T>()->*field) = FromJs<R>(rhs); };
+      set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*field) = FromJs<R>(rhs); };
     }
     template <typename T, typename R> PropertyDesc(R const(T::*field)) {
       get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
