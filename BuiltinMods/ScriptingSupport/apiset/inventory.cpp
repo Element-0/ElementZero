@@ -56,5 +56,6 @@ static ModuleRegister reg("ez:inventory", [](JsObjectWarpper native) -> std::str
   return R"js(
     export const getHandItems = import.meta.native.getHandItems;
     export const getEquipmentItems = import.meta.native.getEquipmentItems;
+    export const getInventoryItems = import.meta.native.getInventoryItems;
   )js";
 });
