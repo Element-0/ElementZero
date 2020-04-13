@@ -1,15 +1,11 @@
 cmake_minimum_required (VERSION 3.8)
 
-add_subdirectory ("CommandSupport")
-add_subdirectory ("ChatAPI")
-add_subdirectory ("Economy")
-add_subdirectory ("Essentials")
-add_subdirectory ("DebugTool")
-add_subdirectory ("BasicAntiCheat")
-add_subdirectory ("NoEncryption")
-add_subdirectory ("Blacklist")
-add_subdirectory ("Audit")
-add_subdirectory ("SpawnProtection")
-add_subdirectory ("DynamicMotd")
-add_subdirectory ("Remote")
-add_subdirectory ("ScriptingSupport")
+file (GLOB cmakefiles
+    LIST_DIRECTORIES true
+    RELATIVE ${CMAKE_CURRENT_LIST_DIR}
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_LIST_DIR}/*/CMakeLists.txt)
+foreach (file ${cmakefiles})
+    get_filename_component (filep ${file} DIRECTORY)
+    add_subdirectory (${filep})
+endforeach ()
