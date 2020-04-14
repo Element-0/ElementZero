@@ -57,3 +57,15 @@ function (def_mod name)
         endforeach ()
     endif ()
 endfunction ()
+
+function (load_subfolders)
+    file (GLOB cmakefiles
+        LIST_DIRECTORIES true
+        RELATIVE ${CMAKE_CURRENT_LIST_DIR}
+        CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_LIST_DIR}/*/CMakeLists.txt)
+    foreach (file ${cmakefiles})
+        get_filename_component (filep ${file} DIRECTORY)
+        add_subdirectory (${filep})
+    endforeach ()
+endfunction ()
