@@ -50,12 +50,12 @@ void LogPacket(NetworkIdentifier id, std::string const &data) {
   cache.exec();
 }
 
-THook(
-    int,
+TInstanceHook(
+    NetworkPeer::DataStatus,
     "?receivePacket@Connection@NetworkHandler@@QEAA?AW4DataStatus@NetworkPeer@@AEAV?$basic_string@DU?$char_traits@D@"
     "std@@V?$allocator@D@2@@std@@@Z",
-    NetworkHandler::Connection *self, std::string &data) {
-  auto status = original(self, data);
-  if (status == 0 && database) LogPacket(self->id, data);
+    NetworkHandler::Connection, std::string &data) {
+  auto status = original(this, data);
+  if (status == NetworkPeer::DataStatus::OK && database) LogPacket(id, data);
   return status;
 }
