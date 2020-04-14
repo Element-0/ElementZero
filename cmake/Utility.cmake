@@ -25,6 +25,10 @@ function (install_pdb name)
 endfunction ()
 
 function (def_mod name)
+    if (NOT PKG_FOUND)
+        include (Deps)
+    endif ()
+    
     cmake_parse_arguments(ARG "BASEMOD" "" "LINK;DELAY_LINK" ${ARGN})
     file (GLOB_RECURSE srcs
         CONFIGURE_DEPENDS *.cpp)
