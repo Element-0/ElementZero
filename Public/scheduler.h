@@ -21,4 +21,7 @@ BASEAPI void ClearTimeOut(Token token);
 BASEAPI Token SetInterval(GameTick interval, Handler fn);
 BASEAPI void ClearInterval(Token token);
 
+BASEAPI void RunInMainThread(std::function<void()> &&);
+BASEAPI void RunInWorkerThread(std::function<void()> &&);
+
 } // namespace Mod::Scheduler

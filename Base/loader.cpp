@@ -195,6 +195,7 @@ TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ") {
   for (auto hook : UnloadHooks) try {
       hook();
     } catch (std::exception const &ex) { LOGE("Exception at unload hook (%s): %s") % hook.name % ex.what(); }
+  OnExit();
   original(this);
 }
 

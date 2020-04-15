@@ -1,11 +1,23 @@
+#include <mutex>
+#include <functional>
+#include <queue>
+#include <stdexcept>
+#include <string>
+#include <atomic>
+#include <thread>
+#include <condition_variable>
+
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/tag.hpp>
+
 #include <Level/Level.h>
+#include <Core/AppPlatform.h>
 
 #include <scheduler.h>
 #include <hook.h>
+#include <base.h>
 
 using namespace Mod::Scheduler;
 using namespace boost::multi_index;
@@ -100,4 +112,36 @@ void Mod::Scheduler::ClearTimeOut(Token token) {
 void Mod::Scheduler::ClearInterval(Token token) {
   auto &db = container<IntervalEvent>.get<Token>();
   if (auto it = db.find(token); it != db.end()) db.erase(it);
+}
+
+static std::mutex mtx;
+static std::condition_variable cv;
+static std::atomic_bool exited;
+static std::vector<std::function<void()>> tasks;
+static std::thread worker{[] {
+  while (true) {
+    std::unique_lock lk{mtx};
+    cv.wait(lk, [] { return exited || tasks.size(); });
+    if (exited) return;
+    for (auto &task : tasks) task();
+    tasks.clear();
+  }
+}};
+
+void OnExit() {
+  exited = true;
+  cv.notify_one();
+  worker.join();
+}
+
+void Mod::Scheduler::RunInWorkerThread(std::function<void()> &&fn) {
+  {
+    std::lock_guard lg{mtx};
+    tasks.emplace_back(std::move(fn));
+  }
+  cv.notify_one();
+}
+
+void Mod::Scheduler::RunInMainThread(std::function<void()> &&fn) {
+  LocateService<AppPlatform>()->queueForMainThread(fn);
 }

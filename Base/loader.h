@@ -4,5 +4,6 @@
 
 #include <yaml.h>
 
-void loadMods(YAML::Node &cfg_node);
-void worldHook(std::filesystem::path const &);
+extern void loadMods(YAML::Node &cfg_node);
+extern void worldHook(std::filesystem::path const &);
+extern void OnExit();
