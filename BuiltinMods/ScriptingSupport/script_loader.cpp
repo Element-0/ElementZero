@@ -50,7 +50,7 @@ static void LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path fu
   if (!ifs) throw JsErrorInvalidArgument;
   std::string content{std::istreambuf_iterator{ifs}, {}};
 
-  auto xec = JsParseModuleSource(
+  JsParseModuleSource(
       module, cookies, (BYTE *) content.data(), content.size(), JsParseModuleSourceFlags_DataIsUTF8, &exception);
   if (exception) JsSetException(exception);
 }
@@ -100,15 +100,6 @@ void loadCustomScript() try {
   LOGE("Failed to load root module: %s") % hasException;
 } catch (JsErrorCode ec) { LOGE("Failed to load: %d") % ec; }
 
-static JsErrorCode copyString(JsValueRef jsv, std::string &ws) {
-  char buffer[2048];
-  size_t length;
-  auto ec = JsCopyString(jsv, buffer, sizeof buffer, &length);
-  if (ec != JsNoError) return ec;
-  ws = std::string(buffer, length);
-  return ec;
-}
-
 static JsErrorCode resolveModule(JsValueRef specifier, fs::path &path, fs::path &full) {
   std::wstring addition = FromJs<std::wstring>(specifier);
   JsErrorCode ec        = JsNoError;
@@ -126,7 +117,7 @@ static void LoadBuiltinModule(
   ThrowError(JsInitializeModuleRecord(referencingModule, specifier, target));
   ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_Url, specifier));
   auto cookies = NextContext();
-  JsValueRef exception, result;
+  JsValueRef exception;
   JsObjectWarpper obj;
   const auto script = fn(obj);
   ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_HostDefined, obj.ref));
