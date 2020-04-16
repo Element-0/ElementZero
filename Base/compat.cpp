@@ -30,13 +30,19 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
 
 #pragma region Player
 
-SimpleContainer &Player::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1360); }
-SimpleContainer &Player::getHandContainer() { return direct_access<SimpleContainer>(this, 1632); }
-PlayerInventoryProxy &Player::getInventory() { return *direct_access<PlayerInventoryProxy *>(this, 3488); }
-Certificate &Player::getCertificate() { return *direct_access<Certificate *>(this, 3208); }
-BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos const>(this, 7548); }
+// Actor::Actor
+SimpleContainer &Player::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1400); }
+// Actor::Actor
+SimpleContainer &Player::getHandContainer() { return direct_access<SimpleContainer>(this, 1672); }
+// Player::GetSelectedItem
+PlayerInventoryProxy &Player::getInventory() { return *direct_access<PlayerInventoryProxy *>(this, 3528); }
+// ServerPlayer::ServerPlayer
+Certificate &Player::getCertificate() { return *direct_access<Certificate *>(this, 3248); }
+// Player::setBedRespawnPosition
+BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos const>(this, 7740); }
+// ServerPlayer::ServerPlayer
 NetworkIdentifier const &Player::getNetworkIdentifier() const {
-  return direct_access<NetworkIdentifier const>(this, 2904);
+  return direct_access<NetworkIdentifier const>(this, 8536);
 }
 
 #pragma endregion
