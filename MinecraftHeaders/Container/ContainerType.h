@@ -1,3 +1,3 @@
 #pragma once
 
-enum class ContainerType {};
+enum class ContainerType : char {};
