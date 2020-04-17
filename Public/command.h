@@ -9,6 +9,9 @@
 
 #include <Core/type_id.h>
 #include <Core/Util.h>
+#include <Command/Command.h>
+#include <Command/CommandOutput.h>
+#include <Command/CommandRegistry.h>
 #include <Command/CommandOrigin.h>
 #include <Command/CommandSelector.h>
 #include <Command/CommandRegistry.h>
