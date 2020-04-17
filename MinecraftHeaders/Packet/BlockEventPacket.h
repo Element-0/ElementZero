@@ -5,6 +5,7 @@
 #include "../dll.h"
 
 class BlockEventPacket : public Packet {
+public:
   BlockPos pos;
   int a, b;
 
