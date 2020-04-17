@@ -1,10 +1,11 @@
 #pragma once
 
+#include <string>
+
 #include "../Core/Packet.h"
 #include "../Math/BlockPos.h"
 #include "../Actor/ActorUniqueID.h"
 #include "../dll.h"
-#include <string>
 
 enum class BossEventUpdateType {
   SHOW              = 0,
