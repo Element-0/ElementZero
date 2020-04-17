@@ -41,6 +41,10 @@ public:
     }
     auto source = (Player *) origin.getEntity();
     auto pos    = level->mSpawnPos;
+    if (pos.y > 256) {
+      output.error("commands.spawn.error.not.set");
+      return;
+    }
     source->teleport(pos, {0}, 0);
     output.success("commands.spawn.success");
   }
