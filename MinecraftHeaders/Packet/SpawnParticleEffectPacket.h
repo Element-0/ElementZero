@@ -7,8 +7,8 @@
 
 class SpawnParticleEffectPacket : public Packet {
 public:
-  char dimensionId;
-  ActorRuntimeID actorId;
+  char dim;
+  ActorRuntimeID actor_id;
   Vec3 pos;
   std::string id;
 
@@ -19,3 +19,6 @@ public:
   MCAPI virtual void write(BinaryStream &) const;
   MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };
+
+static_assert(offsetof(SpawnParticleEffectPacket, dim) == 36);
+static_assert(offsetof(SpawnParticleEffectPacket, id) == 64);

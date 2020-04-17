@@ -21,6 +21,7 @@ enum class BossEventUpdateType {
 
 class BossEventPacket : public Packet {
 public:
+  int unk_val_1 = 1;
   int unk_val_2 = 2;
   ActorUniqueID owner, player;
   BossEventUpdateType type;
@@ -36,4 +37,5 @@ public:
   MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };
 
+static_assert(offsetof(BossEventPacket, owner) == 48);
 static_assert(offsetof(BossEventPacket, fog) == 117);

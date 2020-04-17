@@ -9,7 +9,7 @@ class Dimension;
 
 class ChangeDimensionPacket : public Packet {
 public:
-  AutomaticID<Dimension, int> dim;
+  alignas(8) AutomaticID<Dimension, int> dim;
   Vec3 pos;
   bool respawn;
 

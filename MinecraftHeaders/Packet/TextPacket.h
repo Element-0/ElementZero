@@ -22,7 +22,7 @@ enum class TextPacketType : char {
 
 class TextPacket : public Packet {
 public:
-  TextPacketType type;
+  alignas(8) TextPacketType type;
   std::string source, content;
   std::vector<std::string> args;
   bool translated;
@@ -71,3 +71,6 @@ public:
   MCAPI virtual void write(BinaryStream &) const;
   MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };
+
+static_assert(offsetof(TextPacket, type) == 40);
+static_assert(offsetof(TextPacket, unknown) == 176);

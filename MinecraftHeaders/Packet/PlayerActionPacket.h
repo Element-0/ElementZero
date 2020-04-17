@@ -36,7 +36,7 @@ enum class PlayerActionType : unsigned {
 
 class PlayerActionPacket : public Packet {
 public:
-  BlockPos pos;           // 40
+  alignas(8) BlockPos pos;           // 40
   int face;               // 52
   PlayerActionType type;  // 56
   ActorRuntimeID actorId; // 64
