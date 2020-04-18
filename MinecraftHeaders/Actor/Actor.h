@@ -1,8 +1,10 @@
 #pragma once
 
+#include <base.h>
 #include <hook.h>
 #include "../Math/Vec3.h"
 #include "../Actor/ActorType.h"
+#include "../Container/SimpleContainer.h"
 #include "../Core/AutomaticID.h"
 
 class Dimension;
@@ -39,6 +41,9 @@ public:
         "?teleport@TeleportCommand@@AEBAXAEAVActor@@VVec3@@PEAV3@V?$AutomaticID@VDimension@@H@@@Z", this, this, target,
         &old, dim);
   }
+
+  BASEAPI SimpleContainer &getEquipmentContainer();
+  BASEAPI SimpleContainer &getHandContainer();
 };
 
 class Mob : public Actor {

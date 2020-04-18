@@ -31,9 +31,9 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
 #pragma region Player
 
 // Actor::Actor
-SimpleContainer &Player::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1400); }
+SimpleContainer &Actor::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1400); }
 // Actor::Actor
-SimpleContainer &Player::getHandContainer() { return direct_access<SimpleContainer>(this, 1672); }
+SimpleContainer &Actor::getHandContainer() { return direct_access<SimpleContainer>(this, 1672); }
 // Player::GetSelectedItem
 PlayerInventoryProxy &Player::getInventory() { return *direct_access<PlayerInventoryProxy *>(this, 3528); }
 // ServerPlayer::ServerPlayer
@@ -44,6 +44,8 @@ BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos
 NetworkIdentifier const &Player::getNetworkIdentifier() const {
   return direct_access<NetworkIdentifier const>(this, 8536);
 }
+// AddPlayerPacket::AddPlayerPacket
+std::string const &Player::getDeviceId() const { return direct_access<std::string>(this, 8360); }
 
 #pragma endregion
 

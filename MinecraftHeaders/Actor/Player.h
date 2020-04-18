@@ -6,7 +6,6 @@
 
 #include "Actor.h"
 #include "../Core/ExtendedCertificate.h"
-#include "../Container/SimpleContainer.h"
 #include "../Container/PlayerInventoryProxy.h"
 #include "../Math/Vec3.h"
 #include "../Math/BlockPos.h"
@@ -41,32 +40,25 @@ public:
         "?getCommandPermissionLevel@Player@@UEBA?AW4CommandPermissionLevel@@XZ", this);
   }
 
-  inline float getDestroySpeed(class Block const& a0) const {
-      return CallServerClassMethod<float>(
-          "?getDestroySpeed@Player@@QEBAMAEBVBlock@@@Z", this, &a0);
+  inline float getDestroySpeed(class Block const &a0) const {
+    return CallServerClassMethod<float>("?getDestroySpeed@Player@@QEBAMAEBVBlock@@@Z", this, &a0);
   }
 
-  inline bool isCreative() const {
-      return CallServerClassMethod<bool>(
-          "?isCreative@Player@@UEBA_NXZ", this);
+  inline bool isCreative() const { return CallServerClassMethod<bool>("?isCreative@Player@@UEBA_NXZ", this); }
+
+  inline std::vector<class ItemStack const *> getAllHand() const {
+    return CallServerClassMethod<std::vector<class ItemStack const *>>(
+        "?getAllHand@Player@@UEBA?AV?$vector@PEBVItemStack@@V?$allocator@PEBVItemStack@@@std@@@std@@XZ", this);
   }
 
-  inline std::vector<class ItemStack const*> getAllHand() const {
-      return CallServerClassMethod<std::vector<class ItemStack const*>>(
-          "?getAllHand@Player@@UEBA?AV?$vector@PEBVItemStack@@V?$allocator@PEBVItemStack@@@std@@@std@@XZ", this);
+  inline class ItemStack const &getCarriedItem() const {
+    return CallServerClassMethod<ItemStack const &>("?getCarriedItem@Player@@UEBAAEBVItemStack@@XZ", this);
   }
-
-  inline class ItemStack const& getCarriedItem() const {
-      return CallServerClassMethod<ItemStack const& >(
-          "?getCarriedItem@Player@@UEBAAEBVItemStack@@XZ", this);
-  }
-
-  BASEAPI SimpleContainer &getEquipmentContainer();
-  BASEAPI SimpleContainer &getHandContainer();
   BASEAPI PlayerInventoryProxy &getInventory();
   BASEAPI Certificate &getCertificate();
   BASEAPI NetworkIdentifier const &getNetworkIdentifier() const;
   BASEAPI BlockPos const &getSpawnPosition() const;
+  BASEAPI std::string const &getDeviceId() const;
   BASEAPI void kick();
 
   MCAPI bool canUseOperatorBlocks() const;
