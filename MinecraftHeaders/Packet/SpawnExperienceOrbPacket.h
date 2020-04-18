@@ -6,7 +6,7 @@
 
 class SpawnExperienceOrbPacket : public Packet {
 public:
-  alignas(8) Vec3 pos;
+  Vec3 pos;
   int amount;
 
   inline ~SpawnExperienceOrbPacket() {}

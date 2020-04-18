@@ -20,5 +20,5 @@ public:
   MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };
 
-static_assert(offsetof(SpawnParticleEffectPacket, dim) == 36);
-static_assert(offsetof(SpawnParticleEffectPacket, id) == 64);
+static_assert(offsetof(SpawnParticleEffectPacket, dim) == 40);
+static_assert(offsetof(SpawnParticleEffectPacket, id) == 72);

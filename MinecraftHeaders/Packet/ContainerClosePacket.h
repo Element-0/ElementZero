@@ -6,7 +6,7 @@
 
 class ContainerClosePacket : public Packet {
 public:
-  alignas(8) ContainerID id;
+  ContainerID id;
 
   inline ~ContainerClosePacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

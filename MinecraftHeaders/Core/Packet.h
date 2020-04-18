@@ -9,13 +9,11 @@ enum class MinecraftPacketIds {};
 class BinaryStream;
 class ReadOnlyBinaryStream;
 
-#pragma pack(push, 1)
 class Packet {
 public:
   unsigned unk2                     = 2;                                 // 8
   PacketReliability reliableOrdered = PacketReliability::RelibleOrdered; // 12
   unsigned char clientSubId         = 0;                                 // 16
-  char _pad17[7];
   uint64_t unk24                    = 0;                                 // 24
   unsigned compressible             = 0;                                 // 32
 
@@ -28,6 +26,3 @@ public:
   virtual PacketReadResult read(ReadOnlyBinaryStream &) = 0;
   virtual bool disallowBatching() const { return false; }
 };
-#pragma pack(pop)
-
-static_assert(sizeof(Packet) == 36);

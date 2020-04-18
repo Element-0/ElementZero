@@ -6,7 +6,8 @@
 #include "../dll.h"
 
 class BookEditPacket : public Packet {
-  enum struct Action : char { REPLACE_PAGE, ADD_PAGE, DELETE_PAGE, SWAP_PAGES, SIGN_BOOK, UNKNOWN = -1 };
+public:
+  enum struct Action  { REPLACE_PAGE, ADD_PAGE, DELETE_PAGE, SWAP_PAGES, SIGN_BOOK, UNKNOWN = -1 };
   Action action;
   int slot, page, secondary_page;
   std::string a, b, sign;
@@ -17,3 +18,9 @@ class BookEditPacket : public Packet {
   MCAPI virtual void write(BinaryStream &) const;
   MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };
+
+static_assert(offsetof(BookEditPacket, action) == 40);
+static_assert(offsetof(BookEditPacket, slot) == 44);
+static_assert(offsetof(BookEditPacket, a) == 56);
+static_assert(offsetof(BookEditPacket, b) == 88);
+static_assert(offsetof(BookEditPacket, sign) == 120);

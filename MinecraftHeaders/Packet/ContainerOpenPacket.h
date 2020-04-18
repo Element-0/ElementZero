@@ -9,7 +9,7 @@
 
 class ContainerOpenPacket : public Packet {
 public:
-  alignas(8) ContainerID id;
+  ContainerID id;
   ContainerType type;
   BlockPos pos;
   ActorUniqueID actor_id;

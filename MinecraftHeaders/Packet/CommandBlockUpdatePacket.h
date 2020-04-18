@@ -7,7 +7,7 @@
 
 class CommandBlockUpdatePacket : public Packet {
 public:
-  alignas(8) BlockPos pos;
+  BlockPos pos;
   unsigned short mode;
   bool redstone;
   bool conditional;

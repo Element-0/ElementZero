@@ -38,4 +38,5 @@ public:
 };
 
 static_assert(offsetof(BossEventPacket, owner) == 48);
+static_assert(offsetof(BossEventPacket, name) == 72);
 static_assert(offsetof(BossEventPacket, fog) == 117);
