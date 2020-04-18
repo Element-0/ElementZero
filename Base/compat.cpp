@@ -46,6 +46,12 @@ NetworkIdentifier const &Player::getNetworkIdentifier() const {
 }
 // AddPlayerPacket::AddPlayerPacket
 std::string const &Player::getDeviceId() const { return direct_access<std::string>(this, 8360); }
+// ServerNetworkHandler::_createNewPlayer
+std::string const &Player::getClientPlatformId() const { return direct_access<std::string>(this, 3256); }
+// ServerNetworkHandler::_createNewPlayer
+std::string const &Player::getPlatformOfflineId() const { return direct_access<std::string>(this, 3192); }
+// ServerNetworkHandler::_createNewPlayer
+std::string const &Player::getClientPlatformOnlineId() const { return direct_access<std::string>(this, 4120); }
 
 #pragma endregion
 

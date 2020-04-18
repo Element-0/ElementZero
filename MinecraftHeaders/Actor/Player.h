@@ -59,6 +59,9 @@ public:
   BASEAPI NetworkIdentifier const &getNetworkIdentifier() const;
   BASEAPI BlockPos const &getSpawnPosition() const;
   BASEAPI std::string const &getDeviceId() const;
+  BASEAPI std::string const &getClientPlatformId() const;
+  BASEAPI std::string const &getPlatformOfflineId() const;
+  BASEAPI std::string const &getClientPlatformOnlineId() const;
   BASEAPI void kick();
 
   MCAPI bool canUseOperatorBlocks() const;
