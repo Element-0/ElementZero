@@ -30,7 +30,7 @@ template <> inline DataItemType typeFor<Vec3>        = DataItemType::VEC3;
 class DataItem {
 public:
   enum class Id : uint16_t {
-    FLAGS                               = 0,
+    FLAGS                               = 0,  // LONG
     HEALTH                              = 1,  // INT (minecart/boat)
     VARIANT                             = 2,  // INT
     COLOR                               = 3,  // BYTE
