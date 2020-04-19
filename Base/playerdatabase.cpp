@@ -1,26 +1,36 @@
-#include <playerdb.h>
-#include <log.h>
+#include <mutex>
+
+#include <boost/scope_exit.hpp>
+
+#include <RakNet/RakPeer.h>
+#include <Core/ExtendedCertificate.h>
+
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <sqlite3.h>
-#include <Core/ExtendedCertificate.h>
-#include <RakNet/RakPeer.h>
-#include <mutex>
-#include <boost/scope_exit.hpp>
+
+#include <playerdb.h>
+#include <log.h>
+#include <modutils.h>
 
 #include "settings.hpp"
 
 DEF_LOGGER("PlayerDB");
 
 template <uint64_t sig> static void (Mod::PlayerDatabase::*emitter)(sigt<sig>, Mod::PlayerEntry const &);
+static void (Mod::PlayerDatabase::*emit_change_dim)(
+    sigt<"change_dimension"_sig>, Mod::PlayerEntry const &, ChangeDimensionRequest const &, bool stage);
 
 static Mod::PlayerEntryContainer *container;
+static std::map<Player *, std::map<std::type_index, std::shared_ptr<Mod::AuxHolder>>> *auxm;
 Mod::PlayerDatabase &db = Mod::PlayerDatabase::GetInstance();
 std::unique_ptr<SQLite::Database> sqldb;
 
 Mod::PlayerDatabase::PlayerDatabase() {
   emitter<"joined"_sig> = &Mod::PlayerDatabase::Emit;
   emitter<"left"_sig>   = &Mod::PlayerDatabase::Emit;
+  emit_change_dim       = &Mod::PlayerDatabase::Emit;
   container             = &data;
+  auxm                  = &auxmap;
   sqldb = std::make_unique<SQLite::Database>(settings.UserDatabase, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
   sqldb->exec(
       "CREATE TABLE IF NOT EXISTS user"
@@ -163,7 +173,26 @@ TClasslessInstanceHook(
     stmt_logout.bindNoCopy(1, it->uuid, sizeof(mce::UUID));
     stmt_logout.exec();
     (db.*emitter<"left"_sig>) (SIG("left"), *it);
+    auxm->erase(player);
     container->erase(it);
     original(this, player, flag);
   }
+}
+
+TClasslessInstanceHook(
+    bool, "?_playerChangeDimension@Level@@AEAA_NPEAVPlayer@@AEAVChangeDimensionRequest@@@Z", Player *player,
+    ChangeDimensionRequest &request) {
+  bool ret = false;
+  if (request.unk0 == 0) {
+    if (auto it = container->find(player); it != container->end()) {
+      (db.*emit_change_dim)(SIG("change_dimension"), *it, request, false);
+      ret = original(this, player, request);
+    }
+  } else {
+    ret = original(this, player, request);
+    if (ret)
+      if (auto it = container->find(player); it != container->end())
+        (db.*emit_change_dim)(SIG("change_dimension"), *it, request, true);
+  }
+  return ret;
 }
