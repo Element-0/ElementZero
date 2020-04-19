@@ -111,12 +111,16 @@ jobs:
         ..
         ninja
         ninja install
-        cpack -G TZST .
         popd
         cp Lib/bedrock_server_mod.exe Dist
         cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*
       shell: bash
+
+    - name: Package
+      run: |
+        cd Build
+        cpack -G TZST .
 
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
