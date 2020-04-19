@@ -14,22 +14,26 @@
 #include "../Actor/SyncedAttribute.h"
 #include "../Actor/ActorUniqueID.h"
 #include "../Actor/ActorRuntimeID.h"
+#include "../Actor/SynchedActorData.h"
 #include "../dll.h"
+
+class Actor;
 
 class AddActorPacket : public Packet {
 public:
   std::vector<ActorLink> links;
   ActorUniqueID uid;
   ActorRuntimeID rid;
-  uint64_t type;
+  SynchedActorData *syncedata;
   std::vector<std::unique_ptr<DataItem>> items;
-  ActorDefinitionIdentifier act_id;
+  ActorDefinitionIdentifier def_id;
   Vec3 pos, speed;
   Vec2 rot;
   float headYaw;
   std::vector<AttributeInstanceHandle> attributes;
-  std::vector<SyncedAttribute> synced;
+  std::vector<SyncedAttribute> synced_attribute;
 
+  MCAPI AddActorPacket(Actor &);
   inline ~AddActorPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;
   MCAPI virtual std::string getName() const;
@@ -37,7 +41,10 @@ public:
   MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
 };
 
-static_assert(offsetof(AddActorPacket, act_id) == 112);
+static_assert(offsetof(AddActorPacket, uid) == 64);
+static_assert(offsetof(AddActorPacket, rid) == 72);
+static_assert(offsetof(AddActorPacket, syncedata) == 80);
+static_assert(offsetof(AddActorPacket, def_id) == 112);
 static_assert(offsetof(AddActorPacket, rot) == 304);
 static_assert(offsetof(AddActorPacket, attributes) == 320);
-static_assert(offsetof(AddActorPacket, synced) == 344);
+static_assert(offsetof(AddActorPacket, synced_attribute) == 344);

@@ -9,12 +9,15 @@
 
 class Player;
 class Dimension;
+class PacketSender;
 
 class Level {
 public:
   MCAPI void forEachPlayer(std::function<bool(Player const &)>) const;
   MCAPI void forEachDimension(std::function<bool(Dimension const &)>);
-  MCAPI class Actor* fetchEntity(struct ActorUniqueID a0, bool a1) const;
+  MCAPI class Actor *fetchEntity(struct ActorUniqueID a0, bool a1) const;
+  BASEAPI ActorUniqueID getNewUniqueID() const;
+  BASEAPI PacketSender &getPacketSender() const;
   BASEAPI uint64_t GetServerTick();
   BASEAPI LevelDataWrapper &GetLevelDataWrapper();
 };

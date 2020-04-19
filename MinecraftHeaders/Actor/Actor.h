@@ -2,10 +2,13 @@
 
 #include <base.h>
 #include <hook.h>
+
+#include "ActorType.h"
+#include "ActorUniqueID.h"
 #include "../Math/Vec3.h"
-#include "../Actor/ActorType.h"
 #include "../Container/SimpleContainer.h"
 #include "../Core/AutomaticID.h"
+#include "../dll.h"
 
 class Dimension;
 
@@ -42,6 +45,7 @@ public:
         &old, dim);
   }
 
+  MCAPI ActorUniqueID const &getUniqueID() const;
   BASEAPI SimpleContainer &getEquipmentContainer();
   BASEAPI SimpleContainer &getHandContainer();
 };

@@ -16,6 +16,7 @@ public:
   MCAPI HashedString(HashedString &&rhs);
   MCAPI HashedString(char const *rhs);
   MCAPI HashedString(std::string const &rhs);
+  inline HashedString() {}
   MCAPI bool operator==(HashedString const &rhs) const;
   MCAPI bool operator!=(HashedString const &rhs) const;
 };

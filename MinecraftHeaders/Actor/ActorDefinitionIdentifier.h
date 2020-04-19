@@ -5,7 +5,7 @@
 #include "ActorType.h"
 #include "../dll.h"
 
-class ActorDefinitionIdentifier {
+struct ActorDefinitionIdentifier {
   std::string ns;             // 0
   std::string identifier;     // 32
   std::string event;          // 64
@@ -29,6 +29,7 @@ public:
   MCAPI ActorDefinitionIdentifier(std::string, std::string, std::string);
   MCAPI ActorDefinitionIdentifier(std::string const &);
   MCAPI ActorDefinitionIdentifier(ActorType);
+  inline ActorDefinitionIdentifier() {}
   MCAPI ActorDefinitionIdentifier &operator=(ActorDefinitionIdentifier const &);
   MCAPI bool operator==(ActorDefinitionIdentifier const &);
 };

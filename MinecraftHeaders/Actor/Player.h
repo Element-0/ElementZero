@@ -62,6 +62,7 @@ public:
   BASEAPI std::string const &getClientPlatformId() const;
   BASEAPI std::string const &getPlatformOfflineId() const;
   BASEAPI std::string const &getClientPlatformOnlineId() const;
+  BASEAPI unsigned char getClientSubId() const;
   BASEAPI void kick();
 
   MCAPI bool canUseOperatorBlocks() const;

@@ -6,6 +6,7 @@
 #include "../Core/Packet.h"
 #include "../Core/DataItem.h"
 #include "../Actor/ActorRuntimeID.h"
+#include "../Actor/SynchedActorData.h"
 #include "../dll.h"
 
 class SetActorDataPacket : public Packet {
@@ -13,6 +14,7 @@ public:
   ActorRuntimeID rid;
   std::vector<std::unique_ptr<DataItem>> items;
 
+  MCAPI SetActorDataPacket(ActorRuntimeID, SynchedActorData &, bool);
   inline ~SetActorDataPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;
   MCAPI virtual std::string getName() const;
