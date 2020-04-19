@@ -1,3 +1,4 @@
 cmake_minimum_required (VERSION 3.8)
 
-def_mod (BossBarSupport)
+def_mod (BossBarSupport
+    LINK ScriptingSupport)

@@ -77,7 +77,19 @@ inline JsValueRef ToJs(int val) {
   return ref;
 }
 
+inline JsValueRef ToJs(uint32_t val) {
+  JsValueRef ref;
+  ThrowError(JsDoubleToNumber(val, &ref));
+  return ref;
+}
+
 inline JsValueRef ToJs(double val) {
+  JsValueRef ref;
+  ThrowError(JsDoubleToNumber(val, &ref));
+  return ref;
+}
+
+inline JsValueRef ToJs(float val) {
   JsValueRef ref;
   ThrowError(JsDoubleToNumber(val, &ref));
   return ref;
@@ -159,6 +171,12 @@ template <> inline short FromJs(JsValueRef ref) {
 template <> inline unsigned char FromJs(JsValueRef ref) {
   int val;
   ThrowError(JsNumberToInt(ref, &val));
+  return val;
+}
+
+template <> inline float FromJs(JsValueRef ref) {
+  double val;
+  ThrowError(JsNumberToDouble(ref, &val));
   return val;
 }
 

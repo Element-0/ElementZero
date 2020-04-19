@@ -24,6 +24,8 @@
 
 DEF_LOGGER("BossBar");
 
+using namespace Mod::Scripting;
+
 namespace Mod::Bossbar {
 
 class Instance {
@@ -55,6 +57,17 @@ struct Set : Mod::AuxHolder {
   std::set<std::shared_ptr<Instance>> sets;
 };
 
+JsValueRef Handle::InitProto() {
+  static ValueHolder temp = IIFE([] {
+    JsObjectWarpper proto;
+    proto["valid"]         = &Handle::Valid;
+    proto["updateText"]    = &Handle::UpdateText;
+    proto["updatePercent"] = &Handle::UpdatePercent;
+    return *proto;
+  });
+  return *temp;
+}
+
 Handle Handle::Create(const Config &cfg) {
   if (!cfg.entry.player) throw std::invalid_argument{"target player is null"};
   auto &pdb = Mod::PlayerDatabase::GetInstance();
@@ -64,6 +77,12 @@ Handle Handle::Create(const Config &cfg) {
   auto &entry = cfg.entry;
   pdb.GetAuxAuto<Set>(entry.player).sets.emplace(std::move(inst));
   return ret;
+}
+
+JsObjectWarpper Handle::CreateJsObject(Handle const &orig) {
+  Handle *obj = new Handle;
+  obj->ref    = orig.ref;
+  return JsObjectWarpper::FromExternalObject(obj, InitProto());
 }
 
 void Handle::UpdateText(const std::string &text) {

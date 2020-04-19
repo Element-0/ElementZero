@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <playerdb.h>
+#include <scriptapi.h>
 
 class Player;
 
@@ -21,7 +22,7 @@ struct Config {
   PlayerEntry entry;
   std::string text = "dummy";
   float percent    = 0.5f;
-  uint32_t color   = 1;
+  uint32_t color   = 0; // Not implmented in client
 };
 
 class Instance;
@@ -38,9 +39,20 @@ public:
 
   BOSSBARAPI void UpdateColor(uint32_t color);
 
-  static BOSSBARAPI Handle Create(Config const &cfg);
+  BOSSBARAPI static Handle Create(Config const &cfg);
+
+  BOSSBARAPI static JsValueRef InitProto();
+
+  BOSSBARAPI static Scripting::JsObjectWarpper CreateJsObject(Handle const &orig);
 };
 
 BOSSBARAPI std::vector<Handle> GetHandlesForPlayer(Player *);
 
 } // namespace Mod::Bossbar
+
+namespace Mod::Scripting {
+
+inline JsValueRef ToJs(Bossbar::Handle const &handle) { return *Bossbar::Handle::CreateJsObject(handle); }
+template <> struct HasToJs<Bossbar::Handle> : std::true_type {};
+
+} // namespace Mod::Scripting
