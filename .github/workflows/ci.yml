@@ -109,7 +109,7 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH="$cur/Dist" \
         -DCMAKE_TOOLCHAIN_FILE="$cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
-        /c/Program Files/CMake/bin/cpack -G TZST .
+        "/c/Program Files/CMake/bin/cpack" -G TZST .
         ninja
         ninja install
         popd
