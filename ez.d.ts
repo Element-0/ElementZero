@@ -63,9 +63,9 @@ declare module "ez:blacklist" {
   export function addByXUID(xuid: string, reason: string, op: string): void;
   export function addByUUID(uuid: string, reason: string, op: string): void;
   export function addByNAME(name: string, reason: string, op: string): void;
-  export function removeByXUID(xuid: stirng): void;
-  export function removeByUUID(uuid: stirng): void;
-  export function removeByNAME(name: stirng): void;
+  export function removeByXUID(xuid: string): void;
+  export function removeByUUID(uuid: string): void;
+  export function removeByNAME(name: string): void;
 }
 
 declare module "ez:chat" {
