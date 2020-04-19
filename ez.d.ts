@@ -38,6 +38,15 @@ declare type ItemStack = {
   toString(): string;
 };
 
+declare type BossBar = {
+  valid(): boolean;
+  updateText(text: string): void;
+  updatePercent(percent: number): void;
+  show(): void;
+  hide(): void;
+  destory(): void;
+};
+
 declare module "ez:player" {
   export function getPlayerByXUID(xuid: string): PlayerEntry;
   export function getPlayerByUUID(uuid: string): PlayerEntry;
@@ -94,4 +103,16 @@ declare module "ez:inventory" {
     ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
     ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
   ];
+}
+
+declare module "ez:utils" {
+  export function delay(time: number): Promise<void>;
+}
+
+declare module "ez:bossbar" {
+  export function create(
+    player: PlayerEntry,
+    text: string,
+    percent: number
+  ): BossBar;
 }
