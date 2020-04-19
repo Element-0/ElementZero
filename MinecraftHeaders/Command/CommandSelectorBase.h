@@ -14,7 +14,7 @@
 
 class CommandOrigin;
 class Actor;
-class ActorDefinitionIdentifier;
+struct ActorDefinitionIdentifier;
 
 class CommandSelectorBase {
   uint32_t version;                                                                     // 0

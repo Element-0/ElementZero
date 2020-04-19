@@ -3,6 +3,7 @@
 class BaseAttributeMap;
 
 class AttributeInstanceHandle {
+public:
   int id;
   BaseAttributeMap *source;
 };
