@@ -18,4 +18,5 @@ add_subdirectory ("CustomMods")
 
 set (CPACK_PACKAGE_VERSION ${git_version})
 set (CPACK_PACKAGE_DIRECTORY ${PROJECT_SOURCE_DIR}/pack)
+set (CPACK_PACKAGE_CHECKSUM SHA256)
 include (CPack)
