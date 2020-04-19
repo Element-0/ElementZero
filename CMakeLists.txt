@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.8)
 
-project ("WineBDLauncher")
+project ("ElementZero")
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
@@ -15,3 +15,7 @@ add_subdirectory ("ModLoader")
 add_subdirectory ("Base")
 add_subdirectory ("BuiltinMods")
 add_subdirectory ("CustomMods")
+
+set (CPACK_PACKAGE_VERSION ${git_version})
+set (CPACK_PACKAGE_DIRECTORY ${PROJECT_SOURCE_DIR}/pack)
+include (CPack)

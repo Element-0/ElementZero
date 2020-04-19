@@ -344,4 +344,5 @@ Lib/bedrock_server_mod.lib
 *.dll
 [Bb]uild
 [Dd]ist
+pack
 compile_commands.json

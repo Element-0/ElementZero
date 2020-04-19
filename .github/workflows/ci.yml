@@ -111,6 +111,7 @@ jobs:
         ..
         ninja
         ninja install
+        cpack -G TZST .
         popd
         cp Lib/bedrock_server_mod.exe Dist
         cp Lib/bedrock_server_mod.lib Dist/Lib
@@ -123,7 +124,9 @@ jobs:
         name: v${{ env.GITHUB_TAG_NAME }}
         prerelease: false
         draft: true
-        files: pkg.tar.xz
+        files: |
+          pack/ElementZero-*-win64.tar.zst
+          pkg.tar.xz
         body: (empty)
       if: startsWith(github.ref, 'refs/tags/')
       env:
