@@ -109,8 +109,8 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH="$cur/Dist" \
         -DCMAKE_TOOLCHAIN_FILE="$cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
-        "/c/Program Files/CMake/bin/cpack" -G TZST .
         ninja
+        "/c/Program Files/CMake/bin/cpack" -G TZST .
         ninja install
         popd
         cp Lib/bedrock_server_mod.exe Dist
