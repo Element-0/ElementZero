@@ -1,4 +1,5 @@
 #include <base.h>
+#include <modutils.h>
 #include <Actor/Player.h>
 #include <Core/Minecraft.h>
 #include <Container/SimpleContainer.h>
@@ -16,17 +17,6 @@ template <typename Holder> struct ValueHolder {
   ~ValueHolder() {}
   operator Holder() const { return value; }
 };
-
-template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t offset) {
-  union {
-    size_t raw;
-    Type *source;
-    Ret *target;
-  } u;
-  u.source = type;
-  u.raw += offset;
-  return *u.target;
-}
 
 #pragma region Player
 
@@ -52,6 +42,8 @@ std::string const &Player::getClientPlatformId() const { return direct_access<st
 std::string const &Player::getPlatformOfflineId() const { return direct_access<std::string>(this, 3192); }
 // ServerNetworkHandler::_createNewPlayer
 std::string const &Player::getClientPlatformOnlineId() const { return direct_access<std::string>(this, 4120); }
+// RaidBossComponent::_sendBossEvent
+unsigned char Player::getClientSubId() const { return direct_access<unsigned char>(this, 4112); }
 
 #pragma endregion
 
@@ -68,6 +60,14 @@ void CommandOutput::success() { direct_access<bool>(this, 40) = true; }
 uint64_t Level::GetServerTick() {
   return CallServerClassMethod<ValueHolder<uint64_t>>("?getCurrentServerTick@Level@@UEBA?BUTick@@XZ", this);
 }
+
+ActorUniqueID Level::getNewUniqueID() const {
+  auto &r = direct_access<uint64_t>(this, 408);
+  return ++r;
+}
+
+// RaidBossComponent::_sendBossEvent
+PacketSender &Level::getPacketSender() const { return direct_access<PacketSender>(this, 2096); }
 
 LevelDataWrapper &Level::GetLevelDataWrapper() { return direct_access<LevelDataWrapper>(this, 536); }
 
