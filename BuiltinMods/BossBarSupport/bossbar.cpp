@@ -28,9 +28,10 @@ using namespace Mod::Scripting;
 
 namespace Mod::Bossbar {
 
-class Instance {
+class Instance : public std::enable_shared_from_this<Instance> {
   uint64_t unqid;
   Config cfg;
+  bool state = true;
 
   void createBossActor();
   void removeBossActor();
@@ -49,6 +50,9 @@ public:
   void UpdateText(std::string const &text);
   void UpdatePercent(float percent);
   void UpdateColor(uint32_t color);
+  void Show();
+  void Hide();
+  void Destory();
   void Refresh();
   void Rebuild(bool stage);
 };
@@ -61,6 +65,9 @@ JsValueRef Handle::InitProto() {
   static ValueHolder temp = IIFE([] {
     JsObjectWarpper proto;
     proto["valid"]         = &Handle::Valid;
+    proto["show"]          = &Handle::Show;
+    proto["hide"]          = &Handle::Hide;
+    proto["destory"]       = &Handle::Destory;
     proto["updateText"]    = &Handle::UpdateText;
     proto["updatePercent"] = &Handle::UpdatePercent;
     return *proto;
@@ -83,6 +90,18 @@ JsObjectWarpper Handle::CreateJsObject(Handle const &orig) {
   Handle *obj = new Handle;
   obj->ref    = orig.ref;
   return JsObjectWarpper::FromExternalObject(obj, InitProto());
+}
+
+void Handle::Show() {
+  if (auto ptr = ref.lock(); ptr) ptr->Show();
+}
+
+void Handle::Hide() {
+  if (auto ptr = ref.lock(); ptr) ptr->Hide();
+}
+
+void Handle::Destory() {
+  if (auto ptr = ref.lock(); ptr) ptr->Destory();
 }
 
 void Handle::UpdateText(const std::string &text) {
@@ -132,6 +151,23 @@ void Instance::Rebuild(bool stage) {
     sendHideBossBar();
     removeBossActor();
   }
+}
+
+void Instance::Show() {
+  state = true;
+  sendShowBossBar();
+}
+
+void Instance::Hide() {
+  state = false;
+  sendHideBossBar();
+}
+
+void Instance::Destory() {
+  sendHideBossBar();
+  removeBossActor();
+  auto &pdb = Mod::PlayerDatabase::GetInstance();
+  pdb.GetAuxAuto<Set>(cfg.entry.player).sets.erase(shared_from_this());
 }
 
 void Instance::UpdateText(const std::string &text) {

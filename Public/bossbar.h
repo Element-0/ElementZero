@@ -39,6 +39,12 @@ public:
 
   BOSSBARAPI void UpdateColor(uint32_t color);
 
+  BOSSBARAPI void Hide();
+
+  BOSSBARAPI void Show();
+
+  BOSSBARAPI void Destory();
+
   BOSSBARAPI static Handle Create(Config const &cfg);
 
   BOSSBARAPI static JsValueRef InitProto();
