@@ -41,4 +41,7 @@ public:
 static_assert(offsetof(BossEventPacket, owner) == 48);
 static_assert(offsetof(BossEventPacket, name) == 72);
 static_assert(offsetof(BossEventPacket, percent) == 104);
+static_assert(offsetof(BossEventPacket, color) == 108);
+static_assert(offsetof(BossEventPacket, overlay) == 112);
+static_assert(offsetof(BossEventPacket, darken_sky) == 116);
 static_assert(offsetof(BossEventPacket, fog) == 117);

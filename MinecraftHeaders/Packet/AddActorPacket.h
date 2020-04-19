@@ -33,6 +33,7 @@ public:
   std::vector<AttributeInstanceHandle> attributes;
   std::vector<SyncedAttribute> synced_attribute;
 
+  inline AddActorPacket() {}
   MCAPI AddActorPacket(Actor &);
   inline ~AddActorPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

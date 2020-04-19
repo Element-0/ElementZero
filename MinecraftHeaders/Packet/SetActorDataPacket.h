@@ -14,6 +14,7 @@ public:
   ActorRuntimeID rid;
   std::vector<std::unique_ptr<DataItem>> items;
 
+  inline SetActorDataPacket() {}
   MCAPI SetActorDataPacket(ActorRuntimeID, SynchedActorData &, bool);
   inline ~SetActorDataPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;
