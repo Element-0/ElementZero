@@ -109,7 +109,7 @@ jobs:
         -DCMAKE_INSTALL_PREFIX:PATH="$cur/Dist" \
         -DCMAKE_TOOLCHAIN_FILE="$cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
-        which cmake
+        /c/Program Files/CMake/bin/cpack -G TZST .
         ninja
         ninja install
         popd
@@ -117,11 +117,6 @@ jobs:
         cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*
       shell: bash
-
-    - name: Package
-      run: |
-        cd Build
-        cpack -G TZST .
 
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
