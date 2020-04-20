@@ -2,8 +2,13 @@ declare interface PlayerEntry {
   readonly xuid: string;
   readonly uuid: string;
   readonly name: string;
+  /** IP and port info */
   readonly address: string;
+  /** Detect if player is still exists in server */
   readonly alive: boolean;
+  /** A object shared between all instances */
+  readonly aux: object;
+  /** Get offline player entry */
   getOffline(): OfflinePlayerEntry;
   toString(): string;
 }
@@ -12,6 +17,7 @@ declare interface OfflinePlayerEntry {
   readonly xuid: string;
   readonly uuid: string;
   readonly name: string;
+  /** Get online player entry if the player is online, or you will get null */
   getOnline(): PlayerEntry | null;
   toString(): string;
 }
@@ -39,6 +45,10 @@ declare type ItemStack = {
 };
 
 declare type BossBar = {
+  /**
+   * Detect if the bossbar still valid
+   * It will be invalid after player left or having been destoryed
+   */
   valid(): boolean;
   updateText(text: string): void;
   updatePercent(percent: number): void;
@@ -58,7 +68,15 @@ declare module "ez:player" {
 
   export function getPlayerList(): PlayerEntry[];
 
+  /**
+   * Called when player joined
+   * @param cb Callback
+   */
   export function onPlayerJoined(cb: (entry: PlayerEntry) => void): void;
+  /**
+   * Called before player left
+   * @param cb Callback
+   */
   export function onPlayerLeft(cb: (entry: PlayerEntry) => void): void;
 }
 
@@ -83,10 +101,23 @@ declare module "ez:chat" {
 }
 
 declare module "ez:command" {
+  /**
+   * Execute server command
+   * @param data command
+   * @param cb Callback
+   */
   export function executeCommand(
     data: string,
     cb: (obj: { statusMessage: string; [key: string]: any }) => void
   ): void;
+
+  /**
+   * Execute server command (async version)
+   * @param data command
+   */
+  export function executeCommand(
+    data: string
+  ): Promise<{ statusMessage: string; [key: string]: any }>;
 }
 
 declare module "ez:inventory" {
