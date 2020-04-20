@@ -29,6 +29,14 @@ static ModuleRegister reg("ez:command", [](JsObjectWarpper native) -> std::strin
     return result == MCRESULT_Success;
   };
   return R"js(
-    export const executeCommand = import.meta.native.executeCommand;
+    const rawExecuteCommand = import.meta.native.executeCommand;
+    export const executeCommand = function(command, callback) {
+      if (callback) return rawExecuteCommand(command, callback);
+      return new Promise((resolve, reject) => {
+        if (!rawExecuteCommand(command, resolve)) {
+          reject("Failed to execute command")
+        }
+      })
+    }
   )js";
 });
