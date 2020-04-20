@@ -41,6 +41,14 @@ struct ModuleRegister {
   SCRIPTAPI ModuleRegister(char const *name, std::string (*t)(JsObjectWarpper global));
 };
 
+struct ScriptAuxData : Mod::AuxHolder {
+  ValueHolder holder;
+  ScriptAuxData() {
+    JsObjectWarpper wrapper;
+    holder.ref = *wrapper;
+  }
+};
+
 struct PlayerBinding {
   Mod::PlayerEntry entry;
 
@@ -52,6 +60,9 @@ struct PlayerBinding {
   inline std::string GetUUID() const { return entry.uuid.asString(); }
   inline std::string GetNAME() const { return entry.name; }
   inline std::string GetADDRESS() const { return entry.netid.getRealAddress().ToString(); }
+  inline JsValueRef GetAuxData() const {
+    return *Mod::PlayerDatabase::GetInstance().GetAuxAuto<ScriptAuxData>(entry.player).holder;
+  }
 
   inline Mod::OfflinePlayerEntry ToOffline() { return Mod::OfflinePlayerEntry{entry.name, entry.xuid, entry.uuid}; }
   inline bool alive() const { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid).has_value(); }

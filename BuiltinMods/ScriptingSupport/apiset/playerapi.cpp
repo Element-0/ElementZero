@@ -19,6 +19,7 @@ JsValueRef PlayerBinding::InitProto() {
     PlayerProto["name"]       = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetNAME};
     PlayerProto["address"]    = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetADDRESS};
     PlayerProto["alive"]      = JsObjectWarpper::PropertyDesc{&PlayerBinding::alive};
+    PlayerProto["aux"]        = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetAuxData};
     PlayerProto["getOffline"] = &PlayerBinding::ToOffline;
     PlayerProto["toString"]   = &PlayerBinding::ToString;
     return PlayerProto.ref;
