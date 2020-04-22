@@ -22,41 +22,6 @@ declare interface OfflinePlayerEntry {
   toString(): string;
 }
 
-declare type EnchantmentInstance = {
-  type: number;
-  level: number;
-  name(): string;
-  toString(): string;
-};
-
-declare type ItemStack = {
-  readonly raw_name: string;
-  readonly name: string;
-  readonly hover_name: string;
-  readonly custom_hover_name: boolean;
-  readonly id: number;
-  readonly aux: number;
-  readonly count: number;
-  readonly max_count: number;
-  readonly enchanted: boolean;
-  readonly enchants: EnchantmentInstance[];
-  equals(stack: ItemStack): boolean;
-  toString(): string;
-};
-
-declare type BossBar = {
-  /**
-   * Detect if the bossbar still valid
-   * It will be invalid after player left or having been destoryed
-   */
-  valid(): boolean;
-  updateText(text: string): void;
-  updatePercent(percent: number): void;
-  show(): void;
-  hide(): void;
-  destory(): void;
-};
-
 declare module "ez:player" {
   export function getPlayerByXUID(xuid: string): PlayerEntry;
   export function getPlayerByUUID(uuid: string): PlayerEntry;
@@ -120,6 +85,28 @@ declare module "ez:command" {
   ): Promise<{ statusMessage: string; [key: string]: any }>;
 }
 
+declare type ItemStack = {
+  readonly raw_name: string;
+  readonly name: string;
+  readonly hover_name: string;
+  readonly custom_hover_name: boolean;
+  readonly id: number;
+  readonly aux: number;
+  readonly count: number;
+  readonly max_count: number;
+  readonly enchanted: boolean;
+  readonly enchants: EnchantmentInstance[];
+  equals(stack: ItemStack): boolean;
+  toString(): string;
+};
+
+declare type EnchantmentInstance = {
+  type: number;
+  level: number;
+  name(): string;
+  toString(): string;
+};
+
 declare module "ez:inventory" {
   export function getOffHandItem(player: PlayerEntry): ItemStack;
   export function getEquipmentItems(
@@ -140,10 +127,62 @@ declare module "ez:utils" {
   export function delay(time: number): Promise<void>;
 }
 
+declare type BossBar = {
+  /**
+   * Detect if the bossbar still valid
+   * It will be invalid after player left or having been destoryed
+   */
+  valid(): boolean;
+  updateText(text: string): void;
+  updatePercent(percent: number): void;
+  show(): void;
+  hide(): void;
+  destory(): void;
+};
+
 declare module "ez:bossbar" {
   export function create(
     player: PlayerEntry,
     text: string,
     percent: number
   ): BossBar;
+}
+
+declare type Sqlite3BindType =
+  | number
+  | null
+  | undefined
+  | string
+  | ArrayBuffer
+  | ArrayBufferView;
+declare type Sqlite3ColumnType = number | null | string | Uint8Array;
+
+declare type Sqlite3Statement = {
+  reset(): void;
+  clearBindings(): void;
+  bind(index: number | string, value: Sqlite3BindType): void;
+  bindAll(obj: Array<Sqlite3BindType>): void;
+  bindAll(obj: Record<string, Sqlite3BindType>): void;
+  exec(): void;
+  execWith(obj: Array<Sqlite3BindType>): void;
+  execWith(obj: Record<string, Sqlite3BindType>): void;
+  forEach(fn: (...columns: Array<Sqlite3ColumnType>) => boolean | void): void;
+  forEachWith(
+    obj: Array<Sqlite3BindType>,
+    fn: (...columns: Array<Sqlite3ColumnType>) => boolean | void
+  ): void;
+  forEachWith(
+    obj: Record<string, Sqlite3BindType>,
+    fn: (...columns: Array<Sqlite3ColumnType>) => boolean | void
+  ): void;
+};
+
+declare type Sqlite3Database = {
+  exec(sql: string): void;
+
+  prepare(sql: string): Sqlite3Statement;
+};
+
+declare module "ez:sqlite3" {
+  export function open(filename: string): Sqlite3Database;
 }
