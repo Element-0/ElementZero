@@ -13,7 +13,7 @@
 
 using namespace Mod::Scripting;
 
-static ModuleRegister reg("ez:command", [](JsObjectWarpper native) -> std::string {
+static ModuleRegister reg("ez:command", [](JsObjectWrapper native) -> std::string {
   native["executeCommand"] = +[](std::string const &data, JsValueRef cb) {
     if (GetJsType(cb) != JsFunction) throw std::runtime_error{"require function"};
     auto origin      = std::make_unique<Mod::CustomCommandOrigin>();

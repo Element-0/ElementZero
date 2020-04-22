@@ -7,7 +7,7 @@
 using namespace Mod::Scripting;
 using namespace Mod::Bossbar;
 
-static ModuleRegister reg("ez:bossbar", [](JsObjectWarpper native) -> std::string {
+static ModuleRegister reg("ez:bossbar", [](JsObjectWrapper native) -> std::string {
   native["create"] = +[](Mod::PlayerEntry entry, std::string const &name, float percent) {
     Config cfg;
     cfg.entry   = entry;

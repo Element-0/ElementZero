@@ -288,7 +288,7 @@ struct JsConvertible {
             Arguments args{arguments, argumentCount, info};
             if (args.size() != sizeof...(PS))
               throw std::runtime_error{"Require " + std::to_string(sizeof...(PS)) + " argument"};
-            JsObjectWarpper xself{args.self};
+            JsObjectWrapper xself{args.self};
             auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
               using tp = std::tuple<PS...>;
               return fn(FromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
@@ -326,7 +326,7 @@ struct JsConvertible {
             Arguments args{arguments, argumentCount, info};
             if (args.size() != sizeof...(PS))
               throw std::runtime_error{"Require " + std::to_string(sizeof...(PS)) + " argument"};
-            JsObjectWarpper xself{args.self};
+            JsObjectWrapper xself{args.self};
             auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
               using tp = std::tuple<PS...>;
               return (xself.GetExternalData<C>()->*fn)(FromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
@@ -363,7 +363,7 @@ struct JsConvertible {
             Arguments args{arguments, argumentCount, info};
             if (args.size() != sizeof...(PS))
               throw std::runtime_error{"Require " + std::to_string(sizeof...(PS)) + " argument"};
-            JsObjectWarpper xself{args.self};
+            JsObjectWrapper xself{args.self};
             auto lfn = [&]<std::size_t... I>(std::index_sequence<I...> seq) {
               using tp = std::tuple<PS...>;
               return (xself.GetExternalData<C>()->*fn)(FromJs<remove_cvref_t<std::tuple_element_t<I, tp>>>(args[I])...);
@@ -396,44 +396,44 @@ struct HasJsConvertible<T, std::void_t<decltype(JsConvertible{std::declval<T>()}
 
 template <class... T> struct always_false : std::false_type {};
 
-struct JsObjectWarpper {
+struct JsObjectWrapper {
   JsValueRef ref;
 
   struct PropertyDesc {
-    std::function<JsValueRef(JsObjectWarpper)> get;
-    std::function<void(JsObjectWarpper, JsValueRef)> set;
+    std::function<JsValueRef(JsObjectWrapper)> get;
+    std::function<void(JsObjectWrapper, JsValueRef)> set;
 
-    PropertyDesc(std::function<JsValueRef(JsObjectWarpper)> get, std::function<void(JsObjectWarpper, JsValueRef)> set)
+    PropertyDesc(std::function<JsValueRef(JsObjectWrapper)> get, std::function<void(JsObjectWrapper, JsValueRef)> set)
         : get(get), set(set) {}
 
     template <typename T> PropertyDesc(JsValueRef (T::*tget)() const, void (T::*tset)(JsValueRef) = nullptr) {
-      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return (obj.GetExternalData<T>()->*tget)(); };
-      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(rhs); };
+      if (tget) get = [=](JsObjectWrapper obj) -> JsValueRef { return (obj.GetExternalData<T>()->*tget)(); };
+      if (tset) set = [=](JsObjectWrapper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(rhs); };
     }
     template <typename T, typename R> PropertyDesc(R (T::*tget)() const, void (T::*tset)(R) = nullptr) {
-      if (tget) get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs((obj.GetExternalData<T>()->*tget)()); };
-      if (tset) set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(FromJs<R>(rhs)); };
+      if (tget) get = [=](JsObjectWrapper obj) -> JsValueRef { return ToJs((obj.GetExternalData<T>()->*tget)()); };
+      if (tset) set = [=](JsObjectWrapper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*tset)(FromJs<R>(rhs)); };
     }
     template <typename T, typename R> PropertyDesc(R(T::*field)) {
-      get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
-      set = [=](JsObjectWarpper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*field) = FromJs<R>(rhs); };
+      get = [=](JsObjectWrapper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
+      set = [=](JsObjectWrapper obj, JsValueRef rhs) { (obj.GetExternalData<T>()->*field) = FromJs<R>(rhs); };
     }
     template <typename T, typename R> PropertyDesc(R const(T::*field)) {
-      get = [=](JsObjectWarpper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
+      get = [=](JsObjectWrapper obj) -> JsValueRef { return ToJs(obj.GetExternalData<T>()->*field); };
     }
 
     JsValueRef toObject() {
-      JsObjectWarpper ret;
+      JsObjectWrapper ret;
       ret["configurable"] = false;
       ret["enumerable"]   = true;
       if (get)
         ret["get"] = [get = this->get](JsValueRef callee, Arguments args) -> JsValueRef {
-          JsObjectWarpper self{args.self};
+          JsObjectWrapper self{args.self};
           return get(self);
         };
       if (set)
         ret["set"] = [set = this->set](JsValueRef callee, Arguments args) -> JsValueRef {
-          JsObjectWarpper self{args.self};
+          JsObjectWrapper self{args.self};
           set(self, args[0]);
           return GetUndefined();
         };
@@ -464,7 +464,7 @@ struct JsObjectWarpper {
       if constexpr (std::is_same_v<T, JsValueRef>) {
         set(val);
         return val;
-      } else if constexpr (std::is_same_v<T, JsObjectWarpper> || std::is_same_v<T, JsConvertible>) {
+      } else if constexpr (std::is_same_v<T, JsObjectWrapper> || std::is_same_v<T, JsConvertible>) {
         set(val.ref);
         return val.ref;
       } else if constexpr (std::is_same_v<T, PropertyDesc>) {
@@ -488,8 +488,8 @@ struct JsObjectWarpper {
     template <typename T = JsValueRef> T get() {
       if constexpr (std::is_same_v<T, JsValueRef>) {
         return fetch();
-      } else if constexpr (std::is_same_v<T, JsObjectWarpper>) {
-        return JsObjectWarpper{fetch()};
+      } else if constexpr (std::is_same_v<T, JsObjectWrapper>) {
+        return JsObjectWrapper{fetch()};
       } else {
         return FromJs<T>(fetch());
       }
@@ -502,7 +502,7 @@ struct JsObjectWarpper {
 
     PropProxy(JsValueRef ref, JsPropertyIdRef name) : ref(ref), name(name) {}
 
-    friend struct JsObjectWarpper;
+    friend struct JsObjectWrapper;
 
     JsValueRef fetch() {
       if (!temp) JsGetProperty(ref, name, &temp);
@@ -510,27 +510,27 @@ struct JsObjectWarpper {
     }
   };
 
-  explicit JsObjectWarpper(JsValueRef ref) : ref(ref) {}
-  explicit JsObjectWarpper() { ThrowError(JsCreateObject(&ref)); }
+  explicit JsObjectWrapper(JsValueRef ref) : ref(ref) {}
+  explicit JsObjectWrapper() { ThrowError(JsCreateObject(&ref)); }
 
-  JsObjectWarpper(JsObjectWarpper const &rhs) : ref(rhs.ref) {}
+  JsObjectWrapper(JsObjectWrapper const &rhs) : ref(rhs.ref) {}
 
-  static JsObjectWarpper FromGlobal() {
+  static JsObjectWrapper FromGlobal() {
     JsValueRef ref;
     ThrowError(JsGetGlobalObject(&ref));
-    return JsObjectWarpper{ref};
+    return JsObjectWrapper{ref};
   }
-  static JsObjectWarpper FromCurrentException() {
+  static JsObjectWrapper FromCurrentException() {
     JsValueRef ref;
     ThrowError(JsGetAndClearExceptionWithMetadata(&ref));
-    return JsObjectWarpper{ref};
+    return JsObjectWrapper{ref};
   }
-  static JsObjectWarpper FromModuleRecord(JsModuleRecord mod) {
+  static JsObjectWrapper FromModuleRecord(JsModuleRecord mod) {
     JsValueRef ref = nullptr;
     ThrowError(JsGetModuleNamespace(mod, &ref));
-    return JsObjectWarpper{ref};
+    return JsObjectWrapper{ref};
   }
-  template <typename T> static JsObjectWarpper FromExternalObject(T *type, JsValueRef prototype = nullptr) {
+  template <typename T> static JsObjectWrapper FromExternalObject(T *type, JsValueRef prototype = nullptr) {
     JsValueRef ref          = nullptr;
     JsFinalizeCallback fini = [](void *ptr) { delete (T *) ptr; };
     if (prototype) {
@@ -538,7 +538,7 @@ struct JsObjectWarpper {
     } else {
       ThrowError(JsCreateExternalObject(type, fini, &ref));
     }
-    return JsObjectWarpper{ref};
+    return JsObjectWrapper{ref};
   }
 
   template <typename T> T *GetExternalData() {
@@ -553,6 +553,8 @@ struct JsObjectWarpper {
 
   JsValueRef operator*() const { return ref; }
 };
+
+inline JsValueRef ToJs(JsObjectWrapper const &wrapper) { return *wrapper; }
 
 struct ValueHolder {
   JsValueRef ref;

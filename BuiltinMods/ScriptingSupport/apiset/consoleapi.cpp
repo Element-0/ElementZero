@@ -7,9 +7,9 @@
 
 using namespace Mod::Scripting;
 
-static RegisterQueue queue("console", [](JsObjectWarpper global) {
+static RegisterQueue queue("console", [](JsObjectWrapper global) {
   DEF_LOGGER("ScriptOut");
-  JsObjectWarpper console;
+  JsObjectWrapper console;
   console["log"] = [](JsValueRef callee, Arguments args) {
     if (!args.empty()) {
       std::stringstream ss;

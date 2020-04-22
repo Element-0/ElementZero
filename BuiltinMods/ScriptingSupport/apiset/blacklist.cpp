@@ -9,7 +9,7 @@
 
 using namespace Mod::Scripting;
 
-static LazyModuleRegister reg("ez:blacklist", "Blacklist", [](JsObjectWarpper native) -> std::string {
+static LazyModuleRegister reg("ez:blacklist", "Blacklist", [](JsObjectWrapper native) -> std::string {
   native["addByXUID"] = +[](std::string const &xuid_str, std::string const &reason, std::string const &op) {
     auto xuid = boost::lexical_cast<uint64_t>(xuid_str);
     Mod::Blacklist::GetInstance().Add(Mod::Blacklist::XUID(xuid), reason, op);

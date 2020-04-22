@@ -9,7 +9,7 @@
 
 using namespace Mod::Scripting;
 
-static RegisterQueue queue("timer", [](JsObjectWarpper global) {
+static RegisterQueue queue("timer", [](JsObjectWrapper global) {
   global["setTimeout"] = [](JsValueRef callee, Arguments args) -> JsValueRef {
     if (args.size() != 1 && args.size() != 2) throw std::runtime_error{"Require 1 or 2 arguments"};
     auto fn = args[0];

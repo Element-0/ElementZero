@@ -10,8 +10,8 @@ namespace Mod::Scripting {
 
 JsValueRef ScriptNBT::InitProto() {
   static ValueHolder temp = IIFE([] {
-    JsObjectWarpper proto;
-    proto["type"] = JsObjectWarpper::PropertyDesc{&ScriptNBT::type};
+    JsObjectWrapper proto;
+    proto["type"] = JsObjectWrapper::PropertyDesc{&ScriptNBT::type};
     proto["toString"] = &ScriptNBT::toString;
     proto["equals"] = &ScriptNBT::equals;
     proto["clone"] = &ScriptNBT::clone;

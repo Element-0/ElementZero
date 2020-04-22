@@ -91,7 +91,7 @@ void loadCustomScript() try {
   if (JsHasException(&hasException) != JsNoError) return;
   if (!hasException) return;
   try {
-    auto metadata = JsObjectWarpper::FromCurrentException();
+    auto metadata = JsObjectWrapper::FromCurrentException();
     LOGE("Exception %s") % metadata["exception"].ToString();
     LOGE("File: %s") % metadata["url"].ToString();
     LOGE("Line: %f") % metadata["line"].get<double>();
@@ -113,12 +113,12 @@ static JsErrorCode resolveModule(JsValueRef specifier, fs::path &path, fs::path 
 
 static void LoadBuiltinModule(
     JsModuleRecord referencingModule, JsValueRef specifier, JsModuleRecord *target, std::string const &name,
-    std::string (*fn)(JsObjectWarpper native)) {
+    std::string (*fn)(JsObjectWrapper native)) {
   ThrowError(JsInitializeModuleRecord(referencingModule, specifier, target));
   ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_Url, specifier));
   auto cookies = NextContext();
   JsValueRef exception;
-  JsObjectWarpper obj;
+  JsObjectWrapper obj;
   const auto script = fn(obj);
   ThrowError(JsSetModuleHostInfo(*target, JsModuleHostInfo_HostDefined, obj.ref));
   ThrowError(JsParseModuleSource(
@@ -213,7 +213,7 @@ static JsErrorCode NativeInitializeImportMetaCallback(JsModuleRecord referencing
   JsValueRef defined, url;
   ThrowError(JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_HostDefined, &defined));
   ThrowError(JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_Url, &url));
-  JsObjectWarpper wrap{importMetaVar};
+  JsObjectWrapper wrap{importMetaVar};
   if (GetJsType(defined) == JsObject) {
     // Native module
     wrap["native"] = defined;
@@ -228,7 +228,7 @@ static JsErrorCode NativeInitializeImportMetaCallback(JsModuleRecord referencing
 //   JsValueRef result, nameref;
 //   ThrowError(JsModuleEvaluation(referencingModule, &result));
 //   JsGetModuleHostInfo(referencingModule, JsModuleHostInfo_HostDefined, &nameref);
-//   auto ns   = JsObjectWarpper::FromModuleRecord(referencingModule);
+//   auto ns   = JsObjectWrapper::FromModuleRecord(referencingModule);
 //   auto name = FromJs<std::string>(nameref);
 //   LOGV("native");
 //   ModuleRegister::GetList()[name](ns);

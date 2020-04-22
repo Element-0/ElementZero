@@ -13,13 +13,13 @@ using namespace Mod::Scripting;
 
 JsValueRef PlayerBinding::InitProto() {
   static ValueHolder proto = IIFE([] {
-    JsObjectWarpper PlayerProto;
-    PlayerProto["xuid"]       = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetXUID};
-    PlayerProto["uuid"]       = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetUUID};
-    PlayerProto["name"]       = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetNAME};
-    PlayerProto["address"]    = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetADDRESS};
-    PlayerProto["alive"]      = JsObjectWarpper::PropertyDesc{&PlayerBinding::alive};
-    PlayerProto["aux"]        = JsObjectWarpper::PropertyDesc{&PlayerBinding::GetAuxData};
+    JsObjectWrapper PlayerProto;
+    PlayerProto["xuid"]       = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetXUID};
+    PlayerProto["uuid"]       = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetUUID};
+    PlayerProto["name"]       = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetNAME};
+    PlayerProto["address"]    = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetADDRESS};
+    PlayerProto["alive"]      = JsObjectWrapper::PropertyDesc{&PlayerBinding::alive};
+    PlayerProto["aux"]        = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetAuxData};
     PlayerProto["getOffline"] = &PlayerBinding::ToOffline;
     PlayerProto["toString"]   = &PlayerBinding::ToString;
     return PlayerProto.ref;
@@ -29,10 +29,10 @@ JsValueRef PlayerBinding::InitProto() {
 
 JsValueRef OfflinePlayerBinding::InitProto() {
   static ValueHolder proto = IIFE([] {
-    JsObjectWarpper OfflinePlayerProto;
-    OfflinePlayerProto["xuid"]      = JsObjectWarpper::PropertyDesc{&OfflinePlayerBinding::GetXUID};
-    OfflinePlayerProto["uuid"]      = JsObjectWarpper::PropertyDesc{&OfflinePlayerBinding::GetUUID};
-    OfflinePlayerProto["name"]      = JsObjectWarpper::PropertyDesc{&OfflinePlayerBinding::GetNAME};
+    JsObjectWrapper OfflinePlayerProto;
+    OfflinePlayerProto["xuid"]      = JsObjectWrapper::PropertyDesc{&OfflinePlayerBinding::GetXUID};
+    OfflinePlayerProto["uuid"]      = JsObjectWrapper::PropertyDesc{&OfflinePlayerBinding::GetUUID};
+    OfflinePlayerProto["name"]      = JsObjectWrapper::PropertyDesc{&OfflinePlayerBinding::GetNAME};
     OfflinePlayerProto["getOnline"] = &OfflinePlayerBinding::ToOnline;
     OfflinePlayerProto["toString"]  = &OfflinePlayerBinding::ToString;
     return OfflinePlayerProto.ref;
@@ -40,7 +40,7 @@ JsValueRef OfflinePlayerBinding::InitProto() {
   return *proto;
 }
 
-static ModuleRegister reg("ez:player", [](JsObjectWarpper native) -> std::string {
+static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string {
   native["getPlayerByXUID"] = +[](JsValueRef ref) {
     auto xuid = boost::lexical_cast<uint64_t>(JsToString(ref));
     auto &db  = Mod::PlayerDatabase::GetInstance();

@@ -49,7 +49,7 @@ public:
 
   BOSSBARAPI static JsValueRef InitProto();
 
-  BOSSBARAPI static Scripting::JsObjectWarpper CreateJsObject(Handle const &orig);
+  BOSSBARAPI static Scripting::JsObjectWrapper CreateJsObject(Handle const &orig);
 };
 
 BOSSBARAPI std::vector<Handle> GetHandlesForPlayer(Player *);

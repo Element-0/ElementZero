@@ -63,7 +63,7 @@ struct Set : Mod::AuxHolder {
 
 JsValueRef Handle::InitProto() {
   static ValueHolder temp = IIFE([] {
-    JsObjectWarpper proto;
+    JsObjectWrapper proto;
     proto["valid"]         = &Handle::Valid;
     proto["show"]          = &Handle::Show;
     proto["hide"]          = &Handle::Hide;
@@ -86,10 +86,10 @@ Handle Handle::Create(const Config &cfg) {
   return ret;
 }
 
-JsObjectWarpper Handle::CreateJsObject(Handle const &orig) {
+JsObjectWrapper Handle::CreateJsObject(Handle const &orig) {
   Handle *obj = new Handle;
   obj->ref    = orig.ref;
-  return JsObjectWarpper::FromExternalObject(obj, InitProto());
+  return JsObjectWrapper::FromExternalObject(obj, InitProto());
 }
 
 void Handle::Show() {

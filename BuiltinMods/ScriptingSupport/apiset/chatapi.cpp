@@ -5,7 +5,7 @@
 
 using namespace Mod::Scripting;
 
-static LazyModuleRegister reg("ez:chat", "ChatAPI", [](JsObjectWarpper native) -> std::string {
+static LazyModuleRegister reg("ez:chat", "ChatAPI", [](JsObjectWrapper native) -> std::string {
   native["onChat"] = +[](JsValueRef ref) {
     if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
     Mod::Chat::GetInstance().AddListener(
@@ -14,7 +14,7 @@ static LazyModuleRegister reg("ez:chat", "ChatAPI", [](JsObjectWarpper native) -
                                                Mod::PlayerEntry const &entry, std::string &displayName,
                                                std::string &content, Mod::CallbackToken<std::string> &token) {
           if (token) return;
-          JsObjectWarpper wrap;
+          JsObjectWrapper wrap;
           wrap["sender"]    = entry.name;
           wrap["content"]   = content;
           JsValueRef args[] = {GetUndefined(), *wrap};

@@ -8,7 +8,7 @@
 
 using namespace Mod::Scripting;
 
-void installConsoleAPI(JsObjectWarpper &global);
+void installConsoleAPI(JsObjectWrapper &global);
 
 void PromiseContinuationCallback(JsValueRef task, void *callbackState) {
   using namespace Mod::Scheduler;
@@ -21,7 +21,7 @@ void PromiseContinuationCallback(JsValueRef task, void *callbackState) {
 void initBasicAPI() {
   DEF_LOGGER("ScriptAPI");
   JsSetPromiseContinuationCallback(PromiseContinuationCallback, nullptr);
-  auto global             = JsObjectWarpper::FromGlobal();
+  auto global             = JsObjectWrapper::FromGlobal();
   global["isElementZero"] = true;
   for (auto [name, fn] : RegisterQueue::GetList()) {
     LOGV("register %s") % name;

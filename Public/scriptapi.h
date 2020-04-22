@@ -30,21 +30,21 @@ SCRIPTAPI JsValueRef ToJs(Json::Value entry);
 template <> SCRIPTAPI Json::Value FromJs(JsValueRef ref);
 
 struct RegisterQueue {
-  SCRIPTAPI static std::map<std::string, void (*)(JsObjectWarpper global)> &GetList();
+  SCRIPTAPI static std::map<std::string, void (*)(JsObjectWrapper global)> &GetList();
 
-  SCRIPTAPI RegisterQueue(char const *name, void (*t)(JsObjectWarpper global));
+  SCRIPTAPI RegisterQueue(char const *name, void (*t)(JsObjectWrapper global));
 };
 
 struct ModuleRegister {
-  SCRIPTAPI static std::map<std::string, std::string (*)(JsObjectWarpper module)> &GetList();
+  SCRIPTAPI static std::map<std::string, std::string (*)(JsObjectWrapper module)> &GetList();
 
-  SCRIPTAPI ModuleRegister(char const *name, std::string (*t)(JsObjectWarpper global));
+  SCRIPTAPI ModuleRegister(char const *name, std::string (*t)(JsObjectWrapper global));
 };
 
 struct ScriptAuxData : Mod::AuxHolder {
   ValueHolder holder;
   ScriptAuxData() {
-    JsObjectWarpper wrapper;
+    JsObjectWrapper wrapper;
     holder.ref = *wrapper;
   }
 };
@@ -75,8 +75,8 @@ struct PlayerBinding {
 
   SCRIPTAPI static JsValueRef InitProto();
 
-  inline static JsObjectWarpper Create(Mod::PlayerEntry entry) {
-    return JsObjectWarpper::FromExternalObject(new PlayerBinding(entry), InitProto());
+  inline static JsObjectWrapper Create(Mod::PlayerEntry entry) {
+    return JsObjectWrapper::FromExternalObject(new PlayerBinding(entry), InitProto());
   }
 };
 
@@ -112,8 +112,8 @@ struct OfflinePlayerBinding {
 
   SCRIPTAPI static JsValueRef InitProto();
 
-  inline static JsObjectWarpper Create(Mod::OfflinePlayerEntry entry) {
-    return JsObjectWarpper::FromExternalObject(new OfflinePlayerBinding(entry), InitProto());
+  inline static JsObjectWrapper Create(Mod::OfflinePlayerEntry entry) {
+    return JsObjectWrapper::FromExternalObject(new OfflinePlayerBinding(entry), InitProto());
   }
 };
 
@@ -146,8 +146,8 @@ struct ScriptNBT {
 
   SCRIPTAPI static JsValueRef InitProto();
 
-  inline static JsObjectWarpper Create(std::unique_ptr<Tag> const &tag) {
-    return JsObjectWarpper::FromExternalObject(new ScriptNBT{tag}, InitProto());
+  inline static JsObjectWrapper Create(std::unique_ptr<Tag> const &tag) {
+    return JsObjectWrapper::FromExternalObject(new ScriptNBT{tag}, InitProto());
   }
 };
 inline JsValueRef ToJs(std::unique_ptr<Tag> const &tag) { return *ScriptNBT::Create(tag); }
@@ -172,8 +172,8 @@ struct ScriptEnchantmentInstance {
 
   static JsValueRef InitProto();
 
-  inline static JsObjectWarpper Create(EnchantmentInstance const &instance) {
-    return JsObjectWarpper::FromExternalObject(new ScriptEnchantmentInstance{instance}, InitProto());
+  inline static JsObjectWrapper Create(EnchantmentInstance const &instance) {
+    return JsObjectWrapper::FromExternalObject(new ScriptEnchantmentInstance{instance}, InitProto());
   }
 };
 
@@ -193,8 +193,8 @@ struct ScriptItemStack {
 
   static JsValueRef InitProto();
 
-  inline static JsObjectWarpper Create(ItemStack const &stack) {
-    return JsObjectWarpper::FromExternalObject(new ScriptItemStack{stack}, InitProto());
+  inline static JsObjectWrapper Create(ItemStack const &stack) {
+    return JsObjectWrapper::FromExternalObject(new ScriptItemStack{stack}, InitProto());
   }
 };
 inline JsValueRef ToJs(ItemStack const &stack) {
