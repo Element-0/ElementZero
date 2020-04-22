@@ -30,7 +30,7 @@ public:
   virtual void writeFloat(float)                     = 0;
   virtual void writeDouble(double)                   = 0;
   virtual void writeByte(char)                       = 0;
-  virtual void wruteShort(short)                     = 0;
+  virtual void writeShort(short)                     = 0;
   virtual void writeInt(int)                         = 0;
   virtual void writeLongLong(long long)              = 0;
   virtual void writeBytes(void const *, std::size_t) = 0;
@@ -61,7 +61,7 @@ public:
   MCAPI virtual void writeFloat(float);
   MCAPI virtual void writeDouble(double);
   MCAPI virtual void writeByte(char);
-  MCAPI virtual void wruteShort(short);
+  MCAPI virtual void writeShort(short);
   MCAPI virtual void writeInt(int);
   MCAPI virtual void writeLongLong(long long);
   virtual void writeBytes(void const *, std::size_t) = 0;
@@ -98,7 +98,7 @@ public:
   MCAPI virtual void writeFloat(float);
   MCAPI virtual void writeDouble(double);
   MCAPI virtual void writeByte(char);
-  MCAPI virtual void wruteShort(short);
+  MCAPI virtual void writeShort(short);
   MCAPI virtual void writeInt(int);
   MCAPI virtual void writeLongLong(long long);
   MCAPI virtual void writeBytes(void const *, std::size_t);
@@ -143,7 +143,7 @@ public:
   MCAPI virtual void writeFloat(float);
   MCAPI virtual void writeDouble(double);
   MCAPI virtual void writeByte(char);
-  MCAPI virtual void wruteShort(short);
+  MCAPI virtual void writeShort(short);
   MCAPI virtual void writeInt(int);
   MCAPI virtual void writeLongLong(long long);
   MCAPI virtual void writeReverseBytes(void const *, std::size_t);
