@@ -26,8 +26,8 @@ class IDataOutput {
 public:
   inline IDataOutput() {}
   inline virtual ~IDataOutput() {}
-  virtual void writeString(gsl::cstring_span<>)       = 0;
-  virtual void writeLongString(gsl::cstring_span<>)   = 0;
+  virtual void writeString(gsl::cstring_span<>)      = 0;
+  virtual void writeLongString(gsl::cstring_span<>)  = 0;
   virtual void writeFloat(float)                     = 0;
   virtual void writeDouble(double)                   = 0;
   virtual void writeByte(char)                       = 0;
