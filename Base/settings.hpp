@@ -10,7 +10,7 @@ struct Settings {
   bool ModDefaultEnabled = false;
   std::map<std::string, YAML::Node> ModSettings;
   struct LogSettingsType {
-    std::string Format   = "%1$c [%2$s] (%3$s:%4$d) %5$s";
+    std::string Format   = "%6$s %1$c [%2$s] (%3$s:%4$d) %5$s";
     std::string Database = "log.db";
     bool HideVerbose     = false;
     std::vector<std::string> Filters;

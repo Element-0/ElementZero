@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <string>
 #include <memory>
 #include <mutex>
@@ -172,7 +173,9 @@ TInstanceHook(void, "?_openLogFile@LogDetails@BedrockLog@@AEAAXXZ", BedrockLog::
 std::set<std::string_view> LogFilters;
 
 void generalLog(unsigned int pri, std::string_view area, char const *source, unsigned line, std::string content) {
-  auto f    = boost::format(settings.LogSettings.Format) % getPriority(pri) % area % source % line % content;
+  std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  auto f          = boost::format(settings.LogSettings.Format) % getPriority(pri) % area % source % line % content %
+           std::put_time(std::localtime(&now), "%Y-%m-%d %X");
   auto data = f.str();
   if (data.back() != '\n') data.append("\n");
   auto deco = settings.LogSettings.Decorations[getPriorityDecoration(pri)];
@@ -184,16 +187,18 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
     std::call_once(
         of, [] { LogFilters.insert(settings.LogSettings.Filters.begin(), settings.LogSettings.Filters.end()); });
     try {
-      static SQLite::Statement insert{*log_database,
-                                      "INSERT INTO log (session, time, priority, area, source, line, content) "
-                                      "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
+      static SQLite::Statement insert{
+          *log_database,
+          "INSERT INTO log (session, time, priority, area, source, line, content) "
+          "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
       if (session != "") {
         static std::once_flag o;
         std::call_once(o, [] {
-          SQLite::Statement stmt{*log_database,
-                                 "INSERT INTO log SELECT "
-                                 "?, time, priority, area, source, line, content "
-                                 "FROM temp.pending"};
+          SQLite::Statement stmt{
+              *log_database,
+              "INSERT INTO log SELECT "
+              "?, time, priority, area, source, line, content "
+              "FROM temp.pending"};
           stmt.bind(1, session);
           stmt.exec();
         });
@@ -207,9 +212,10 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
         insert.reset();
         insert.clearBindings();
       } else {
-        static SQLite::Statement insert_temp{*log_database,
-                                             "INSERT INTO temp.pending (time, priority, area, source, line, content) "
-                                             "VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
+        static SQLite::Statement insert_temp{
+            *log_database,
+            "INSERT INTO temp.pending (time, priority, area, source, line, content) "
+            "VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
         insert_temp.bind(1, pri);
         insert_temp.bindNoCopy(2, area.data());
         insert_temp.bindNoCopy(3, source);
