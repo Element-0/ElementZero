@@ -1,6 +1,8 @@
-#include "boost/format/format_fwd.hpp"
+#include "ChakraCommon.h"
+#include <Core/DataIO.h>
 #include <Item/Enchant.h>
 #include <Item/ItemStack.h>
+
 #include <chakra_helper.h>
 #include <log.h>
 #include <scriptapi.h>
@@ -19,6 +21,19 @@ JsValueRef ScriptEnchantmentInstance::InitProto() {
   return *temp;
 }
 
+JsValueRef ScriptItemStack::Dump() const {
+  std::string buffer;
+  StringByteOutput output{buffer};
+  stack.save()->write(output);
+  JsValueRef ret;
+  JsCreateArrayBuffer(buffer.size(), &ret);
+  ChakraBytePtr ptr;
+  unsigned int _len;
+  JsGetArrayBufferStorage(ret, &ptr, &_len);
+  memcpy(ptr, buffer.data(), buffer.size());
+  return ret;
+}
+
 JsValueRef ScriptItemStack::InitProto() {
   static ValueHolder temp = IIFE([] {
     JsObjectWrapper proto;
@@ -32,6 +47,7 @@ JsValueRef ScriptItemStack::InitProto() {
     proto["max_count"]         = JsObjectWrapper::PropertyDesc{&ItemStack::getMaxStackSize};
     proto["enchanted"]         = JsObjectWrapper::PropertyDesc{&ItemStack::isEnchanted};
     proto["enchants"]          = JsObjectWrapper::PropertyDesc{&ScriptItemStack::GetEnchants};
+    proto["dump"]              = &ScriptItemStack::Dump;
     proto["equals"]            = &ScriptItemStack::Equals;
     proto["toString"]          = &ItemStackBase::toString;
     return *proto;

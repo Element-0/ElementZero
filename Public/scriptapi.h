@@ -170,7 +170,7 @@ struct ScriptEnchantmentInstance {
 
   ScriptEnchantmentInstance(EnchantmentInstance const &instance) : instance(instance) {}
 
-  static JsValueRef InitProto();
+  SCRIPTAPI static JsValueRef InitProto();
 
   inline static JsObjectWrapper Create(EnchantmentInstance const &instance) {
     return JsObjectWrapper::FromExternalObject(new ScriptEnchantmentInstance{instance}, InitProto());
@@ -189,9 +189,11 @@ struct ScriptItemStack {
     return ToJsArray(vec);
   }
 
+  SCRIPTAPI JsValueRef Dump() const;
+
   inline bool Equals(ItemStack const &rhs) { return !(stack != rhs); }
 
-  static JsValueRef InitProto();
+  SCRIPTAPI static JsValueRef InitProto();
 
   inline static JsObjectWrapper Create(ItemStack const &stack) {
     return JsObjectWrapper::FromExternalObject(new ScriptItemStack{stack}, InitProto());

@@ -96,6 +96,7 @@ declare type ItemStack = {
   readonly max_count: number;
   readonly enchanted: boolean;
   readonly enchants: EnchantmentInstance[];
+  dump(): ArrayBuffer;
   equals(stack: ItemStack): boolean;
   toString(): string;
 };
@@ -155,7 +156,7 @@ declare type Sqlite3BindType =
   | string
   | ArrayBuffer
   | ArrayBufferView;
-declare type Sqlite3ColumnType = number | null | string | Uint8Array;
+declare type Sqlite3ColumnType = number | null | string | ArrayBuffer;
 
 declare type Sqlite3Statement = {
   reset(): void;
