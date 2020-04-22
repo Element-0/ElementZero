@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <gsl/string_span>
 #include <string_view>
 
 #include "../dll.h"
@@ -25,8 +26,8 @@ class IDataOutput {
 public:
   inline IDataOutput() {}
   inline virtual ~IDataOutput() {}
-  virtual void writeString(std::string const &)      = 0;
-  virtual void writeLongString(std::string const &)  = 0;
+  virtual void writeString(gsl::cstring_span<>)       = 0;
+  virtual void writeLongString(gsl::cstring_span<>)   = 0;
   virtual void writeFloat(float)                     = 0;
   virtual void writeDouble(double)                   = 0;
   virtual void writeByte(char)                       = 0;
@@ -56,8 +57,8 @@ class BytesDataOutput : public IDataOutput {
 public:
   inline BytesDataOutput() {}
   inline virtual ~BytesDataOutput() {}
-  MCAPI virtual void writeString(std::string const &);
-  MCAPI virtual void writeLongString(std::string const &);
+  MCAPI virtual void writeString(gsl::cstring_span<>);
+  MCAPI virtual void writeLongString(gsl::cstring_span<>);
   MCAPI virtual void writeFloat(float);
   MCAPI virtual void writeDouble(double);
   MCAPI virtual void writeByte(char);
@@ -93,8 +94,8 @@ public:
   BinaryStream &stream;
   inline BinaryDataOutput(BinaryStream &stream) : stream(stream) {}
   MCAPI virtual ~BinaryDataOutput();
-  MCAPI virtual void writeString(std::string const &);
-  MCAPI virtual void writeLongString(std::string const &);
+  MCAPI virtual void writeString(gsl::cstring_span<>);
+  MCAPI virtual void writeLongString(gsl::cstring_span<>);
   MCAPI virtual void writeFloat(float);
   MCAPI virtual void writeDouble(double);
   MCAPI virtual void writeByte(char);
