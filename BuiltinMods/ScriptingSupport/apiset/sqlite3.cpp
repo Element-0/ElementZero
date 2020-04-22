@@ -1,6 +1,3 @@
-#include "ChakraCommon.h"
-#include "ChakraCore.h"
-#include "log.h"
 #include <stdexcept>
 
 #include <sqlite3.h>
