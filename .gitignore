@@ -341,6 +341,7 @@ healthchecksdb
 
 # Custom
 Lib/bedrock_server_mod.lib
+Lib/addition_symbols.db
 *.dll
 [Bb]uild
 [Dd]ist
