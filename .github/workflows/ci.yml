@@ -140,7 +140,7 @@ jobs:
         name: dist
         path: Dist
 
-    - uses: aquiladev/ipfs-action@v1
+    - uses: aquiladev/ipfs-action@v0.1.2-alpha.0
       with:
         path: vcpkg/installed/x64-windows-rel
         host: ipfs.infura.io
