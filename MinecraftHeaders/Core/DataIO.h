@@ -19,7 +19,7 @@ public:
   virtual int readInt()                       = 0;
   virtual long long readLongLong()            = 0;
   virtual bool readBytes(void *, std::size_t) = 0;
-  virtual std::size_t numBytesLeft()          = 0;
+  virtual std::size_t numBytesLeft() const    = 0;
 };
 
 class IDataOutput {
@@ -50,7 +50,7 @@ public:
   MCAPI virtual int readInt();
   MCAPI virtual long long readLongLong();
   virtual bool readBytes(void *, std::size_t) = 0;
-  virtual std::size_t numBytesLeft()          = 0;
+  virtual std::size_t numBytesLeft() const    = 0;
 };
 
 class BytesDataOutput : public IDataOutput {
@@ -84,7 +84,7 @@ public:
   MCAPI virtual int readInt();
   MCAPI virtual long long readLongLong();
   MCAPI virtual bool readBytes(void *, std::size_t);
-  MCAPI virtual std::size_t numBytesLeft();
+  MCAPI virtual std::size_t numBytesLeft() const;
 };
 
 class BinaryStream;
@@ -112,7 +112,7 @@ public:
   inline StringByteInput(std::string const &buffer, int start, int end) : start(start), end(end), buffer(buffer) {}
   MCAPI virtual ~StringByteInput();
   MCAPI virtual bool readBytes(void *, std::size_t);
-  MCAPI virtual std::size_t numBytesLeft();
+  MCAPI virtual std::size_t numBytesLeft() const;
 };
 
 class StringByteOutput : public BytesDataOutput {
@@ -160,7 +160,7 @@ public:
   inline RakDataInput(RakNet::BitStream &stream) : stream(stream) {}
   MCAPI virtual ~RakDataInput();
   MCAPI virtual bool readBytes(void *, std::size_t);
-  MCAPI virtual std::size_t numBytesLeft();
+  MCAPI virtual std::size_t numBytesLeft() const;
 };
 
 class RakDataOutput : BytesDataOutput {
