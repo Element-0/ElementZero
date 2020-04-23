@@ -340,8 +340,7 @@ ASALocalRun/
 healthchecksdb
 
 # Custom
-Lib/bedrock_server_mod.lib
-Lib/addition_symbols.db
+Lib
 *.dll
 [Bb]uild
 [Dd]ist

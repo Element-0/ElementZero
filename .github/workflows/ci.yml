@@ -117,9 +117,6 @@ jobs:
         "/c/Program Files/CMake/bin/cpack" -G 7Z .
         ninja install
         popd
-        cp Lib/addition_symbols.db Dist
-        cp Lib/bedrock_server_mod.exe Dist
-        cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*
       shell: bash
 
