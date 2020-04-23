@@ -40,8 +40,9 @@ TInstanceHook(
         decltype(param.parser) parser;
       } u;
       u.parser = param.parser;
-      LOGV("\t%c %s[%s] %d(%d) +%d(%d) @%p") % (param.optional ? '+' : '-') % param.name % (param.desc ? param.desc : "") %
-          param.tid.value % (int) param.type % param.offset % param.flag_offset % u.pointer;
+      LOGV("\t%c %s[%s] %d(%d) +%d(%d) @%p") % (param.optional ? '+' : '-') % param.name %
+          (param.desc ? param.desc : "") % param.tid.value % (int) param.type % param.offset % param.flag_offset %
+          u.pointer;
     }
   }
   return original(this, signature, ovd);
