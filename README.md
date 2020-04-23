@@ -58,7 +58,7 @@ A: I created a dll that simply forwards all APIs to the open source version of C
 1. Copy $(SolutionDir)\eatpdb.yaml to bds folder
 2. Run `eatpdb exec eatpdb.yaml`
 3. Open `x64 Native Tools Command Prompt for VS 2019`, then run `lib /def:bedrock_server_mod.def /machine:x64`
-4. Copy bedrock_server_mod.lib to $(SolutionDir)Lib\bedrock_server_mod.lib
+4. Copy bedrock_server_mod.lib, addition_symbols.db, bedrock_server_mod.exe to $(SolutionDir)Lib\
 
 ## LICENSE
 
