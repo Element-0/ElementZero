@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 env:
-  eatpdb_version: v0.0.4
+  eatpdb_version: v0.0.5
   bds_version: 1.14.60.5
 
 jobs:
@@ -95,6 +95,7 @@ jobs:
         D:/rcedit.exe bedrock_server.exe --set-icon ../index.ico
         D:/eatpdb/eatpdb exec ../eatpdb.yaml
         lib /def:bedrock_server_mod.def /machine:x64
+        cp addition_symbols.db ../Lib
         cp bedrock_server_mod.lib ../Lib
         cp bedrock_server_mod.exe ../Lib
       shell: bash
@@ -116,6 +117,7 @@ jobs:
         "/c/Program Files/CMake/bin/cpack" -G 7Z .
         ninja install
         popd
+        cp Lib/addition_symbols.db Dist
         cp Lib/bedrock_server_mod.exe Dist
         cp Lib/bedrock_server_mod.lib Dist/Lib
         tar cvfJ pkg.tar.xz Dist/*

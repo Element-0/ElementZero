@@ -1,5 +1,6 @@
 in: bedrock_server.exe
 out: bedrock_server_mod.exe
+filterdb: addition_symbols.db
 filter: !blacklist
   - prefix: "_"
   - prefix: "?__"
