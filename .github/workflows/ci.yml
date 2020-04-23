@@ -140,8 +140,16 @@ jobs:
         name: dist
         path: Dist
 
-    - name: Upload vcpkg installed
-      uses: actions/upload-artifact@v1.0.0
+    - uses: aquiladev/ipfs-action@v1
       with:
-        name: vcpkg
         path: vcpkg/installed/x64-windows-rel
+        host: ipfs.infura.io
+        port: 5001
+        timeout: 3600000
+        verbose: true
+
+    # - name: Upload vcpkg installed
+    #   uses: actions/upload-artifact@v1.0.0
+    #   with:
+    #     name: vcpkg
+    #     path: vcpkg/installed/x64-windows-rel
