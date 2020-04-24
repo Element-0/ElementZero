@@ -7,6 +7,7 @@
 #include "Actor.h"
 #include "../Core/ExtendedCertificate.h"
 #include "../Container/PlayerInventoryProxy.h"
+#include "../Container/EnderChestContainer.h"
 #include "../Math/Vec3.h"
 #include "../Math/BlockPos.h"
 #include "../Core/AutomaticID.h"
@@ -45,6 +46,11 @@ public:
   }
 
   inline bool isCreative() const { return CallServerClassMethod<bool>("?isCreative@Player@@UEBA_NXZ", this); }
+
+  inline class EnderChestContainer &getEnderChestContainer() {
+    return CallServerClassMethod<class EnderChestContainer &>(
+        "?getEnderChestContainer@Player@@QEAAPEAVEnderChestContainer@@XZ", this);
+  }
 
   inline std::vector<class ItemStack const *> getAllHand() const {
     return CallServerClassMethod<std::vector<class ItemStack const *>>(
