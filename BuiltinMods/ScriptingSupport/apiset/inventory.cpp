@@ -1,4 +1,3 @@
-#include "ChakraCommon.h"
 #include <Core/DataIO.h>
 #include <Item/Enchant.h>
 #include <Item/ItemStack.h>
@@ -72,9 +71,14 @@ static ModuleRegister reg("ez:inventory", [](JsObjectWrapper native) -> std::str
     auto &container = *entry.player->getInventory().invectory;
     return ToJsArray(container.data);
   };
+  native["getEnderChestItems"] = +[](Mod::PlayerEntry entry) {
+    auto &container = entry.player->getEnderChestContainer();
+    return ToJsArray(container.data);
+  };
   return R"js(
     export const getOffHandItem = import.meta.native.getOffHandItem;
     export const getEquipmentItems = import.meta.native.getEquipmentItems;
     export const getInventoryItems = import.meta.native.getInventoryItems;
+    export const getEnderChestItems = import.meta.native.getEnderChestItems;
   )js";
 });
