@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <string>
 #include <gsl/string_span>
 #include <string_view>
@@ -115,12 +116,39 @@ public:
   MCAPI virtual std::size_t numBytesLeft() const;
 };
 
+class SimpleStringByteInput : public BytesDataInput {
+  std::string_view buffer;
+
+public:
+  inline SimpleStringByteInput(std::string_view buffer) : buffer(buffer) {}
+  inline bool readBytes(void *out, std::size_t length) override {
+    if (buffer.size() < length) return false;
+    memcpy(out, buffer.data(), length);
+    buffer.remove_prefix(length);
+    return true;
+  }
+  inline std::size_t numBytesLeft() const override { return buffer.size(); }
+};
+
 class StringByteOutput : public BytesDataOutput {
 public:
   std::string &str;
   inline StringByteOutput(std::string &str) : str(str) {}
   MCAPI virtual ~StringByteOutput();
   MCAPI virtual void writeBytes(void const *, std::size_t);
+};
+
+class SimpleStringByteOutput : public BytesDataOutput {
+  std::string buffer;
+
+public:
+  inline SimpleStringByteOutput(){};
+  inline void writeBytes(const void *inp, std::size_t length) override {
+    buffer += std::string_view{(char const *) inp, length};
+  }
+
+  inline std::string const &getRef() const { return buffer; }
+  inline std::string get() { return std::move(buffer); }
 };
 
 class BigEndianStringByteInput : public StringByteInput {
