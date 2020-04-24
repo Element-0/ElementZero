@@ -107,9 +107,9 @@ public:
 
 class StringByteInput : public BytesDataInput {
 public:
-  int start, end;            // 8, 12
-  std::string const &buffer; // 16
-  inline StringByteInput(std::string const &buffer, int start, int end) : start(start), end(end), buffer(buffer) {}
+  size_t pos, total;
+  char const *buffer;
+  inline StringByteInput(gsl::cstring_span<> span) : buffer(span.data()), pos(0), total(span.size()) {}
   MCAPI virtual ~StringByteInput();
   MCAPI virtual bool readBytes(void *, std::size_t);
   MCAPI virtual std::size_t numBytesLeft() const;
@@ -125,7 +125,7 @@ public:
 
 class BigEndianStringByteInput : public StringByteInput {
 public:
-  inline BigEndianStringByteInput(std::string const &str, int start, int end) : StringByteInput(str, start, end) {}
+  inline BigEndianStringByteInput(gsl::cstring_span<> span) : StringByteInput(span) {}
   MCAPI virtual ~BigEndianStringByteInput();
   MCAPI virtual float readFloat();
   MCAPI virtual double readDouble();
