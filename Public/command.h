@@ -9,8 +9,12 @@
 
 #include <Core/type_id.h>
 #include <Core/Util.h>
+#include <Core/json.h>
+#include <Core/MCRESULT.h>
+#include <Command/MinecraftCommands.h>
 #include <Command/Command.h>
 #include <Command/CommandOutput.h>
+#include <Command/CommandContext.h>
 #include <Command/CommandRegistry.h>
 #include <Command/CommandOrigin.h>
 #include <Command/CommandSelector.h>
@@ -31,6 +35,8 @@ class Value;
 
 namespace Mod {
 
+class CustomCommandOrigin;
+
 // Custom command registration related functions
 class CommandSupport : public EventEmitter<"loaded"_sig, CommandRegistry *> {
   COMMANDAPI CommandSupport();
@@ -39,6 +45,9 @@ class CommandSupport : public EventEmitter<"loaded"_sig, CommandRegistry *> {
 public:
   USING_EVENTEMITTER("loaded", CommandRegistry *);
   COMMANDAPI static CommandSupport &GetInstance();
+
+  // Execute command and get the result
+  COMMANDAPI Json::Value ExecuteCommand(std::unique_ptr<CustomCommandOrigin> origin, std::string command);
 
   template <typename T> static typeid_t<CommandRegistry> GetParameterTypeId() {
     static auto value = type_id_count()++;
@@ -64,8 +73,18 @@ public:
   Actor *actor;
   CommandPermissionLevel level = CommandPermissionLevel::Internal;
   CommandOriginType type       = CommandOriginType::Script;
-  bool allowSelectorExpansion  = false;
-  std::function<void(Json::Value &&)> callback;
+  bool allowSelectorExpansion  = true;
+  Json::Value *result;
+
+  inline CustomCommandOrigin() {}
+  static std::unique_ptr<CustomCommandOrigin> CopyFrom(CommandOrigin const &orig) {
+    auto ret           = std::make_unique<CustomCommandOrigin>();
+    ret->pos           = orig.getBlockPosition();
+    ret->worldPosition = orig.getWorldPosition();
+    ret->dim           = orig.getDimension();
+    ret->actor         = orig.getEntity();
+    return ret;
+  }
 
   std::string const &getRequestId() const override { return Util::EMPTY_GUID; }
   std::string getName() const override { return name; }
@@ -80,7 +99,7 @@ public:
   bool canUseCommandsWithoutCheatsEnabled() const override { return true; }
   bool isSelectorExpansionAllowed() const override { return allowSelectorExpansion; }
   void handleCommandOutputCallback(Json::Value &&val) const override {
-    if (callback) callback(std::move(val));
+    if (result) *result = std::move(val);
   }
 };
 

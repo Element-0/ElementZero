@@ -69,20 +69,10 @@ declare module "ez:command" {
   /**
    * Execute server command
    * @param data command
-   * @param cb Callback
-   */
-  export function executeCommand(
-    data: string,
-    cb: (obj: { statusMessage: string; [key: string]: any }) => void
-  ): void;
-
-  /**
-   * Execute server command (async version)
-   * @param data command
    */
   export function executeCommand(
     data: string
-  ): Promise<{ statusMessage: string; [key: string]: any }>;
+  ): { statusMessage: string; [key: string]: any };
 }
 
 declare type ItemStack = {

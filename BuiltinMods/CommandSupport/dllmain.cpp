@@ -11,6 +11,16 @@ Mod::CommandSupport &Mod::CommandSupport::GetInstance() {
   return instance;
 }
 
+Json::Value Mod::CommandSupport::ExecuteCommand(std::unique_ptr<CustomCommandOrigin> origin, std::string command) {
+  Json::Value result;
+
+  origin->result = &result;
+  auto ctx       = CommandContext::create(command, std::move(origin));
+  LocateService<MinecraftCommands>()->executeCommand(std::move(ctx), false);
+
+  return result;
+}
+
 THook(void, "?setup@ChangeSettingCommand@@SAXAEAVCommandRegistry@@@Z", CommandRegistry *registry) {
   original(registry);
   (Mod::CommandSupport::GetInstance().*emitter)(SIG("loaded"), registry);
