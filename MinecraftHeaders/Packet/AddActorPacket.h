@@ -29,7 +29,7 @@ public:
   ActorDefinitionIdentifier def_id;
   Vec3 pos, speed;
   Vec2 rot;
-  float headYaw;
+  float head_yaw;
   std::vector<AttributeInstanceHandle> attributes;
   std::vector<SyncedAttribute> synced_attribute;
 
