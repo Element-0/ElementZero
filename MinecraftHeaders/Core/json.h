@@ -189,6 +189,8 @@ public:
 
   MCAPI Value &resolveReference(const char *key);
 
+  MCAPI std::string toStyledString() const;
+
 private:
   union ValueHolder {
     LargestInt int_;
@@ -380,7 +382,6 @@ public:
   MCAPI std::string write(const Value &root) override;
 
 private:
-
   typedef std::vector<std::string> ChildValues;
 
   ChildValues childValues_;
