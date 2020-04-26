@@ -110,7 +110,7 @@ class StringByteInput : public BytesDataInput {
 public:
   size_t pos, total;
   char const *buffer;
-  inline StringByteInput(gsl::cstring_span<> span) : buffer(span.data()), pos(0), total(span.size()) {}
+  inline StringByteInput(gsl::cstring_span<> span) : pos(0), total(span.size()), buffer(span.data()) {}
   MCAPI virtual ~StringByteInput();
   MCAPI virtual bool readBytes(void *, std::size_t);
   MCAPI virtual std::size_t numBytesLeft() const;
