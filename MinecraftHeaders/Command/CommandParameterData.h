@@ -27,5 +27,5 @@ struct CommandParameterData {
       typeid_t<CommandRegistry> tid, ParseFn parser, std::string name, CommandParameterDataType type, char const *desc,
       int offset, bool mand, int flag_offset)
       : tid(tid), parser(parser), name(name), desc(desc), unk56(-1), type(type), offset(offset),
-        flag_offset(flag_offset), optional(mand) {}
+        flag_offset(flag_offset), optional(mand), pad73(false) {}
 };

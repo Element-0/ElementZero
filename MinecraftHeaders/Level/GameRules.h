@@ -13,11 +13,12 @@ public:
   };
 
   bool saved = false;
-  Type type = Type::Invalid;
+  Type type  = Type::Invalid;
   Value value{};
   std::string name;
   bool use_in_command = false;
-  bool default_set = false;
+  bool default_set    = false;
+  bool requires_cheat = false;
 };
 
 class GameRules {
