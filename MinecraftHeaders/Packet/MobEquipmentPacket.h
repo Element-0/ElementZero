@@ -9,13 +9,13 @@ class MobEquipmentPacket : public Packet {
 public:
   ActorRuntimeID actorId;
   ItemStack stack;
-  uint32_t inventorySlot;
-  uint32_t hotbarSlot;
-  bool flag192;
-  char containerId; //193
-  bool flag194;
-  bool flag195;
-  bool flag196;
+  uint32_t inventorySlot = 0;
+  uint32_t hotbarSlot = 0;
+  bool flag192 = 0;
+  char containerId = 0; //193
+  bool flag194 = 0;
+  bool flag195 = 0;
+  bool flag196 = 0;
 
   inline ~MobEquipmentPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

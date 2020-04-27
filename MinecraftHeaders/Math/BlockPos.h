@@ -4,7 +4,7 @@
 
 class BlockPos {
 public:
-  int x, y, z;
+  int x = 0, y = 0, z = 0;
   // For ABI
   inline ~BlockPos() {}
 

@@ -7,7 +7,7 @@
 class PlayerInputPacket : public Packet {
 public:
   Vec2 motion;
-  bool jump, sneak;
+  bool jump = false, sneak = false;
 
   inline ~PlayerInputPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

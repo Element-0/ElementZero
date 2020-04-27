@@ -10,14 +10,14 @@ class ServerLevel;
 class ScriptEngine;
 
 class ScriptCommandOrigin : public CommandOrigin {
-
 public:
   mce::UUID uuid;
   ServerLevel *level;
   unsigned int id;
   ScriptEngine *engine;
   bool flag;
-  ScriptCommandOrigin(ServerLevel &, ScriptEngine &, unsigned int);
+
+  MCAPI ScriptCommandOrigin(ServerLevel &, ScriptEngine &, unsigned int);
   MCAPI std::string const &getRequestId() const override;
   MCAPI std::string getName() const override;
   MCAPI BlockPos getBlockPosition() const override;

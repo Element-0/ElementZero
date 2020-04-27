@@ -15,12 +15,12 @@
 class AddItemActorPacket : public Packet {
 public:
   std::vector<std::unique_ptr<DataItem>> items;
-  uint64_t type;
+  uint64_t type = 0;
   ActorUniqueID uid;
   ActorRuntimeID rid;
   ItemStack stack;
   Vec3 pos, speed;
-  bool from_fishing;
+  bool from_fishing = false;
 
   inline ~AddItemActorPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

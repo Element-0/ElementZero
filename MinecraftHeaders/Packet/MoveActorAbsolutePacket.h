@@ -7,9 +7,9 @@
 class MoveActorAbsolutePacket : public Packet {
 public:
   enum struct Flags { teleport = 1, on_ground = 2 };
-  Flags flags;
+  Flags flags = Flags::teleport;
   Vec3 pos;
-  char pitch, head_yaw, yaw;
+  char pitch = 0, head_yaw = 0, yaw = 0;
 
   inline ~MoveActorAbsolutePacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

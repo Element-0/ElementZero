@@ -7,7 +7,7 @@
 
 class SpawnParticleEffectPacket : public Packet {
 public:
-  char dim;
+  char dim = 0;
   ActorRuntimeID actor_id;
   Vec3 pos;
   std::string id;

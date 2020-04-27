@@ -6,7 +6,7 @@
 
 class ContainerClosePacket : public Packet {
 public:
-  ContainerID id;
+  ContainerID id = ContainerID::Invalid;
 
   inline ~ContainerClosePacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

@@ -7,7 +7,7 @@
 class BlockEventPacket : public Packet {
 public:
   BlockPos pos;
-  int a, b;
+  int a = 0, b = 0;
 
   inline ~BlockEventPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

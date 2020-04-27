@@ -11,7 +11,7 @@ class ChangeDimensionPacket : public Packet {
 public:
   AutomaticID<Dimension, int> dim;
   Vec3 pos;
-  bool respawn;
+  bool respawn = false;
 
   inline ~ChangeDimensionPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

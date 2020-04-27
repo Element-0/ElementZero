@@ -10,7 +10,7 @@
 class UpdateAttributesPacket : public Packet {
 public:
   struct AttributeData {
-    float value, min, max, def;
+    float value = 0.0f, min = 0.0f, max = 0.0f, def = 0.0f;
     HashedString name;
   };
 

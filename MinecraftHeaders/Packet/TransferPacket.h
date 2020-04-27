@@ -7,7 +7,7 @@
 
 class TransferPacket : public Packet {
   std::string address;
-  int port;
+  int port = 0;
 
 public:
   TransferPacket(std::string address, int port) : address(address), port(port) {}

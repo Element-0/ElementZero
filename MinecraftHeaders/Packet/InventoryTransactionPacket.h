@@ -35,8 +35,8 @@ enum class InventorySourceType {
 
 class InventorySource {
 public:
-  InventorySourceType type;
-  ContainerID container = ContainerID::Invalid;
+  InventorySourceType type = InventorySourceType::Invalid;
+  ContainerID container    = ContainerID::Invalid;
   enum class InventorySourceFlags { DropItem, PickupItem, None } flags;
 
   inline InventorySource(ContainerID id) : container(id) {}
@@ -74,17 +74,17 @@ template <> struct hash<InventorySource> {
 class InventoryAction {
 public:
   InventorySource source;
-  unsigned int slot;
+  unsigned int slot = 0;
   ItemStack from, to;
 };
 
 class InventoryTransactionItemGroup {
 public:
-  unsigned short itemId;
-  unsigned short itemAux;
+  unsigned short itemId  = 0;
+  unsigned short itemAux = 0;
   std::unique_ptr<CompoundTag> tag;
-  int count;
-  unsigned char flag;
+  int count          = 0;
+  unsigned char flag = 0;
 
   MCAPI InventoryTransactionItemGroup(ItemStack const &, int);
   inline ~InventoryTransactionItemGroup() {}
@@ -140,11 +140,11 @@ static_assert(sizeof(ComplexInventoryTransaction) == 104);
 
 class ItemUseInventoryTransaction : public ComplexInventoryTransaction {
 public:
-  int actionType;
+  int actionType = 0;
   NetworkBlockPosition pos;
-  uint32_t unk;
-  BlockFace face;
-  uint32_t slot;
+  uint32_t unk   = 0;
+  BlockFace face = (BlockFace) 0;
+  uint32_t slot = 0;
   ItemStack itemInHand;
   Vec3 playerPos, clickPos;
 

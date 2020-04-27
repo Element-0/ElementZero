@@ -2,7 +2,7 @@
 
 template <typename Type, typename Store> class AutomaticID {
 public:
-  Store value;
+  Store value = {};
   // make it non-POD
   inline ~AutomaticID() noexcept {}
   inline AutomaticID() {}

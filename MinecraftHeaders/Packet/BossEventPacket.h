@@ -27,9 +27,9 @@ public:
   ActorUniqueID owner, player;
   BossEventUpdateType type;
   std::string name;
-  float percent;
-  unsigned color, overlay;
-  bool darken_sky, fog;
+  float percent  = 0.0f;
+  unsigned color = 0, overlay = 0;
+  bool darken_sky = false, fog = false;
 
   inline ~BossEventPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

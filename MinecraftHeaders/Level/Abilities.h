@@ -23,9 +23,9 @@ public:
     Value(float val) { val_float = val; }
     Value() {}
   };
-  Type type;
-  Value value;
-  Options opts;
+  Type type = Type::Invalid;
+  Value value{};
+  Options opts = Options::Unset;
 };
 
 class Abilities {

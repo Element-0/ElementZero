@@ -12,7 +12,7 @@ namespace mce {
 
 class UUID {
 public:
-  std::uint64_t a, b;
+  std::uint64_t a = 0, b = 0;
 
   UUID() {}
   UUID(std::uint64_t a, std::uint64_t b) : a(a), b(b) {}

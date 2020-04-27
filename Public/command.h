@@ -67,14 +67,14 @@ template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTyp
 class CustomCommandOrigin : public CommandOrigin {
 public:
   std::string name;
-  BlockPos pos;
-  Vec3 worldPosition;
-  Dimension *dim;
-  Actor *actor;
+  BlockPos pos                 = {0, 0, 0};
+  Vec3 worldPosition           = {0, 0, 0};
+  Dimension *dim               = nullptr;
+  Actor *actor                 = nullptr;
   CommandPermissionLevel level = CommandPermissionLevel::Internal;
   CommandOriginType type       = CommandOriginType::Script;
   bool allowSelectorExpansion  = true;
-  Json::Value *result;
+  Json::Value *result          = nullptr;
 
   inline CustomCommandOrigin() {}
   static std::unique_ptr<CustomCommandOrigin> CopyFrom(CommandOrigin const &orig) {

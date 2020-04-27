@@ -7,7 +7,7 @@
 class SpawnExperienceOrbPacket : public Packet {
 public:
   Vec3 pos;
-  int amount;
+  int amount = 0;
 
   inline ~SpawnExperienceOrbPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

@@ -8,7 +8,7 @@ class CommandRequestPacket : public Packet {
 public:
   std::string command;
   CommandOriginData data;
-  bool flag;
+  bool flag = false;
 
   inline ~CommandRequestPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

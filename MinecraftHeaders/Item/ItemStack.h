@@ -25,18 +25,18 @@ class ItemEnchants;
 
 class ItemStackBase {
 public:
-  Item *item;
+  Item *item{};
   std::unique_ptr<CompoundTag> tag;
-  uint64_t block_state;
-  uint16_t aux_value;
-  unsigned char count;
-  bool flag35;
-  std::chrono::steady_clock::time_point time;
-  bool flag48;
+  uint64_t block_state{};
+  uint16_t aux_value{};
+  unsigned char count{};
+  bool flag35{};
+  std::chrono::steady_clock::time_point time{};
+  bool flag48{};
   std::vector<BlockLegacy *> blv56;
-  uint64_t unk80;
+  uint64_t unk80{};
   std::vector<BlockLegacy *> blv88;
-  uint64_t unk112;
+  uint64_t unk112{};
   Tick blocking_tick;
   std::unique_ptr<ItemInstance> instance;
 

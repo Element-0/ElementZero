@@ -7,9 +7,9 @@
 
 class BookEditPacket : public Packet {
 public:
-  enum struct Action  { REPLACE_PAGE, ADD_PAGE, DELETE_PAGE, SWAP_PAGES, SIGN_BOOK, UNKNOWN = -1 };
-  Action action;
-  int slot, page, secondary_page;
+  enum struct Action { REPLACE_PAGE, ADD_PAGE, DELETE_PAGE, SWAP_PAGES, SIGN_BOOK, UNKNOWN = -1 };
+  Action action = Action::UNKNOWN;
+  int slot = 0, page = 0, secondary_page = 0;
   std::string a, b, sign;
 
   inline ~BookEditPacket() {}

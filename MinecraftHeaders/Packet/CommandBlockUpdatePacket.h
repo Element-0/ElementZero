@@ -8,15 +8,15 @@
 class CommandBlockUpdatePacket : public Packet {
 public:
   BlockPos pos;
-  unsigned short mode;
-  bool redstone;
-  bool conditional;
+  unsigned short mode = 0;
+  bool redstone       = false;
+  bool conditional    = false;
   ActorRuntimeID runtime_id;
   std::string command, output, raw_name;
-  int delay;
-  bool track_output;
-  bool execute_first_tick;
-  bool is_block;
+  int delay               = 0;
+  bool track_output       = false;
+  bool execute_first_tick = false;
+  bool is_block           = false;
 
   inline ~CommandBlockUpdatePacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

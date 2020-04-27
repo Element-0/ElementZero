@@ -36,10 +36,10 @@ enum class PlayerActionType : unsigned {
 
 class PlayerActionPacket : public Packet {
 public:
-  BlockPos pos;           // 40
-  int face;               // 52
-  PlayerActionType type;  // 56
-  ActorRuntimeID actorId; // 64
+  BlockPos pos;                                 // 40
+  int face              = 0;                    // 52
+  PlayerActionType type = (PlayerActionType) 0; // 56
+  ActorRuntimeID actorId;                       // 64
 
   inline ~PlayerActionPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;

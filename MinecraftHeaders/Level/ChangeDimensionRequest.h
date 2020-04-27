@@ -10,9 +10,9 @@ class Dimension;
 
 class ChangeDimensionRequest {
 public:
-  int unk0;
+  int unk0 = 0;
   AutomaticID<Dimension, int> from, to;
   Vec3 pos;
-  bool flag1, flag2;
+  bool flag1 = false, flag2 = false;
   std::unique_ptr<CompoundTag> nbt;
 };

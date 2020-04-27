@@ -12,12 +12,12 @@ public:
     float val_float;
   };
 
-  bool saved;
-  Type type;
-  Value value;
+  bool saved = false;
+  Type type = Type::Invalid;
+  Value value{};
   std::string name;
-  bool useInCommand;
-  bool defaultSet;
+  bool use_in_command = false;
+  bool default_set = false;
 };
 
 class GameRules {

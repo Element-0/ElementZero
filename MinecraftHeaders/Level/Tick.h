@@ -3,5 +3,5 @@
 #include <cstdint>
 
 struct Tick {
-  std::uint64_t value;
+  std::uint64_t value = {};
 };

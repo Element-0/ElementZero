@@ -2,7 +2,7 @@
 
 class Vec2 {
 public:
-  float x, y, z;
+  float x = 0.0f, y = 0.0f;
   // For ABI
   inline ~Vec2() {}
 

@@ -12,8 +12,8 @@ class CraftingEventPacket : public Packet {
 public:
   enum class Type { shapeless, shaped, furnace, furnace_data, multi, shulker_box };
 
-  ContainerID container;
-  Type type;
+  ContainerID container = ContainerID::Invalid;
+  Type type = Type::shapeless;
   mce::UUID uuid;
   std::vector<ItemStack> inputs, outputs;
 

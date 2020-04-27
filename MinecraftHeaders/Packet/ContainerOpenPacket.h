@@ -9,8 +9,8 @@
 
 class ContainerOpenPacket : public Packet {
 public:
-  ContainerID id;
-  ContainerType type;
+  ContainerID id     = ContainerID::Invalid;
+  ContainerType type = (ContainerType) 0;
   BlockPos pos;
   ActorUniqueID actor_id;
 

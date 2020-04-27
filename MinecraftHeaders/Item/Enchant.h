@@ -54,16 +54,16 @@ public:
   enum struct Frequency {};
   enum struct Slot {};
 
-  Type type;
-  Frequency freq;
-  bool lootable;
-  Slot primarySlot;
-  Slot secondarySlot;
-  int compatibility;
+  Type type{};
+  Frequency freq{};
+  bool lootable{};
+  Slot primarySlot{};
+  Slot secondarySlot{};
+  int compatibility{};
   std::string description;
   Util::HashString stringId;
-  bool experimental;
-  bool disabled;
+  bool experimental{};
+  bool disabled{};
 
   MCAPI virtual ~Enchant();
   MCAPI virtual bool isCompatibleWith(Type) const;

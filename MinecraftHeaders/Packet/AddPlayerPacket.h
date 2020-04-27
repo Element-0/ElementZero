@@ -27,13 +27,13 @@ public:
   std::string platform_online_id;
   Vec3 pos, speed;
   Vec2 rot;
-  float head_yaw;
+  float head_yaw = 0.0f;
   ItemStack selected_item;
   std::vector<std::unique_ptr<DataItem>> data_items;
   Abilities abilities;
   std::string device_id;
-  int build_platform;
-  SynchedActorData *syncedata;
+  int build_platform          = 0;
+  SynchedActorData *syncedata = nullptr;
 
   inline ~AddPlayerPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;
