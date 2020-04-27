@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <Command/CommandRegistry.h>
 #include <Command/CommandParameterData.h>
 #include <dllentry.h>
@@ -43,6 +45,7 @@ TInstanceHook(
       LOGV("\t%c %s[%s] %d(%d) +%d(%d) @%p") % (param.optional ? '+' : '-') % param.name %
           (param.desc ? param.desc : "") % param.tid.value % (int) param.type % param.offset % param.flag_offset %
           u.pointer;
+      if (param.unk56 != -1 || param.pad73) LOGW("\t\tunk56 %d pad73 %d") % param.unk56 % param.pad73;
     }
   }
   return original(this, signature, ovd);
@@ -63,6 +66,20 @@ TInstanceHook(
     LOGV("Command: %s (%s) [%d/%d] {%d}") % name % desc % (int) a.value % (int) b.value % (int) perm;
   }
   return original(this, name, desc, perm, a, b);
+}
+
+TInstanceHook(
+    void,
+    "?addEnumValueConstraints@CommandRegistry@@QEAAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@"
+    "AEBV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_"
+    "traits@D@std@@V?$allocator@D@2@@std@@@2@@3@W4SemanticConstraint@@@Z",
+    CommandRegistry, std::string const &en, std::vector<std::string> const &data, int value) {
+  if (settings.command.logRegister) {
+    DEF_LOGGER("CommandRegister");
+    LOGV("Enum constraints for %s: (%d)") % en % value;
+    for (auto &it : data) { LOGV("\t%s") % it; }
+  }
+  original(this, en, data, value);
 }
 
 TInstanceHook2(
