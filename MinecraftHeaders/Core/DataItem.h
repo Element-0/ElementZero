@@ -15,9 +15,9 @@ namespace DataTypeMap {
 
 template <typename T> DataItemType typeFor;
 
-template <> inline DataItemType typeFor<char>        = DataItemType::BYTE;
-template <> inline DataItemType typeFor<short>       = DataItemType::SHORT;
-template <> inline DataItemType typeFor<int>         = DataItemType::INT;
+template <> inline DataItemType typeFor<int8_t>      = DataItemType::BYTE;
+template <> inline DataItemType typeFor<int16_t>     = DataItemType::SHORT;
+template <> inline DataItemType typeFor<int32_t>     = DataItemType::INT;
 template <> inline DataItemType typeFor<float>       = DataItemType::FLOAT;
 template <> inline DataItemType typeFor<std::string> = DataItemType::STRING;
 template <> inline DataItemType typeFor<CompoundTag> = DataItemType::NBT;
