@@ -20,6 +20,8 @@ template <typename Holder> struct ValueHolder {
 
 #pragma region Player
 
+// AddPlayerPacket::AddPlayerPacket(Player &)
+SynchedActorData const &Actor::getEntityData() const { return direct_access<SynchedActorData const>(this, 304); }
 // Actor::Actor
 SimpleContainer &Actor::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1400); }
 // Actor::Actor

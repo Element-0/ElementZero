@@ -5,6 +5,7 @@
 
 #include "ActorType.h"
 #include "ActorUniqueID.h"
+#include "SynchedActorData.h"
 #include "../Math/Vec3.h"
 #include "../Container/SimpleContainer.h"
 #include "../Core/AutomaticID.h"
@@ -48,6 +49,7 @@ public:
   MCAPI ActorUniqueID const &getUniqueID() const;
   BASEAPI SimpleContainer &getEquipmentContainer();
   BASEAPI SimpleContainer &getHandContainer();
+  BASEAPI SynchedActorData const &getEntityData() const;
 };
 
 class Mob : public Actor {
