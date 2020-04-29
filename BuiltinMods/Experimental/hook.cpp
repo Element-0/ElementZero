@@ -1,8 +1,11 @@
-#include "pch.h"
-
-#include "global.h"
+#include <functional>
 
 #include <Core/core.h>
+
+#include <hook.h>
+#include <log.h>
+
+#include "global.h"
 
 TClasslessInstanceHook(bool, "?_isFeatureEnabled@EducationOptions@@AEBA_NW4EducationFeature@@@Z", int v) {
   if (settings.education_feature) return true;
@@ -49,10 +52,10 @@ TClasslessInstanceHook(
   }
 }
 
-THook(void *, "??0MinecraftEventing@@QEAA@AEBVPath@Core@@@Z", void *a, void *b) {
-  // HACK FOR LevelSettings
-  char *access = (char *) b + 2800;
-  access[76]   = settings.force_experimental_gameplay;
-  access[36]   = settings.education_feature;
-  return original(a, b);
-}
+// THook(void *, "??0PackSourceFactory@@QEAA@AEBV?$shared_ptr@VIInPackagePacks@@@std@@@Z", void *a, void *b) {
+//   // HACK FOR LevelSettings
+//   char *access = (char *) b + 0x10E0;
+//   access[76]   = settings.force_experimental_gameplay;
+//   access[36]   = settings.education_feature;
+//   return original(a, b);
+// }

@@ -23,17 +23,12 @@ struct Settings {
       return true;
     }
   } commands;
-  bool force_experimental_gameplay = false;
-  bool education_feature           = false;
-  bool debug_packs                 = false;
-  std::string database             = "essentials.db";
-  std::string worldDatabase        = "essentials.db";
+  std::string database      = "essentials.db";
+  std::string worldDatabase = "essentials.db";
 
   template <typename IO> static inline bool io(IO f, Settings &settings, YAML::Node &node) {
-    return f(settings.commands, node["commands"]) &&
-           f(settings.force_experimental_gameplay, node["force-experimental-gameplay"]) &&
-           f(settings.education_feature, node["education-feature"]) && f(settings.debug_packs, node["debug-packs"]) &&
-           f(settings.database, node["database"]) && f(settings.worldDatabase, node["world-database"]);
+    return f(settings.commands, node["commands"]) && f(settings.database, node["database"]) &&
+           f(settings.worldDatabase, node["world-database"]);
   }
 };
 
