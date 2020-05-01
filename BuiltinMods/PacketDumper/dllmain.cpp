@@ -2,6 +2,7 @@
 
 #include <SQLiteCpp/Statement.h>
 
+#include <Core/Packet.h>
 #include <Net/NetworkPeer.h>
 #include <Net/NetworkIdentifier.h>
 #include <Net/NetworkHandler.h>
@@ -38,7 +39,7 @@ void PreInit() {
 }
 
 void LogPacket(NetworkIdentifier id, std::string const &data) {
-  static SQLite::Statement cache{*database, "INSERT INTO record VALUES (?, ?, CURRENT_TIMESTAMP, ?)"};
+  static SQLite::Statement cache{*database, "INSERT INTO record VALUES (?, ?, strftime('%Y-%m-%d %H:%M:%f', 'now'), ?)"};
   static auto sess = SessionUUID();
   BOOST_SCOPE_EXIT_ALL() {
     cache.reset();
@@ -50,6 +51,21 @@ void LogPacket(NetworkIdentifier id, std::string const &data) {
   cache.exec();
 }
 
+void LogSendingPacket(NetworkIdentifier id, Packet const &pkt, std::string const &data) {
+  static SQLite::Statement cache{*database, "INSERT INTO send_record VALUES (?, ?, strftime('%Y-%m-%d %H:%M:%f', 'now'), ?, ?, ?)"};
+  static auto sess = SessionUUID();
+  BOOST_SCOPE_EXIT_ALL() {
+    cache.reset();
+    cache.clearBindings();
+  };
+  cache.bindNoCopy(1, sess, sizeof sess);
+  cache.bind(2, (int64_t) id.guid.g);
+  cache.bind(3, (int64_t) pkt.getId());
+  cache.bind(4, pkt.getName());
+  cache.bindNoCopy(5, data);
+  cache.exec();
+}
+
 TInstanceHook(
     NetworkPeer::DataStatus,
     "?receivePacket@Connection@NetworkHandler@@QEAA?AW4DataStatus@NetworkPeer@@AEAV?$basic_string@DU?$char_traits@D@"
@@ -58,4 +74,13 @@ TInstanceHook(
   auto status = original(this, data);
   if (status == NetworkPeer::DataStatus::OK && database) LogPacket(id, data);
   return status;
+}
+
+TClasslessInstanceHook(
+    void,
+    "?_sendInternal@NetworkHandler@@AEAAXAEBVNetworkIdentifier@@AEBVPacket@@AEBV?$basic_string@DU?$char_traits@D@std@@"
+    "V?$allocator@D@2@@std@@@Z",
+    NetworkIdentifier const &id, Packet const &pkt, std::string const &content) {
+  LogSendingPacket(id, pkt, content);
+  original(this, id, pkt, content);
 }

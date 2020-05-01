@@ -19,6 +19,14 @@ void InitDatabase() {
       "netid INT, "
       "time DATETIME, "
       "data BLOB)");
+  database->exec(
+      "CREATE TABLE IF NOT EXISTS send_record ("
+      "session BLOB, "
+      "netid INT, "
+      "time DATETIME, "
+      "id INT, "
+      "name TEXT, "
+      "data BLOB)");
   database->exec("PRAGMA journal_mode = WAL");
   database->exec("PRAGMA synchronous = NORMAL");
 }
