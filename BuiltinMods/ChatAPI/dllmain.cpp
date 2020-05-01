@@ -78,7 +78,7 @@ void PreInit() {
       "uuid BLOB NOT NULL, "
       "name TEXT, "
       "content TEXT, "
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')))");
 }
 
 void static logChat(Mod::PlayerEntry const &entry, std::string const &content) {

@@ -41,11 +41,11 @@ Mod::PlayerDatabase::PlayerDatabase() {
       "CREATE TABLE IF NOT EXISTS login"
       "(uuid UUID, "
       "address TEXT, "
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')))");
   sqldb->exec(
       "CREATE TABLE IF NOT EXISTS logout"
       "(uuid UUID, "
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')))");
 }
 
 Mod::PlayerDatabase &Mod::PlayerDatabase::GetInstance() {

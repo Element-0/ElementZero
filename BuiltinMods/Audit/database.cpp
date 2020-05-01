@@ -6,7 +6,7 @@ void InitDatabase() {
   database = std::make_unique<SQLite::Database>(settings.Database, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
   database->exec(
       "CREATE TABLE IF NOT EXISTS audit_action ("
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP, "
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')), "
       "session BLOB, "
       "player BLOB, "
       "dimension INTEGER, "
@@ -18,7 +18,7 @@ void InitDatabase() {
       "face INTEGER)");
   database->exec(
       "CREATE TABLE IF NOT EXISTS audit_transaction ("
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP, "
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')), "
       "session BLOB, "
       "player BLOB, "
       "dimension INTEGER, "

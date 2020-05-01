@@ -190,7 +190,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
       static SQLite::Statement insert{
           *log_database,
           "INSERT INTO log (session, time, priority, area, source, line, content) "
-          "VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
+          "VALUES (?, strftime('%Y-%m-%d %H:%M:%f', 'now'), ?, ?, ?, ?, ?)"};
       if (session != "") {
         static std::once_flag o;
         std::call_once(o, [] {
@@ -215,7 +215,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
         static SQLite::Statement insert_temp{
             *log_database,
             "INSERT INTO temp.pending (time, priority, area, source, line, content) "
-            "VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)"};
+            "VALUES (strftime('%Y-%m-%d %H:%M:%f', 'now'), ?, ?, ?, ?, ?)"};
         insert_temp.bind(1, pri);
         insert_temp.bindNoCopy(2, area.data());
         insert_temp.bindNoCopy(3, source);

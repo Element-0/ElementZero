@@ -31,7 +31,7 @@ void PreInit() {
       "reason TEXT NOT NULL, "
       "source TEXT, "
       "release INTEGER ,"
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')))");
   database->exec(
       "CREATE TABLE IF NOT EXISTS xuid("
       "value INTEGER PRIMARY KEY, "
@@ -39,14 +39,14 @@ void PreInit() {
       "reason TEXT NOT NULL, "
       "source TEXT, "
       "release INTEGER ,"
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')))");
   database->exec(
       "CREATE TABLE IF NOT EXISTS name("
       "value TEXT PRIMARY KEY COLLATE NOCASE, "
       "reason TEXT NOT NULL, "
       "source TEXT, "
       "release INTEGER ,"
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')))");
   database->exec(
       "CREATE TABLE IF NOT EXISTS iplog("
       "uuid BLOB NOT NULL, "
@@ -54,7 +54,7 @@ void PreInit() {
       "name TEXT COLLATE NOCASE NOT NULL, "
       "reason TEXT NOT NULL, "
       "address TEXT NOT NULL, "
-      "time INTEGER DEFAULT CURRENT_TIMESTAMP)");
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')))");
   Mod::CommandSupport::GetInstance().AddListener(SIG("loaded"), registerBanCommand);
 }
 
