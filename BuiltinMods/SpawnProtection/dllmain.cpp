@@ -21,6 +21,8 @@ DEFAULT_SETTINGS(settings);
 void dllenter() {}
 void dllexit() {}
 
+void AfterReload() {}
+
 void checkAction(Mod::PlayerEntry const &, Mod::PlayerAction const &, Mod::CallbackToken<std::string> &);
 void checkInventoryTransaction(
     Mod::PlayerEntry const &, ComplexInventoryTransaction const &, Mod::CallbackToken<std::string> &);
