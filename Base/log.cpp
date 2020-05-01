@@ -207,7 +207,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
         insert.bindNoCopy(3, area.data());
         insert.bindNoCopy(4, source);
         insert.bind(5, line);
-        insert.bindNoCopy(6, data);
+        insert.bindNoCopy(6, content);
         insert.exec();
         insert.reset();
         insert.clearBindings();
