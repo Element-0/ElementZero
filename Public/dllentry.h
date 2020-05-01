@@ -32,6 +32,13 @@ extern "C" __declspec(dllexport) void AfterReload();
   void ApplySettings(YAML::Node const &node) { ReadYAML(settings, node); }                                             \
   bool GenerateSettings(YAML::Node &node) { return WriteYAML(settings, node); }
 
+#define DEFAULT_SETTINGS_WITH_FIX(settings, ...)                                                                       \
+  void ApplySettings(YAML::Node const &node) { ReadYAML(settings, node); }                                             \
+  bool GenerateSettings(YAML::Node &node) {                                                                            \
+    __VA_ARGS__;                                                                                                       \
+    return WriteYAML(settings, node);                                                                                  \
+  }
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
   switch (ul_reason_for_call) {
   case DLL_PROCESS_ATTACH: dllenter(); break;
