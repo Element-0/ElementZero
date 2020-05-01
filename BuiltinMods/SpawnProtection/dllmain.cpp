@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <Actor/Player.h>
 #include <Math/BlockPos.h>
 #include <Net/NetworkIdentifier.h>
@@ -16,7 +18,16 @@
 Settings settings;
 Mode mode;
 
-DEFAULT_SETTINGS(settings);
+static void FixCoordinate() {
+  auto [sx, ex]    = std::minmax({settings.Start.x, settings.End.x});
+  auto [sz, ez]    = std::minmax({settings.Start.z, settings.End.z});
+  settings.Start.x = sx;
+  settings.End.x   = ex;
+  settings.Start.z = sz;
+  settings.End.z   = ez;
+}
+
+DEFAULT_SETTINGS_WITH_FIX(settings, FixCoordinate());
 
 void dllenter() {}
 void dllexit() {}
