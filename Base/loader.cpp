@@ -1,5 +1,8 @@
 #include "loader.h"
+#include "Command/CommandOrigin.h"
+#include "Command/CommandOutput.h"
 #include "settings.hpp"
+#include "yaml.h"
 
 #include <exception>
 #include <filesystem>
@@ -23,6 +26,7 @@ typedef void (*PrePostInitType)();
 typedef void (*WorldInitType)(std::filesystem::path const &);
 typedef void (*ServerStartType)();
 typedef void (*BeforeUnloadType)();
+typedef void (*AfterReloadType)();
 
 class lc_string {
   std::string data;
@@ -52,6 +56,7 @@ struct ModLibrary {
   WorldInitType worldInit;
   ServerStartType serverStart;
   BeforeUnloadType beforeUnload;
+  AfterReloadType afterReload;
 
   lc_set dependencies;
 };
@@ -65,12 +70,30 @@ template <typename Fn, Fn(ModLibrary::*Field)> struct FnWithName {
   template <typename... Ps> void operator()(Ps &&... ps) { fn(std::forward<Ps>(ps)...); }
 };
 
+struct ReloadableMod {
+  std::string name;
+  ApplySettingsType applySettings;
+  GenerateSettingsType generateSettings;
+  AfterReloadType afterReload;
+
+  ReloadableMod(ModLibrary const &src)
+      : name(src.keyname), applySettings(src.applySettings), generateSettings(src.generateSettings),
+        afterReload(src.afterReload) {}
+
+  void operator()(YAML::Node &node) {
+    applySettings(node);
+    generateSettings(node);
+    afterReload();
+  }
+};
+
 static std::map<lc_string, HMODULE> LoadedMods;
 static std::list<ModLibrary> LibList;
 static std::list<FnWithName<PrePostInitType, &ModLibrary::postInit>> PostInits;
 static std::list<FnWithName<WorldInitType, &ModLibrary::worldInit>> WorldInits;
 static std::list<FnWithName<ServerStartType, &ModLibrary::serverStart>> ServerStarts;
 static std::list<FnWithName<BeforeUnloadType, &ModLibrary::beforeUnload>> UnloadHooks;
+static std::list<ReloadableMod> Reloadables;
 static lc_set LibNameList;
 
 HMODULE GetLoadedMod(const char *name) {
@@ -116,6 +139,7 @@ void loadMods(YAML::Node &cfg_node) {
       lib.worldInit        = (WorldInitType) GetProcAddress(handle, "WorldInit");
       lib.serverStart      = (ServerStartType) GetProcAddress(handle, "ServerStart");
       lib.beforeUnload     = (BeforeUnloadType) GetProcAddress(handle, "BeforeUnload");
+      lib.afterReload      = (AfterReloadType) GetProcAddress(handle, "AfterReload");
       LibList.emplace_back(lib);
       LibNameList.emplace(name);
       LOGI("Loaded  %s") % next->path().filename().string();
@@ -188,6 +212,13 @@ void doLoadLib(YAML::Node &cfg_node, ModLibrary const &lib) {
   if (lib.worldInit) WorldInits.emplace_back(lib);
   if (lib.serverStart) ServerStarts.emplace_back(lib);
   if (lib.beforeUnload) UnloadHooks.emplace_back(lib);
+  if (lib.afterReload) {
+    if (lib.applySettings && lib.generateSettings) {
+      LOGV("Mod %s is reloadable") % lib.keyname;
+      Reloadables.emplace_back(lib);
+    } else
+      LOGW("Failed to register as reloadable for mod %s") % lib.keyname;
+  }
   LoadedMods.emplace(lib.keyname, lib.handle);
 }
 
@@ -210,4 +241,31 @@ void worldHook(std::filesystem::path const &path) {
   for (auto hook : WorldInits) try {
       hook(path);
     } catch (std::exception const &ex) { LOGE("Exception at world hook (%s): %s") % hook.name % ex.what(); }
+}
+
+TClasslessInstanceHook(
+    void, "?execute@ReloadCommand@@UEBAXAEBVCommandOrigin@@AEAVCommandOutput@@@Z", CommandOrigin const &orig,
+    CommandOutput &outp) {
+  original(this, orig, outp);
+  auto cfg     = readConfig();
+  bool changed = !ReadYAML(settings, cfg);
+  if (changed) WriteYAML(settings, cfg);
+  auto mods = cfg["mods"];
+  for (auto hook : Reloadables) {
+    auto content = mods[hook.name];
+    if (!content.IsMap()) {
+      LOGE("Reload failed for mod %s: not found section for mod") % hook.name;
+      continue;
+    }
+    if (!content["enabled"].as<bool>(false)) {
+      LOGE("Reload failed for mod %s: cannot disable in runtime") % hook.name;
+      continue;
+    }
+    try {
+      hook(content);
+      outp.addToResultList("mods", hook.name);
+
+    } catch (std::exception const &ex) { LOGE("Exception at reload hook (%s): %s") % hook.name % ex.what(); }
+  }
+  writeConfig(cfg);
 }

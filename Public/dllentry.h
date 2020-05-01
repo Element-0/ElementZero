@@ -25,6 +25,8 @@ extern "C" __declspec(dllexport) void WorldInit(std::filesystem::path const &);
 extern "C" __declspec(dllexport) void ServerStart();
 // Called before the server is stopped
 extern "C" __declspec(dllexport) void BeforeUnload();
+// Called after reload settings
+extern "C" __declspec(dllexport) void AfterReload();
 
 #define DEFAULT_SETTINGS(settings)                                                                                     \
   void ApplySettings(YAML::Node const &node) { ReadYAML(settings, node); }                                             \

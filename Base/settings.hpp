@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <fstream>
+
 #include <yaml.h>
 
 struct Settings {
@@ -42,5 +44,29 @@ struct Settings {
 };
 
 extern Settings settings;
+
+inline YAML::Node readConfig() {
+  constexpr auto config_name = "custom.yaml";
+  try {
+    return YAML::LoadFile(config_name);
+  } catch (YAML::BadFile const &e) {
+    YAML::Emitter out;
+    out.SetIndent(2);
+    YAML::Node node;
+    WriteYAML(settings, node);
+    out << node;
+    std::ofstream{config_name} << out.c_str();
+    return node;
+  }
+}
+
+inline void writeConfig(YAML::Node const &node) {
+  constexpr auto config_name = "custom.yaml";
+  YAML::Emitter emitter;
+  emitter.SetIndent(2);
+  emitter << node;
+  std::ofstream{config_name} << emitter.c_str();
+}
+
 extern std::string session;
 void initDatabase();
