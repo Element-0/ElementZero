@@ -15,13 +15,8 @@
       "variables": [
         {
           "name": "VCPKG_TARGET_TRIPLET",
-          "value": "x64-windows-rel",
+          "value": "elementzero",
           "type": "STRING"
-        },
-        {
-          "name": "NO_INLINE",
-          "value": "True",
-          "type": "BOOL"
         }
       ]
     }

@@ -18,8 +18,6 @@ jobs:
 
     - name: run-vcpkg
       uses: lukka/run-vcpkg@v2
-      id: runvcpkg
-      if: steps.cache.outputs.cache-hit != 'true'
       with:
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
         vcpkgArguments: '@${{ github.workspace }}/vcpkg.txt'
@@ -85,6 +83,13 @@ jobs:
         cp bedrock_server_mod.lib ../Lib
         cp bedrock_server_mod.exe ../Lib
       shell: bash
+
+    - name: Build ElementZero
+      uses: lukka/run-cmake@v2
+      with:
+        cmakeListsOrSettingsJson: CMakeSettingsJson
+        useVcpkgToolchainFile: true
+        vcpkgTriplet: ${{ env.RUNVCPKG_VCPKG_TRIPLET_OUT }}
 
     # - name: Build
     #   run: |
