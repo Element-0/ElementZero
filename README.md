@@ -49,8 +49,8 @@ A: I created a dll that simply forwards all APIs to the open source version of C
 
 ## How to use vcpkg
 
-0. Download and install [vcpkg](https://github.com/microsoft/vcpkg)
-1. Install dependencies by `vcpkg install @vcpkg.txt` (run in $(SolutionDir))
+0. Install vcpkg in source tree `cd vcpkg && bootstrap-vcpkg.bat`
+1. Install dependencies by `vcpkg\vcpkg.exe install @vcpkg.txt` (run in $(SolutionDir))
 
 ## How to get bedrock_server_mod.lib
 
