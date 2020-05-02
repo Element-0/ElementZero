@@ -4,14 +4,14 @@
       "name": "RelWithDebInfo",
       "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
-      "inheritEnvironments": [ "clang_cl_x64" ],
+      "inheritEnvironments": ["clang_cl_x64"],
       "buildRoot": "${projectDir}\\Build",
       "installRoot": "${projectDir}\\Dist",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "intelliSenseMode": "windows-msvc-x64",
-      "cmakeToolchain": "",
+      "cmakeToolchain": "${projectDir}\\Build\\scripts\\buildsystems\\vcpkg.cmake",
       "variables": [
         {
           "name": "VCPKG_TARGET_TRIPLET",
