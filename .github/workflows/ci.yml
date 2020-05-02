@@ -101,7 +101,7 @@ jobs:
         "/c/Program Files/CMake/bin/cpack" -G 7Z .
         ninja install
         cd ../..
-        tar cvfJ pkg.tar.xz C:/Program Files \(x86\)/ElementZero/*
+        tar cvfJ pkg.tar.xz C:/Program Files \\(x86\\)/ElementZero/*
       shell: bash
 
     - name: Create a new GitHub release if a new tag is pushed
