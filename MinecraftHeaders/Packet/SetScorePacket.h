@@ -12,8 +12,8 @@ enum class ScorePacketType : char { set, remove };
 
 class SetScorePacket : public Packet {
   MCAPI SetScorePacket(ScorePacketType, ScoreboardId const &, Objective const &);
-  inline SetScorePacket(ScoreboardId const &id) : infos{id} {}
-  inline SetScorePacket(std::vector<ScorePacketInfo> infos) : infos(std::move(infos)) {}
+  inline SetScorePacket(ScoreboardId const &id) : type(ScorePacketType::remove), infos{id} {}
+  inline SetScorePacket(std::vector<ScorePacketInfo> infos) : type(ScorePacketType::set), infos(std::move(infos)) {}
 
 public:
   ScorePacketType type;

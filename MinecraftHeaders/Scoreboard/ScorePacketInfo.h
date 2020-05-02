@@ -19,3 +19,5 @@ struct ScorePacketInfo {
 
   inline ScorePacketInfo(ScoreboardId const &sid) : sid(sid) {}
 };
+
+static_assert(offsetof(ScorePacketInfo, fake_name) == 72);
