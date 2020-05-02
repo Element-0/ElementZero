@@ -89,6 +89,7 @@ jobs:
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
         useVcpkgToolchainFile: true
+        buildDirectory: ${{ github.workspace }}/Build
         vcpkgTriplet: ${{ env.RUNVCPKG_VCPKG_TRIPLET_OUT }}
     
     - name: Install & Packaging
