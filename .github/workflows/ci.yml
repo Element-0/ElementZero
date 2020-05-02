@@ -15,29 +15,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
-    - name: Set vcpkg's response file path used as part of cache's key.
-      env:
-        vcpkgResponseFile: ${{ github.workspace }}/vcpkg.txt
-      run: |
-        sed -i 's/VcPkgTriplets/..\\VcPkgTriplets/' $vcpkgResponseFile
-        sed -i 's/=ports/=..\\ports/' $vcpkgResponseFile
-        echo "::set-env name=vcpkgResponseFile::$vcpkgResponseFile"
-      shell: bash
-
-    - name: Cache vcpkg artifacts
-      uses: actions/cache@v1
-      id: cache
-      with:
-        path: ${{ github.workspace }}/vcpkg
-        key: vcpkg-${{ hashFiles( env.vcpkgResponseFile ) }}
 
     - name: run-vcpkg
-      uses: lukka/run-vcpkg@v0.9
+      uses: lukka/run-vcpkg@v2
       id: runvcpkg
       if: steps.cache.outputs.cache-hit != 'true'
       with:
-        vcpkgGitCommitId: master
-        vcpkgArguments: '@${{ env.vcpkgResponseFile }}'
+        vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+        vcpkgArguments: '@${{ github.workspace }}/vcpkg.txt'
+        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
     - uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -106,7 +92,7 @@ jobs:
         mkdir Build
         pushd Build
         cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-        -DVCPKG_TARGET_TRIPLET:STRING="x64-windows-rel" \
+        -DVCPKG_TARGET_TRIPLET:STRING="elementzero" \
         -DCMAKE_INSTALL_PREFIX:PATH="$cur/Dist" \
         -DCMAKE_TOOLCHAIN_FILE="$cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
         ..
@@ -144,4 +130,4 @@ jobs:
       uses: actions/upload-artifact@v1.0.0
       with:
         name: vcpkg
-        path: vcpkg/installed/x64-windows-rel
+        path: vcpkg/installed/elementzero

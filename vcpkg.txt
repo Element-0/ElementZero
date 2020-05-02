@@ -1,7 +1,5 @@
---overlay-ports=ports
---overlay-triplets=VcPkgTriplets
 --triplet
-x64-windows-rel
+elementzero
 boost-algorithm
 boost-core
 boost-format
@@ -16,4 +14,3 @@ msgpack
 flatbuffers
 ms-gsl
 funchook
-grpc
