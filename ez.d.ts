@@ -186,3 +186,15 @@ declare type Sqlite3Database = {
 declare module "ez:sqlite3" {
   export function open(filename: string): Sqlite3Database;
 }
+
+declare module "ez:scoreboard" {
+  interface FakeScoreboard {
+    init(target: PlayerEntry, name: string, is_asc: boolean): void;
+    deinit(target: PlayerEntry): void;
+    set(target: PlayerEntry, id: number, name: string, score: number): void;
+    remove(target: PlayerEntry, id: number): void;
+  }
+
+  export const sidebar: FakeScoreboard;
+  export const list: FakeScoreboard;
+}
