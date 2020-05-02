@@ -119,7 +119,7 @@ jobs:
       uses: actions/upload-artifact@v1.0.0
       with:
         name: dist
-        path: C:/Program Files \(x86\)/ElementZero/
+        path: C:/Program Files (x86)/ElementZero/
 
     - name: Upload vcpkg installed
       uses: actions/upload-artifact@v1.0.0
