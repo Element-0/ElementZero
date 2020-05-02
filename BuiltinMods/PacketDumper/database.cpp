@@ -39,7 +39,7 @@ void InitDatabase() {
     SQLite::Transaction trans{*database};
     try {
       switch (version) {
-      case 0: // upgrade custom_name (uuid_a uuid_b to uuid (blob))
+      case 0: // record, send_record to packets
         migrateDatabase<0, 1>();
         break;
       case 1: break;
