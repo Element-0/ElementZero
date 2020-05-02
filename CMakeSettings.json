@@ -11,7 +11,7 @@
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "intelliSenseMode": "windows-msvc-x64",
-      "cmakeToolchain": "${projectDir}\\Build\\scripts\\buildsystems\\vcpkg.cmake",
+      "cmakeToolchain": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
       "variables": [
         {
           "name": "VCPKG_TARGET_TRIPLET",
