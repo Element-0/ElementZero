@@ -90,49 +90,41 @@ jobs:
         cmakeListsOrSettingsJson: CMakeSettingsJson
         useVcpkgToolchainFile: true
         vcpkgTriplet: ${{ env.RUNVCPKG_VCPKG_TRIPLET_OUT }}
+    
+    - name: Install & Packaging
+      run: |
+        cd Build
+        "/c/Program Files/CMake/bin/cpack" -G TZST .
+        "/c/Program Files/CMake/bin/cpack" -G STGZ .
+        "/c/Program Files/CMake/bin/cpack" -G ZIP .
+        "/c/Program Files/CMake/bin/cpack" -G 7Z .
+        ninja install
+        cd ..
+        tar cvfJ pkg.tar.xz Dist/*
+      shell: bash
 
-    # - name: Build
-    #   run: |
-    #     cur=$(cygpath -m $(pwd))
-    #     mkdir Build
-    #     pushd Build
-    #     cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    #     -DVCPKG_TARGET_TRIPLET:STRING="${{ env.RUNVCPKG_VCPKG_TRIPLET_OUT }}" \
-    #     -DCMAKE_INSTALL_PREFIX:PATH="$cur/Dist" \
-    #     -DCMAKE_TOOLCHAIN_FILE="$cur/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-    #     ..
-    #     ninja
-    #     "/c/Program Files/CMake/bin/cpack" -G TZST .
-    #     "/c/Program Files/CMake/bin/cpack" -G STGZ .
-    #     "/c/Program Files/CMake/bin/cpack" -G ZIP .
-    #     "/c/Program Files/CMake/bin/cpack" -G 7Z .
-    #     ninja install
-    #     popd
-    #     tar cvfJ pkg.tar.xz Dist/*
-    #   shell: bash
+    - name: Create a new GitHub release if a new tag is pushed
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v${{ env.GITHUB_TAG_NAME }}
+        prerelease: false
+        draft: true
+        files: |
+          pack/ElementZero-*
+          pkg.tar.xz
+        body: (empty)
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-    # - name: Create a new GitHub release if a new tag is pushed
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     name: v${{ env.GITHUB_TAG_NAME }}
-    #     prerelease: false
-    #     draft: true
-    #     files: |
-    #       pack/ElementZero-*
-    #       pkg.tar.xz
-    #     body: (empty)
-    #   if: startsWith(github.ref, 'refs/tags/')
-    #   env:
-    #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: dist
+        path: Dist
 
-    # - name: Upload artifact
-    #   uses: actions/upload-artifact@v1.0.0
-    #   with:
-    #     name: dist
-    #     path: Dist
-
-    # - name: Upload vcpkg installed
-    #   uses: actions/upload-artifact@v1.0.0
-    #   with:
-    #     name: vcpkg
-    #     path: vcpkg/installed/${{ env.RUNVCPKG_VCPKG_TRIPLET_OUT }}
+    - name: Upload vcpkg installed
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: vcpkg
+        path: vcpkg/installed/${{ env.RUNVCPKG_VCPKG_TRIPLET_OUT }}
