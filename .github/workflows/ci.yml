@@ -94,13 +94,13 @@ jobs:
     
     - name: Install & Packaging
       run: |
-        cd Build
+        cd Build/RelWithDebInfo
         "/c/Program Files/CMake/bin/cpack" -G TZST .
         "/c/Program Files/CMake/bin/cpack" -G STGZ .
         "/c/Program Files/CMake/bin/cpack" -G ZIP .
         "/c/Program Files/CMake/bin/cpack" -G 7Z .
         ninja install
-        cd ..
+        cd ../..
         tar cvfJ pkg.tar.xz Dist/*
       shell: bash
 
