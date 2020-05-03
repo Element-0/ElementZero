@@ -11,8 +11,19 @@
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "intelliSenseMode": "windows-msvc-x64",
-      "cmakeToolchain": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
       "variables": [
+        {
+          "name": "CMAKE_TOOLCHAIN_FILE",
+          "value": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+        },
+        {
+          "name": "ChakraCore",
+          "value": "${projectDir}\\vcpkg\\installed\\elementzero\\bin\\ChakraCore.dll"
+        },
+        {
+          "name": "FUNCHOOK_DLL",
+          "value": "${projectDir}\\vcpkg\\installed\\elementzero\\bin\\funchook.dll"
+        },
         {
           "name": "VCPKG_TARGET_TRIPLET",
           "value": "elementzero",
