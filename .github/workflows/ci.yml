@@ -80,7 +80,6 @@ jobs:
       uses: lukka/run-cmake@v2
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
-        useVcpkgToolchainFile: true
     
     - name: Install & Packaging
       run: |
