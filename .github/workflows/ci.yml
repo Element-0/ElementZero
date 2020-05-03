@@ -88,13 +88,10 @@ jobs:
       uses: lukka/run-cmake@v2
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
-        useVcpkgToolchainFile: true
-        buildDirectory: ${{ github.workspace }}/Build
-        vcpkgTriplet: ${{ env.RUNVCPKG_VCPKG_TRIPLET_OUT }}
     
     - name: Install & Packaging
       run: |
-        cd Build/RelWithDebInfo
+        cd /c/_temp/RelWithDebInfo
         "/c/Program Files/CMake/bin/cpack" -G TZST .
         "/c/Program Files/CMake/bin/cpack" -G STGZ .
         "/c/Program Files/CMake/bin/cpack" -G ZIP .
