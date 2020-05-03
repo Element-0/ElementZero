@@ -7,7 +7,7 @@ if (NOT DEFINED ChakraCore)
 endif ()
 
 if (NOT EXISTS ${ChakraCore})
-    message (FATAL_ERROR "Failed to found ChakraCore.dll, plase install via vcpkg install chakracore:x64-windows-rel")
+    message (FATAL_ERROR "Failed to found ChakraCore.dll, plase install via vcpkg install chakracore:elementzero")
 endif ()
 
 install (FILES ${ChakraCore} DESTINATION .)
@@ -29,11 +29,11 @@ if (NOT DEFINED FUNCHOOK_LIB)
 endif ()
 
 if (NOT EXISTS ${FUNCHOOK_DLL})
-    message (FATAL_ERROR "Failed to found funchook.dll, plase install via vcpkg install funchook:x64-windows-rel")
+    message (FATAL_ERROR "Failed to found funchook.dll, plase install via vcpkg install funchook:elementzero")
 endif ()
 
 if (NOT EXISTS ${FUNCHOOK_LIB})
-    message (FATAL_ERROR "Failed to found funchook_dll.lib, plase install via vcpkg install funchook:x64-windows-rel")
+    message (FATAL_ERROR "Failed to found funchook_dll.lib, plase install via vcpkg install funchook:elementzero")
 endif ()
 
 install (FILES ${FUNCHOOK_DLL} DESTINATION .)

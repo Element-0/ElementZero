@@ -88,10 +88,11 @@ jobs:
       uses: lukka/run-cmake@v2
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
+        useVcpkgToolchainFile: true
     
     - name: Install & Packaging
       run: |
-        cd /c/_temp/RelWithDebInfo
+        cd /d/a/_temp/RelWithDebInfo
         "/c/Program Files/CMake/bin/cpack" -G TZST .
         "/c/Program Files/CMake/bin/cpack" -G STGZ .
         "/c/Program Files/CMake/bin/cpack" -G ZIP .
