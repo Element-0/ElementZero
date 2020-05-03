@@ -20,7 +20,13 @@ TInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ", ScriptEngine) {
   original(this);
   engine = this;
   initBasicAPI();
+}
+
+TInstanceHook(int, "?startScriptLoading@ScriptEngine@@QEAAXXZ", ScriptEngine) {
+  DEF_LOGGER("ScriptEngine");
+  LOGV("loading");
   loadCustomScript();
+  return original(this);
 }
 
 TClasslessInstanceHook(bool, "?_processSystemInitialize@ScriptEngine@@AEAA_NXZ") {
