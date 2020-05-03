@@ -92,6 +92,16 @@ static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string
     });
     return GetUndefined();
   };
+  native["onPlayerInitialized"] = +[](JsValueRef ref) {
+    if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
+    auto &db = Mod::PlayerDatabase::GetInstance();
+    db.AddListener(SIG("initialized"), [=, fn{ValueHolder{ref}}](Mod::PlayerEntry const &entry) {
+      JsValueRef ar[] = {GetUndefined(), ToJs(entry)};
+      JsValueRef res;
+      JsCallFunction(*fn, ar, 2, &res);
+    });
+    return GetUndefined();
+  };
   native["onPlayerLeft"] = +[](JsValueRef ref) {
     if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
     auto &db = Mod::PlayerDatabase::GetInstance();
@@ -114,6 +124,7 @@ static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string
     export const getPlayerList = import.meta.native.getPlayerList;
 
     export const onPlayerJoined = import.meta.native.onPlayerJoined;
+    export const onPlayerInitialized = import.meta.native.onPlayerInitialized;
     export const onPlayerLeft = import.meta.native.onPlayerLeft;
   )";
 });

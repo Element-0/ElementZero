@@ -63,6 +63,7 @@ using PlayerEntryContainer = boost::multi_index_container<
 // Player database for searching players or subscribing to player join and leave events
 class PlayerDatabase
     : public EventEmitter<"joined"_sig, PlayerEntry const &>,
+      public EventEmitter<"initialized"_sig, PlayerEntry const &>,
       public EventEmitter<"left"_sig, PlayerEntry const &>,
       public EventEmitter<"change_dimension"_sig, PlayerEntry const &, ChangeDimensionRequest const &, bool> {
   PlayerEntryContainer data;
@@ -109,6 +110,7 @@ public:
   BASEAPI std::optional<OfflinePlayerEntry> FindOffline(mce::UUID const &uuid);
 
   USING_EVENTEMITTER("joined", PlayerEntry const &);
+  USING_EVENTEMITTER("initialized", PlayerEntry const &);
   USING_EVENTEMITTER("left", PlayerEntry const &);
   USING_EVENTEMITTER("change_dimension", PlayerEntry const &, ChangeDimensionRequest const &, bool);
 };

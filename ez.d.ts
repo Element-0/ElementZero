@@ -39,6 +39,11 @@ declare module "ez:player" {
    */
   export function onPlayerJoined(cb: (entry: PlayerEntry) => void): void;
   /**
+   * Called when player initialized
+   * @param cb Callback
+   */
+  export function onPlayerInitialized(cb: (entry: PlayerEntry) => void): void;
+  /**
    * Called before player left
    * @param cb Callback
    */

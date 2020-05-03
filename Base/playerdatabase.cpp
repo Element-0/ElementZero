@@ -12,6 +12,8 @@
 #include <log.h>
 #include <modutils.h>
 
+#include "Net/NetworkIdentifier.h"
+#include "hook.h"
 #include "settings.hpp"
 
 DEF_LOGGER("PlayerDB");
@@ -26,11 +28,12 @@ Mod::PlayerDatabase &db = Mod::PlayerDatabase::GetInstance();
 std::unique_ptr<SQLite::Database> sqldb;
 
 Mod::PlayerDatabase::PlayerDatabase() {
-  emitter<"joined"_sig> = &Mod::PlayerDatabase::Emit;
-  emitter<"left"_sig>   = &Mod::PlayerDatabase::Emit;
-  emit_change_dim       = &Mod::PlayerDatabase::Emit;
-  container             = &data;
-  auxm                  = &auxmap;
+  emitter<"joined"_sig>      = &Mod::PlayerDatabase::Emit;
+  emitter<"initialized"_sig> = &Mod::PlayerDatabase::Emit;
+  emitter<"left"_sig>        = &Mod::PlayerDatabase::Emit;
+  emit_change_dim            = &Mod::PlayerDatabase::Emit;
+  container                  = &data;
+  auxm                       = &auxmap;
   sqldb = std::make_unique<SQLite::Database>(settings.UserDatabase, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
   sqldb->exec(
       "CREATE TABLE IF NOT EXISTS user"
@@ -162,8 +165,7 @@ TClasslessInstanceHook(
 
 TClasslessInstanceHook(
     void, "?_onPlayerLeft@ServerNetworkHandler@@AEAAXPEAVServerPlayer@@_N@Z", Player *player, bool flag) {
-  auto it = container->find(player);
-  if (it != container->end()) {
+  if (auto it = container->find(player); it != container->end()) {
     LOGV("%s left") % it->name;
     static SQLite::Statement stmt_logout{*sqldb, "INSERT INTO logout (uuid) VALUES (?)"};
     BOOST_SCOPE_EXIT_ALL() {
@@ -195,4 +197,12 @@ TClasslessInstanceHook(
         (db.*emit_change_dim)(SIG("change_dimension"), *it, request, true);
   }
   return ret;
+}
+
+TClasslessInstanceHook(
+    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVSetLocalPlayerAsInitializedPacket@@@Z",
+    NetworkIdentifier const &netid, void *packet) {
+  original(this, netid, packet);
+  auto &view = container->get<NetworkIdentifier>();
+  if (auto it = view.find(netid); it != view.end()) (db.*emitter<"initialized"_sig>) (SIG("initialized"), *it);
 }
