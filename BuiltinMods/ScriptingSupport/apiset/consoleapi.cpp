@@ -4,6 +4,7 @@
 #include "log.h"
 
 #include <scriptapi.h>
+#include <stdexcept>
 
 using namespace Mod::Scripting;
 
@@ -13,9 +14,7 @@ static RegisterQueue queue("console", [](JsObjectWrapper global) {
   console["log"] = [](JsValueRef callee, Arguments args) {
     if (!args.empty()) {
       std::stringstream ss;
-      for (auto arg : args) {
-        ss << JsToString(arg) << " ";
-      }
+      for (auto arg : args) { ss << JsToString(arg) << " "; }
       LOGI("%s") % ss.str();
     }
     return GetUndefined();
@@ -23,9 +22,7 @@ static RegisterQueue queue("console", [](JsObjectWrapper global) {
   console["warn"] = [](JsValueRef callee, Arguments args) {
     if (!args.empty()) {
       std::stringstream ss;
-      for (auto arg : args) {
-        ss << JsToString(arg) << " ";
-      }
+      for (auto arg : args) { ss << JsToString(arg) << " "; }
       LOGW("%s") % ss.str();
     }
     return GetUndefined();
@@ -33,9 +30,7 @@ static RegisterQueue queue("console", [](JsObjectWrapper global) {
   console["error"] = [](JsValueRef callee, Arguments args) {
     if (!args.empty()) {
       std::stringstream ss;
-      for (auto arg : args) {
-        ss << JsToString(arg) << " ";
-      }
+      for (auto arg : args) { ss << JsToString(arg) << " "; }
       LOGE("%s") % ss.str();
     }
     return GetUndefined();
