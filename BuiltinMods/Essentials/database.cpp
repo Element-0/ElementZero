@@ -30,6 +30,11 @@ template <> void migrateDatabase<0, 1>() {
       "prefix, postfix "
       "FROM custom_name_bak_0");
 }
+template <> void migrateDatabase<1, 2>() { database->exec("ALTER TABLE custom_name ADD COLUMN nametag TEXT"); }
+template <> void migrateDatabase<0, 2>() {
+  migrateDatabase<0, 1>();
+  migrateDatabase<1, 2>();
+}
 
 void initDatabase() {
   auto exists = !!database->execAndGet("SELECT count(*) FROM sqlite_master WHERE name = 'custom_name'").getInt();
@@ -39,9 +44,12 @@ void initDatabase() {
     try {
       switch (version) {
       case 0: // upgrade custom_name (uuid_a uuid_b to uuid (blob))
-        migrateDatabase<0, 1>();
+        migrateDatabase<0, 2>();
         break;
-      case 1: break;
+      case 1: // upgrade custom_name (add nametag)
+        migrateDatabase<1, 2>();
+        break;
+      case 2: break;
       default: {
         DEF_LOGGER("essentials");
         LOGE("database corrupted");
@@ -59,8 +67,8 @@ void initDatabase() {
   database->exec(
       "CREATE TABLE IF NOT EXISTS custom_name ("
       "uuid BLOB NOT NULL PRIMARY KEY, "
-      "prefix TEXT, postfix TEXT)");
-  database->exec("PRAGMA user_version = 1");
+      "prefix TEXT, postfix TEXT, nametag TEXT)");
+  database->exec("PRAGMA user_version = 2");
 }
 
 void initWorldDatabase(std::filesystem::path const &base) {

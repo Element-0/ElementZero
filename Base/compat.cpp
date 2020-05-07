@@ -20,8 +20,10 @@ template <typename Holder> struct ValueHolder {
 
 #pragma region Player
 
+// Actor::_sendDirtyActorData
+ActorRuntimeID Actor::getRuntimeID() const { return direct_access<ActorRuntimeID>(this, 159); }
 // AddPlayerPacket::AddPlayerPacket(Player &)
-SynchedActorData const &Actor::getEntityData() const { return direct_access<SynchedActorData const>(this, 304); }
+SynchedActorData &Actor::getEntityData() const { return direct_access<SynchedActorData>(this, 304); }
 // Actor::Actor
 SimpleContainer &Actor::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1400); }
 // Actor::Actor
@@ -69,7 +71,7 @@ ActorUniqueID Level::getNewUniqueID() const {
 }
 
 // RaidBossComponent::_sendBossEvent
-PacketSender &Level::getPacketSender() const { return direct_access<PacketSender>(this, 2096); }
+PacketSender &Level::getPacketSender() const { return *direct_access<PacketSender *>(this, 2096); }
 
 LevelDataWrapper &Level::GetLevelDataWrapper() { return direct_access<LevelDataWrapper>(this, 536); }
 

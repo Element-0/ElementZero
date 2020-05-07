@@ -3,6 +3,7 @@
 #include <base.h>
 #include <hook.h>
 
+#include "ActorRuntimeID.h"
 #include "ActorType.h"
 #include "ActorUniqueID.h"
 #include "SynchedActorData.h"
@@ -47,9 +48,10 @@ public:
   }
 
   MCAPI ActorUniqueID const &getUniqueID() const;
+  BASEAPI ActorRuntimeID getRuntimeID() const;
   BASEAPI SimpleContainer &getEquipmentContainer();
   BASEAPI SimpleContainer &getHandContainer();
-  BASEAPI SynchedActorData const &getEntityData() const;
+  BASEAPI SynchedActorData &getEntityData() const;
 };
 
 class Mob : public Actor {

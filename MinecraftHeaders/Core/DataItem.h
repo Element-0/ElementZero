@@ -25,6 +25,13 @@ template <> inline DataItemType typeFor<BlockPos>    = DataItemType::POS;
 template <> inline DataItemType typeFor<int64_t>     = DataItemType::LONG;
 template <> inline DataItemType typeFor<Vec3>        = DataItemType::VEC3;
 
+template <typename T> struct neqFor {
+  static bool neq(T const &lhs, T const &rhs) { return lhs != rhs; }
+};
+template <typename T> struct copyFor {
+  static void copy(T &lhs, T const &rhs) { lhs = rhs; }
+};
+
 } // namespace DataTypeMap
 
 class DataItem {
@@ -152,6 +159,9 @@ public:
   virtual ~DataItem() {}
   virtual MCAPI bool isDataEqual(DataItem const &rhs) const;
   virtual std::unique_ptr<DataItem> clone() const = 0;
+
+  inline void setDirty() { dirty = true; }
+  inline Id getId() const { return id; }
 };
 
 template <typename T> class DataItem2 : public DataItem {

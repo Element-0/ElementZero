@@ -14,6 +14,7 @@
 #include <yaml-cpp/yaml.h>
 #include <SQLiteCpp/SQLiteCpp.h>
 
+#include <Core/PacketSender.h>
 #include <Command/Command.h>
 #include <Command/CommandRegistry.h>
 #include <Command/CommandPermissionLevel.h>
@@ -27,6 +28,7 @@
 #include <Actor/Player.h>
 #include <Packet/TransferPacket.h>
 #include <Packet/TextPacket.h>
+#include <Packet/SetActorDataPacket.h>
 #include <Level/Level.h>
 
 #include <command.h>

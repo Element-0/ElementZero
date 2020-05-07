@@ -1,8 +1,12 @@
+#include "base.h"
 #include "pch.h"
 
-#include "global.h"
+#include <memory>
 #include <sqlite3.h>
 #include <boost/scope_exit.hpp>
+
+#include "global.h"
+#include "playerdb.h"
 
 #include <chat.h>
 
@@ -23,12 +27,19 @@ void ChatHandler(
   }
 }
 
+static void updateNametag(Player *player, std::string const &tag) {
+  SetActorDataPacket pkt;
+  pkt.rid = player->getRuntimeID();
+  pkt.items.emplace_back(std::make_unique<DataItem2<std::string>>(DataItem::Id::NAMETAG, tag));
+  LocateService<Level>()->getPacketSender().sendBroadcast(pkt);
+}
+
 enum class Action { Set, Clear };
 
 class SetCustomNameCommand : public Command {
 public:
   Action _sig;
-  enum class Key { Prefix, Postfix } key;
+  enum class Key { Prefix, Postfix, Nametag } key;
   CommandSelector<Player> selector;
   std::string str = "";
   SetCustomNameCommand() { selector.setIncludeDeadPlayers(true); }
@@ -41,13 +52,19 @@ public:
       auto it = playerdb.find(player);
       if (it != playerdb.end()) {
         try {
-          static SQLite::Statement prefix_stmt{*database,
-                                               "INSERT INTO custom_name (uuid, prefix) VALUES (?, ?) ON "
-                                               "CONFLICT(uuid) DO UPDATE SET prefix = excluded.prefix"};
-          static SQLite::Statement postfix_stmt{*database,
-                                                "INSERT INTO custom_name (uuid, postfix) VALUES (?, ?) ON "
-                                                "CONFLICT(uuid) DO UPDATE SET postfix = excluded.postfix"};
-          auto &stmt = key == Key::Prefix ? prefix_stmt : postfix_stmt;
+          static SQLite::Statement prefix_stmt{
+              *database,
+              "INSERT INTO custom_name (uuid, prefix) VALUES (?, ?) ON "
+              "CONFLICT(uuid) DO UPDATE SET prefix = excluded.prefix"};
+          static SQLite::Statement postfix_stmt{
+              *database,
+              "INSERT INTO custom_name (uuid, postfix) VALUES (?, ?) ON "
+              "CONFLICT(uuid) DO UPDATE SET postfix = excluded.postfix"};
+          static SQLite::Statement nametag_stmt{
+              *database,
+              "INSERT INTO custom_name (uuid, nametag) VALUES (?, ?) ON "
+              "CONFLICT(uuid) DO UPDATE SET nametag = excluded.nametag"};
+          auto &stmt = key == Key::Prefix ? prefix_stmt : key == Key::Postfix ? postfix_stmt : nametag_stmt;
           BOOST_SCOPE_EXIT_ALL(&) {
             stmt.reset();
             stmt.clearBindings();
@@ -56,6 +73,9 @@ public:
           stmt.bindNoCopy(2, str);
           stmt.exec();
           count++;
+
+          if (key == Key::Nametag) updateNametag(player, str);
+
         } catch (SQLite::Exception const &ex) {
           output.error(ex.getErrorStr());
           return;
@@ -69,7 +89,8 @@ public:
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     commands::addEnum<Action>(registry, "custom-name-set", {{"set", Action::Set}});
-    commands::addEnum<Key>(registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}});
+    commands::addEnum<Key>(
+        registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}, {"nametag", Key::Nametag}});
     registry->registerOverload<SetCustomNameCommand>(
         "custom-name", mandatory<CommandParameterDataType::ENUM>(&SetCustomNameCommand::_sig, "set", "custom-name-set"),
         mandatory<CommandParameterDataType::ENUM>(&SetCustomNameCommand::key, "key", "custom-name-key"),
@@ -111,6 +132,19 @@ public:
   }
 };
 
+static void onPlayerInitialized(Mod::PlayerEntry const &entry) {
+  static SQLite::Statement stmt{*database, "SELECT nametag FROM custom_name WHERE uuid = ?"};
+  BOOST_SCOPE_EXIT_ALL() {
+    stmt.reset();
+    stmt.clearBindings();
+  };
+  stmt.bindNoCopy(1, entry.uuid, sizeof entry.uuid);
+  if (stmt.executeStep()) {
+    std::string nametag = stmt.getColumn("nametag");
+    updateNametag(entry.player, nametag);
+  }
+}
+
 void registerCustomName(CommandRegistry *registry) {
   registry->registerCommand(
       "custom-name", "commands.custom-name.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
@@ -118,4 +152,5 @@ void registerCustomName(CommandRegistry *registry) {
   SetCustomNameCommand::setup(registry);
   ClearCustomNameCommand::setup(registry);
   Mod::Chat::GetInstance().AddListener(SIG("chat"), {Mod::RecursiveEventHandlerAdaptor(ChatHandler)});
+  Mod::PlayerDatabase::GetInstance().AddListener(SIG("initialized"), onPlayerInitialized);
 }

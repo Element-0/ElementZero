@@ -36,6 +36,14 @@ public:
 static_assert(offsetof(NetworkIdentifier, unk136) == 136);
 static_assert(offsetof(NetworkIdentifier, type) == 144);
 
+class NetworkIdentifierWithSubId {
+public:
+  NetworkIdentifier identifier;
+  unsigned char subId;
+};
+
+static_assert(sizeof(NetworkIdentifierWithSubId) == 160);
+
 namespace std {
 
 template <> struct hash<NetworkIdentifier> {

@@ -21,7 +21,7 @@ add_compile_options (
     -Wno-deprecated-declarations
     -Wno-gnu-string-literal-operator-template)
 add_compile_options (/EHsc /utf-8)
-add_definitions (-DWIN32_LEAN_AND_MEAN=1)
+add_definitions (-DWIN32_LEAN_AND_MEAN=1 -DNOMINMAX)
 
 include_directories (${EZ_ROOT}/Public)
 add_compile_definitions (_UNICODE UNICODE NDEBUG)
