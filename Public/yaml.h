@@ -33,6 +33,9 @@ template <typename T>
 using has_io = decltype(T::io(std::declval<YamlIO<false>>(), std::declval<T &>(), std::declval<YAML::Node &>()));
 
 template <> struct YamlIO<false> {
+  inline const static bool is_write = false;
+  inline const static bool is_read  = true;
+
   template <typename T> inline FakeBool operator()(T &target, YAML::Node const &node) {
     try {
       if constexpr (boost::is_detected_v<has_io, T>) {
@@ -45,6 +48,9 @@ template <> struct YamlIO<false> {
 };
 
 template <> struct YamlIO<true> {
+  inline const static bool is_write = true;
+  inline const static bool is_read  = false;
+
   template <typename T> inline FakeBool operator()(T &target, YAML::Node &&node) {
     try {
       if constexpr (boost::is_detected_v<has_io, T>) {
