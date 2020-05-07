@@ -45,7 +45,7 @@ public:
     pkt.content    = content;
     return pkt;
   }
-  template <TextPacketType type, bool translated = true>
+  template <TextPacketType type, bool translated = false>
   static inline TextPacket createTextPacket(std::string source, std::string content, std::string xuid) {
     TextPacket pkt;
     pkt.type       = type;
