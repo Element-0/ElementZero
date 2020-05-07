@@ -193,8 +193,8 @@ public:
 
 #  define VA_EXPAND(...) __VA_ARGS__
 
-template <std::uint32_t sig> struct THookTemplate;
-template <std::uint32_t sig> extern THookRegister THookRegisterTemplate;
+template <SIGTEMPLATE> struct THookTemplate;
+template <SIGTEMPLATE> extern THookRegister THookRegisterTemplate;
 
 #  define _TInstanceHook(class_inh, pclass, iname, sym, ret, ...)                                                      \
     template <> struct THookTemplate<iname##_sig> class_inh {                                                          \

@@ -31,7 +31,7 @@ short &Mod::CommandSupport::type_id_count() {
   return *ptr;
 }
 
-template <std::uint32_t> inline static typeid_t<CommandRegistry> getid(char const *name) {
+template <SIGTEMPLATE> inline static typeid_t<CommandRegistry> getid(char const *name) {
   static auto ptr = (typeid_t<CommandRegistry> *) GetServerSymbol(name);
   return *ptr;
 }

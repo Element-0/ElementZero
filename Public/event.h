@@ -24,7 +24,7 @@ public:
 
 // This class can be used to publish and subscribe to events
 // Declaring multiple independent events through multiple inheritance
-template <std::uint32_t sig, typename... Params> class EventEmitter : public boost::noncopyable {
+template <SIGTEMPLATE, typename... Params> class EventEmitter : public boost::noncopyable {
 public:
   using CallBackType = std::function<void(Params...)>;
 
@@ -44,7 +44,7 @@ protected:
 
 // This class can be used to publish and subscribe to events
 // Declaring multiple independent events through multiple inheritance
-template <std::uint32_t sig, typename... Params> class RecursiveEventEmitter : public boost::noncopyable {
+template <SIGTEMPLATE, typename... Params> class RecursiveEventEmitter : public boost::noncopyable {
 public:
   class Trampoline;
   using CallBackType = std::function<void(Trampoline const &, Params...)>;

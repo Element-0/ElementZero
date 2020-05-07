@@ -18,7 +18,7 @@
 
 DEF_LOGGER("PlayerDB");
 
-template <uint64_t sig> static void (Mod::PlayerDatabase::*emitter)(sigt<sig>, Mod::PlayerEntry const &);
+template <SIGTEMPLATE> static void (Mod::PlayerDatabase::*emitter)(sigt<sig>, Mod::PlayerEntry const &);
 static void (Mod::PlayerDatabase::*emit_change_dim)(
     sigt<"change_dimension"_sig>, Mod::PlayerEntry const &, ChangeDimensionRequest const &, bool stage);
 
