@@ -192,14 +192,23 @@ declare module "ez:sqlite3" {
   export function open(filename: string): Sqlite3Database;
 }
 
-declare module "ez:scoreboard" {
-  interface FakeScoreboard {
-    init(target: PlayerEntry, name: string, is_asc: boolean): void;
-    deinit(target: PlayerEntry): void;
-    set(target: PlayerEntry, id: number, name: string, score: number): void;
-    remove(target: PlayerEntry, id: number): void;
-  }
+declare interface FakeScoreboard {
+  init(target: PlayerEntry, name: string, is_asc: boolean): void;
+  deinit(target: PlayerEntry): void;
+  set(target: PlayerEntry, id: number, name: string, score: number): void;
+  remove(target: PlayerEntry, id: number): void;
+}
 
+declare module "ez:scoreboard" {
   export const sidebar: FakeScoreboard;
   export const list: FakeScoreboard;
+}
+
+declare module "ez:economy" {
+  export function getBalance(player: PlayerEntry): number;
+  export function updateBalance(
+    player: PlayerEntry,
+    value: number,
+    reason: string
+  ): void;
 }
