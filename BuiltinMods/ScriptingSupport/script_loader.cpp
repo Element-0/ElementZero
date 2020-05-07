@@ -93,8 +93,8 @@ void loadCustomScript() try {
     auto metadata = JsObjectWrapper::FromCurrentException();
     LOGE("Exception %s") % metadata["exception"].ToString();
     LOGE("File: %s") % metadata["url"].ToString();
-    LOGE("Line: %f") % metadata["line"].get<double>();
-    LOGE("Column: %f") % metadata["column"].get<double>();
+    LOGE("Line: %0.0f") % (metadata["line"].get<double>() + 1.0);
+    LOGE("Column: %0.0f") % metadata["column"].get<double>();
   } catch (...) {}
   LOGE("Failed to load root module: %s") % hasException;
 } catch (JsErrorCode ec) { LOGE("Failed to load: %d") % ec; }
