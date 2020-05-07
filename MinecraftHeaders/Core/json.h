@@ -110,7 +110,14 @@ public:
   using ObjectValues   = std::map<CZString, Value>;
 
 public:
-  MCAPI Value(ValueType type = nullValue);
+  Value(ValueType type = nullValue) {
+    bits_.value_type_ = type;
+    switch (type) {
+    case 6:
+    case 7: value_.map_ = new ObjectValues; break;
+    default: value_.string_ = nullptr;
+    }
+  }
   Value(Int value) {
     bits_.value_type_ = intValue;
     value_.int_       = value;
@@ -187,11 +194,8 @@ public:
   MCAPI iterator begin();
   MCAPI iterator end();
 
-  MCAPI Value &resolveReference(const char *key);
-
   MCAPI std::string toStyledString() const;
 
-private:
   union ValueHolder {
     LargestInt int_;
     LargestUInt uint_;
@@ -205,6 +209,9 @@ private:
     ValueType value_type_ : 8;
     bool allocated_ : 1;
   } bits_;
+
+private:
+  MCAPI Value &resolveReference(const char *key, bool create);
 };
 
 class ValueIteratorBase {
