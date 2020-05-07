@@ -52,7 +52,6 @@ static void LoadModuleFromFile(JsModuleRecord module, fs::path path, fs::path fu
 
   JsParseModuleSource(
       module, cookies, (BYTE *) content.data(), content.size(), JsParseModuleSourceFlags_DataIsUTF8, &exception);
-  if (exception) JsSetException(exception);
 }
 
 static void initRootModule(std::string_view path, JsModuleRecord *requestModule) {
