@@ -19,13 +19,13 @@ TInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ", ScriptEngine) {
   LOGV("initialize");
   original(this);
   engine = this;
-  initBasicAPI();
+  if (mod_enabled) initBasicAPI();
 }
 
 TInstanceHook(int, "?startScriptLoading@ScriptEngine@@QEAAXXZ", ScriptEngine) {
   DEF_LOGGER("ScriptEngine");
   LOGV("loading");
-  loadCustomScript();
+  if (mod_enabled) loadCustomScript();
   return original(this);
 }
 
