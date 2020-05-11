@@ -21,7 +21,7 @@ template <typename Holder> struct ValueHolder {
 #pragma region Player
 
 // Actor::_sendDirtyActorData
-ActorRuntimeID Actor::getRuntimeID() const { return direct_access<ActorRuntimeID>(this, 159); }
+ActorRuntimeID Actor::getRuntimeID() const { return direct_access<ActorRuntimeID>(this, 1272); }
 // AddPlayerPacket::AddPlayerPacket(Player &)
 SynchedActorData &Actor::getEntityData() const { return direct_access<SynchedActorData>(this, 304); }
 // Actor::Actor
