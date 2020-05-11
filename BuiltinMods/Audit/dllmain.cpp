@@ -1,7 +1,7 @@
 #include <boost/scope_exit.hpp>
 
 #include <base.h>
-#include <Actor/Player.h>
+#include <Core/BinaryStream.h>
 #include <Math/BlockPos.h>
 #include <Net/NetworkIdentifier.h>
 #include <Packet/PlayerActionPacket.h>
@@ -14,7 +14,6 @@
 #include <audit.h>
 
 #include "settings.h"
-#include "serialization.h"
 
 Settings settings;
 DEFAULT_SETTINGS(settings);
@@ -64,10 +63,11 @@ TClasslessInstanceHook(
     Mod::CallbackToken<std::string> token;
     (mAuditSystem.*EmitPlayerAction)(SIG("action"), *it, action, token);
     if (database && !disable_temporary) {
-      static SQLite::Statement stmt{*database,
-                                    "INSERT INTO audit_action "
-                                    "(session, player, dimension, blocked, type, x, y, z, face) VALUES "
-                                    "(?, ?, ?, ?, ?, ?, ?, ?, ?)"};
+      static SQLite::Statement stmt{
+          *database,
+          "INSERT INTO audit_action "
+          "(session, player, dimension, blocked, type, x, y, z, face) VALUES "
+          "(?, ?, ?, ?, ?, ?, ?, ?, ?)"};
       BOOST_SCOPE_EXIT_ALL() {
         stmt.clearBindings();
         stmt.reset();
@@ -100,11 +100,14 @@ TClasslessInstanceHook(
     Mod::CallbackToken<std::string> token;
     (mAuditSystem.*EmitPlayerTransaction)(SIG("inventory_transaction"), *it, *pkt.transaction, token);
     if (database && !disable_temporary) {
-      static SQLite::Statement stmt{*database,
-                                    "INSERT INTO audit_transaction "
-                                    "(session, player, dimension, blocked, data) VALUES "
-                                    "(?, ?, ?, ?, ?)"};
-      auto data = SerializeInventoryTransaction(*pkt.transaction);
+      static SQLite::Statement stmt{
+          *database,
+          "INSERT INTO audit_transaction "
+          "(session, player, dimension, blocked, data) VALUES "
+          "(?, ?, ?, ?, ?)"};
+      BinaryStream outp;
+      pkt.transaction->write(outp);
+      auto data = outp.getAndReleaseData();
       BOOST_SCOPE_EXIT_ALL() {
         stmt.clearBindings();
         stmt.reset();
