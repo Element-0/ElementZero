@@ -74,7 +74,7 @@ void checkInventoryTransaction(
     switch (transaction.type) {
     case ComplexInventoryTransaction::Type::ITEM_USE: {
       auto &data    = (ItemUseInventoryTransaction const &) transaction;
-      auto composed = data.playerPos + data.clickPos;
+      auto composed = data.pos;
       if (!Check(entry.player, composed.x, composed.z)) {
         data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
         token("Blocked by SpawnProtection");
