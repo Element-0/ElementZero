@@ -16,6 +16,7 @@ if (NO_INLINE)
 endif ()
 
 add_compile_options (
+    -Wno-microsoft-enum-forward-reference
     -Wno-c++2a-extensions
     -Wno-invalid-offsetof
     -Wno-deprecated-declarations
