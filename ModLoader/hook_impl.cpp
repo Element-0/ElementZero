@@ -39,10 +39,7 @@ void *GetServerSymbol(char const *name) {
   };
   try {
     stmt.bindNoCopy(1, name);
-    if (stmt.executeStep()) {
-      printf("@@@@ %lld\n", stmt.getColumn(0).getInt64());
-      return (void *) ((uint64_t) stmt.getColumn(0).getInt64() + (uint64_t) handle);
-    }
+    if (stmt.executeStep()) return (void *) ((uint64_t) stmt.getColumn(0).getInt64() + (uint64_t) handle);
     return 0;
   } catch (...) { return 0; }
 }
