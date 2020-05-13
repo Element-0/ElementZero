@@ -16,6 +16,7 @@ public:
       class AABB &, class Block const &, class BlockSource &, class BlockPos const &, class Actor *) const;
   MCAPI virtual bool isObstructingChests(class BlockSource &, class BlockPos const &) const;
   MCAPI virtual class Vec3 randomlyModifyPosition(class BlockPos const &, int &) const;
+  MCAPI virtual class Vec3 randomlyModifyPosition(class BlockPos const &) const;
   MCAPI virtual void addAABBs(
       class Block const &, class BlockSource &, class BlockPos const &, class AABB const *,
       std::vector<class AABB> &) const;
