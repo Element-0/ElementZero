@@ -29,7 +29,6 @@ public:
   SerializedSkin skin;
   bool teacher, host;
 
-  MCAPI PlayerListEntry(PlayerListEntry const &);
   MCAPI ~PlayerListEntry();
   MCAPI void write(BinaryStream &) const;
   MCAPI PacketReadResult read(ReadOnlyBinaryStream &);
