@@ -31,6 +31,52 @@ template <typename T> T *GetServerSymbol(char const *name) {
   return u.target;
 }
 
+template <auto source> constexpr size_t GetVTableOffset() {
+  union {
+    decltype(source) src;
+    struct __attribute__((packed)) {
+      struct __attribute__((packed)) {
+        char ch48, ch8b, ch01;
+      } mov_rax_rcx;
+      char ch48, ch8b;
+      unsigned char sel;
+      union {
+        struct {
+          uint8_t target;
+        } sel_short;
+        struct {
+          uint32_t target;
+        } sel_long;
+      };
+    } * target;
+  } u;
+  u.src = source;
+  if (u.target->sel == 0x40) return u.target->sel_short.target / sizeof(void *);
+  return u.target->sel_long.target / sizeof(void *);
+}
+
+class VTableHook {
+  void *target;
+
+public:
+  template <typename NewFunc> void Replace(char const *original, NewFunc nt) {
+    if (target != GetServerSymbol(original)) throw FailedToReplaceVTable(original);
+    union {
+      NewFunc src;
+      void *ptr;
+    } u;
+    u.src = nt;
+    DWORD old;
+    VirtualProtect((LPVOID) this, (SIZE_T) 8, PAGE_READWRITE, &old);
+    target = u.ptr;
+    VirtualProtect((LPVOID) this, (SIZE_T) 8, old, NULL);
+  }
+
+  template <auto source> static VTableHook *Create(char const *symbol) {
+    return GetServerSymbolWithOffset<VTableHook>(symbol, sizeof(void *) * GetVTableOffset<source>());
+  }
+};
+
 template <int length> struct PatchSpan {
   unsigned char data[length];
   using ref_t = char (&)[length];
@@ -209,8 +255,8 @@ template <SIGTEMPLATE> extern THookRegister THookRegisterTemplate;
       ret _hook(__VA_ARGS__);                                                                                          \
     };                                                                                                                 \
     template <>                                                                                                        \
-    static THookRegister THookRegisterTemplate<iname##_sig>{sym, &THookTemplate<iname##_sig>::_hook,                   \
-                                                            (void **) &THookTemplate<iname##_sig>::_original()};       \
+    static THookRegister THookRegisterTemplate<iname##_sig>{                                                           \
+        sym, &THookTemplate<iname##_sig>::_hook, (void **) &THookTemplate<iname##_sig>::_original()};                  \
     ret THookTemplate<iname##_sig>::_hook(__VA_ARGS__)
 
 #  define _TInstanceDefHook(iname, sym, ret, type, ...)                                                                \
@@ -230,8 +276,8 @@ template <SIGTEMPLATE> extern THookRegister THookRegisterTemplate;
       static ret _hook(__VA_ARGS__);                                                                                   \
     };                                                                                                                 \
     template <>                                                                                                        \
-    static THookRegister THookRegisterTemplate<iname##_sig>{sym, &THookTemplate<iname##_sig>::_hook,                   \
-                                                            (void **) &THookTemplate<iname##_sig>::_original()};       \
+    static THookRegister THookRegisterTemplate<iname##_sig>{                                                           \
+        sym, &THookTemplate<iname##_sig>::_hook, (void **) &THookTemplate<iname##_sig>::_original()};                  \
     ret THookTemplate<iname##_sig>::_hook(__VA_ARGS__)
 
 #  define _TStaticDefHook(iname, sym, ret, type, ...)                                                                  \
