@@ -3,9 +3,8 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#include <gsl/span>
-#include <gsl/span_ext>
 
+#include "../FakeGSL/span.h"
 #include "../dll.h"
 
 namespace mce {

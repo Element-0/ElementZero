@@ -1,8 +1,8 @@
 #pragma once
 
 #include <functional>
-#include <gsl/span>
 
+#include "../FakeGSL/span.h"
 #include "../Core/buffer_span.h"
 #include "../dll.h"
 
@@ -103,10 +103,10 @@ public:
   MCAPI class std::vector<class Actor *> const &fetchEntities(class buffer_span<class Actor *>, class AABB const &);
   MCAPI class std::vector<class Actor *> const &
   fetchActors(struct ActorDefinitionIdentifier const &, class AABB const &);
-  MCAPI class gsl::span<class BlockFetchResult const, gsl::dynamic_extent>
+  MCAPI class gsl::span<class BlockFetchResult const>
   fetchBlocksInBox(class BoundingBox const &, std::function<bool(Block const &)>);
-  MCAPI class gsl::span<class BlockFetchResult const, gsl::dynamic_extent>
+  MCAPI class gsl::span<class BlockFetchResult const>
   fetchBlocksInCylinder(class BlockPos const &, unsigned int, unsigned int, std::function<bool(Block const &)>);
-  MCAPI class gsl::span<class BlockFetchResult const, gsl::dynamic_extent>
+  MCAPI class gsl::span<class BlockFetchResult const>
   fetchBlocksInCylinderSorted(class BlockPos const &, unsigned int, unsigned int, std::function<bool(Block const &)>);
 };
