@@ -48,11 +48,34 @@ template <auto source> constexpr size_t GetVTableOffset() {
           uint32_t target;
         } sel_long;
       };
-    } * target;
+    } * compat;
+    struct __attribute__((packed)) {
+      struct __attribute__((packed)) {
+        char ch48, ch83, chec, ch28;
+      } sub_rsp_0x28;
+      struct __attribute__((packed)) {
+        char ch4c, ch8b, ch11;
+      } mov_r10_rcx;
+      char ch4d, ch8b;
+      unsigned char sel;
+      union {
+        struct {
+          uint8_t target;
+        } sel_short;
+        struct {
+          uint32_t target;
+        } sel_long;
+      };
+    } * alternative;
   } u;
   u.src = source;
-  if (u.target->sel == 0x40) return u.target->sel_short.target / sizeof(void *);
-  return u.target->sel_long.target / sizeof(void *);
+  if (u.compat->mov_rax_rcx.ch8b == 0x8b) {
+    if (u.compat->sel == 0x40) return u.compat->sel_short.target / sizeof(void *);
+    return u.compat->sel_long.target / sizeof(void *);
+  } else {
+    if (u.alternative->sel == 0x52) return u.alternative->sel_short.target / sizeof(void *);
+    return u.alternative->sel_long.target / sizeof(void *);
+  }
 }
 
 class VTableHook {
