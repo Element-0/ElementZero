@@ -2,9 +2,9 @@
 
 #include <cstring>
 #include <string>
-#include <gsl/string_span>
 #include <string_view>
 
+#include "../FakeGSL/string_span.h"
 #include "../dll.h"
 
 class IDataInput {

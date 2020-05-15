@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 #include <variant>
-#include <gsl/string_span>
 
+#include "../FakeGSL/string_span.h"
 #include "../dll.h"
 
 class IDataInput;
