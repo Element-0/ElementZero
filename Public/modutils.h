@@ -18,3 +18,11 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
   u.raw += offset;
   return *u.target;
 }
+
+#define FAKE_FIELD(type, name)                                                                                         \
+  __declspec(property(get = get_##name)) type &name;                                                                   \
+  type &get_##name()
+
+#define BUILD_ACCESS(type, name, offset)                                                                               \
+  __declspec(property(get = get_##name)) type &name;                                                                   \
+  type &get_##name() { return direct_access<type>(this, offset); }
