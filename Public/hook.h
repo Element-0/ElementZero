@@ -31,15 +31,15 @@ template <typename T> T *GetServerSymbol(char const *name) {
   return u.target;
 }
 
-template <auto source> constexpr size_t GetVTableOffset() {
+template <auto source> inline constexpr size_t GetVTableOffset() {
   union {
     decltype(source) src;
     struct __attribute__((packed)) {
       struct __attribute__((packed)) {
-        char ch48, ch8b, ch01;
+        uint8_t ch48, ch8b, ch01;
       } mov_rax_rcx;
-      char ch48, ch8b;
-      unsigned char sel;
+      uint8_t ch48, ch8b;
+      uint8_t sel;
       union {
         struct {
           uint8_t target;
@@ -51,13 +51,13 @@ template <auto source> constexpr size_t GetVTableOffset() {
     } * compat;
     struct __attribute__((packed)) {
       struct __attribute__((packed)) {
-        char ch48, ch83, chec, ch28;
+        uint8_t ch48, ch83, chec, ch28;
       } sub_rsp_0x28;
       struct __attribute__((packed)) {
-        char ch4c, ch8b, ch11;
+        uint8_t ch4c, ch8b, ch11;
       } mov_r10_rcx;
-      char ch4d, ch8b;
-      unsigned char sel;
+      uint8_t ch4d, ch8b;
+      uint8_t sel;
       union {
         struct {
           uint8_t target;
