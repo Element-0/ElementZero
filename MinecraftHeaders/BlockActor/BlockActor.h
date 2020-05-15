@@ -4,12 +4,24 @@
 #include <string>
 #include <vector>
 
+#include "../Math/Vec3.h"
 #include "../dll.h"
 
+#include <modutils.h>
+
 class BlockActor {
-public:
   char unknown[200];
 
+public:
+  BUILD_ACCESS(class Block, block, 16);
+  BUILD_ACCESS(unsigned int, repair_cost, 40);
+  BUILD_ACCESS(Vec3, block_pos, 44);
+  BUILD_ACCESS(class AABB, aabb, 56);
+  BUILD_ACCESS(enum BlockActorType, type, 84);
+  BUILD_ACCESS(std::string, custom_name, 96);
+  BUILD_ACCESS(bool, movable, 165);
+
+  MCAPI BlockActor(enum BlockActorType, class BlockPos const &, std::string const &);
   MCAPI virtual ~BlockActor();
   MCAPI virtual void load(class Level &, class CompoundTag const &, class DataLoadHelper &);
   MCAPI virtual bool save(class CompoundTag &) const;
@@ -18,7 +30,7 @@ public:
   MCAPI virtual void loadBlockData(class CompoundTag const &, class BlockSource &, class DataLoadHelper &);
   MCAPI virtual void onCustomTagLoadDone(class BlockSource &);
   MCAPI virtual void tick(class BlockSource &);
-  MCAPI virtual bool isFinished(class BlockSource &);
+  MCAPI virtual bool isFinished();
   MCAPI virtual void onChanged(class BlockSource &);
   MCAPI virtual bool isMovable(class BlockSource &);
   MCAPI virtual bool isCustomNameSaved();
