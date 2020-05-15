@@ -413,7 +413,7 @@ public:
         &old, dim);
   }
 
-  BUILD_ACCESS(class BlockSource *, region, 100);
+  BUILD_ACCESS(class BlockSource *, region, 800);
   BASEAPI ActorRuntimeID getRuntimeID() const;
   BASEAPI SimpleContainer &getEquipmentContainer();
   BASEAPI SimpleContainer &getHandContainer();
