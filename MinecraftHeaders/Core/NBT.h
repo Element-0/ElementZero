@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <variant>
+#include <gsl/string_span>
 
 #include "../dll.h"
 
@@ -24,12 +26,25 @@ public:
 
 class MCAPI Tag {
 public:
+  enum Type {
+    End       = 0,
+    Byte      = 1,
+    Short     = 2,
+    Int       = 3,
+    Int64     = 4,
+    Float     = 5,
+    Double    = 6,
+    ByteArray = 7,
+    String    = 8,
+    List      = 9,
+    Compound  = 10,
+  };
   virtual ~Tag();
   virtual void deleteChildren();
   virtual void write(IDataOutput &) const = 0;
   virtual void load(IDataInput &)         = 0;
   virtual std::string toString() const    = 0;
-  virtual int getId() const               = 0;
+  virtual Tag::Type getId() const         = 0;
   virtual bool equals(Tag const &) const;
   virtual void print(PrintStream &) const;
   virtual void print(std::string const &, PrintStream &) const;
@@ -43,7 +58,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 0
+  virtual Tag::Type getId() const override; // 0
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -56,7 +71,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 1
+  virtual Tag::Type getId() const override; // 1
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -69,7 +84,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 2
+  virtual Tag::Type getId() const override; // 2
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -82,7 +97,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 3
+  virtual Tag::Type getId() const override; // 3
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -95,7 +110,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 4
+  virtual Tag::Type getId() const override; // 4
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -108,7 +123,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 5
+  virtual Tag::Type getId() const override; // 5
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -121,7 +136,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 6
+  virtual Tag::Type getId() const override; // 6
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -134,7 +149,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 7
+  virtual Tag::Type getId() const override; // 7
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -147,7 +162,7 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 8
+  virtual Tag::Type getId() const override; // 8
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
@@ -161,25 +176,67 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 9
+  virtual Tag::Type getId() const override; // 9
   virtual bool equals(Tag const &) const override;
   virtual void print(std::string const &, PrintStream &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
+
+  class CompoundTag const *getCompound(unsigned __int64) const;
+
+  std::string const &getString(int) const;
+  void add(std::unique_ptr<Tag>);
+  double getDouble(int) const;
+  float getFloat(int) const;
+  int getInt(int) const;
 };
 
 class MCAPI CompoundTag : public Tag {
 public:
-  std::map<std::string, std::unique_ptr<Tag>> value;
+  std::map<std::string, class CompoundTagVariant> value;
   virtual ~CompoundTag() override;
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 10
+  virtual Tag::Type getId() const override; // 10
   virtual bool equals(Tag const &) const override;
   virtual void print(std::string const &, PrintStream &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
+
+  bool contains(gsl::cstring_span<>, enum Tag::Type) const;
+  bool contains(gsl::cstring_span<>) const;
+
+  bool remove(gsl::cstring_span<>);
+
+  void append(CompoundTag const &);
+
+  Tag *put(std::string, std::unique_ptr<Tag>);
+  CompoundTag *putCompound(std::string, std::unique_ptr<CompoundTag>);
+  CompoundTag &putCompound(std::string, CompoundTag);
+  std::string &putString(std::string, std::string);
+  void putBoolean(std::string, bool);
+  unsigned char &putByte(std::string, unsigned char);
+  int &putInt(std::string, int);
+  int64_t &putInt64(std::string, int64_t);
+  short &putShort(std::string, short);
+  float &putFloat(std::string, float);
+
+  std::string const &getString(gsl::cstring_span<>) const;
+  struct TagMemoryChunk const &getByteArray(gsl::cstring_span<>) const;
+  ListTag const *getList(gsl::cstring_span<>) const;
+  ListTag *getList(gsl::cstring_span<>);
+  CompoundTag const *getCompound(gsl::cstring_span<>) const;
+  CompoundTag *getCompound(gsl::cstring_span<>);
+  bool getBoolean(gsl::cstring_span<>) const;
+  int64_t getInt64(gsl::cstring_span<>) const;
+  short getShort(gsl::cstring_span<>) const;
+  float getFloat(gsl::cstring_span<>) const;
+  unsigned char getByte(gsl::cstring_span<>) const;
+  int getInt(gsl::cstring_span<>) const;
+
+  void deepCopy(CompoundTag const &);
+  std::unique_ptr<CompoundTag> clone(void) const;
 };
 
 class MCAPI IntArrayTag : public Tag {
@@ -189,8 +246,16 @@ public:
   virtual void write(IDataOutput &) const override;
   virtual void load(IDataInput &) override;
   virtual std::string toString() const override;
-  virtual int getId() const override; // 11
+  virtual Tag::Type getId() const override; // 11
   virtual bool equals(Tag const &) const override;
   virtual std::unique_ptr<Tag> copy() const override;
   virtual std::uint64_t hash() const override;
+};
+
+class CompoundTagVariant : std::variant<
+                               EndTag, ByteTag, ShortTag, IntTag, Int64Tag, FloatTag, DoubleTag, ByteArrayTag,
+                               StringTag, ListTag, CompoundTag, IntArrayTag> {
+  using std::variant<
+      EndTag, ByteTag, ShortTag, IntTag, Int64Tag, FloatTag, DoubleTag, ByteArrayTag, StringTag, ListTag, CompoundTag,
+      IntArrayTag>::variant;
 };
