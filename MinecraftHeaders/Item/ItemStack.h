@@ -4,11 +4,13 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <hook.h>
 
 #include "../Level/Tick.h"
 
 #include "../dll.h"
+
+#include <hook.h>
+#include <base.h>
 
 class Item;
 class Block;
@@ -18,10 +20,6 @@ class IDataOutput;
 class IDataInput;
 class ItemInstance;
 class ItemEnchants;
-
-#ifndef BASEAPI
-#  define BASEAPI __declspec(dllimport)
-#endif
 
 class ItemStackBase {
 public:
