@@ -13,8 +13,7 @@ class IDataInput;
 class IDataOutput;
 class PrintStream;
 
-class TagMemoryChunk {
-public:
+struct TagMemoryChunk {
   size_t m_cap, m_size;
   std::unique_ptr<unsigned char[]> m_data;
 

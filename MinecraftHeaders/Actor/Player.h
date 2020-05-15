@@ -32,10 +32,6 @@ public:
     CallServerClassMethod<void>("?sendNetworkPacket@ServerPlayer@@UEBAXAEAVPacket@@@Z", this, &pkt);
   }
 
-  void teleportTo(Vec3 const &vec, bool flag, int a, int b) const {
-    CallServerClassMethod<void>("?teleportTo@Player@@UEAAXAEBVVec3@@_NHH@Z", this, &vec, flag, a, b);
-  }
-
   inline CommandPermissionLevel getCommandPermissionLevel() const {
     return CallServerClassMethod<CommandPermissionLevel>(
         "?getCommandPermissionLevel@Player@@UEBA?AW4CommandPermissionLevel@@XZ", this);
