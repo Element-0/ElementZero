@@ -82,7 +82,7 @@ TClasslessInstanceHook(
     auto &stack = packet->stack;
     // detect if it can be offhand
     if (auto item = stack.getItem(); item) {
-      if (!item->getAllowOffhand() || stack.getStackSize() > stack.getMaxStackSize()) {
+      if (!item->AllowOffhand || stack.getStackSize() > stack.getMaxStackSize()) {
         LOGI("\"%s\"(%d) has been detected using: offhand") % it->name % it->xuid;
         (mAntiCheat.*EmitDetected)(SIG("detected"), "offhand", *it);
         return;

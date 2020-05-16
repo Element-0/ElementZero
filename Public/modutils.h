@@ -20,6 +20,7 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
 }
 
 #define AS_FIELD(type, name, fn) __declspec(property(get = fn)) type name
+#define DEF_FIELD_RW(type, name) __declspec(property(get = get##name, put = set##name)) type name
 
 #define FAKE_FIELD(type, name)                                                                                         \
   AS_FIELD(type, name, get##name);                                                                                     \
