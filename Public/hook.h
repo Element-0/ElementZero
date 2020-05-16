@@ -78,6 +78,10 @@ template <auto source> inline constexpr size_t GetVTableOffset() {
   }
 }
 
+struct FailedToReplaceVTable : std::runtime_error {
+  using runtime_error::runtime_error;
+};
+
 class VTableHook {
   void *target;
 
