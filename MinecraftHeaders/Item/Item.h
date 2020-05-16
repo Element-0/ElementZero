@@ -136,4 +136,5 @@ public:
 
   BASEAPI bool getAllowOffhand() const;
   DEF_FIELD_RW(bool, AllowOffhand);
+  BUILD_ACCESS(short, Id, 112);
 };
