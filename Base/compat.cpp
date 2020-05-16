@@ -20,32 +20,34 @@ template <typename Holder> struct ValueHolder {
 
 #pragma region Player
 
+// CommandBlock::use
+BlockSource *Actor::getRegion() const { return direct_access<BlockSource *>(this, 800); }
 // Actor::_sendDirtyActorData
 ActorRuntimeID Actor::getRuntimeID() const { return direct_access<ActorRuntimeID>(this, 1272); }
 // AddPlayerPacket::AddPlayerPacket(Player &)
 SynchedActorData &Actor::getEntityData() const { return direct_access<SynchedActorData>(this, 304); }
 // Actor::Actor
-SimpleContainer &Actor::getEquipmentContainer() { return direct_access<SimpleContainer>(this, 1400); }
+SimpleContainer &Actor::getEquipmentContainer() const { return direct_access<SimpleContainer>(this, 1400); }
 // Actor::Actor
-SimpleContainer &Actor::getHandContainer() { return direct_access<SimpleContainer>(this, 1672); }
+SimpleContainer &Actor::getHandContainer() const { return direct_access<SimpleContainer>(this, 1672); }
 // Player::GetSelectedItem
-PlayerInventoryProxy &Player::getInventory() { return *direct_access<PlayerInventoryProxy *>(this, 3528); }
+PlayerInventoryProxy &Player::getInventory() const { return *direct_access<PlayerInventoryProxy *>(this, 3528); }
 // ServerPlayer::ServerPlayer
-Certificate &Player::getCertificate() { return *direct_access<Certificate *>(this, 3248); }
+Certificate &Player::getCertificate() const { return *direct_access<class Certificate *>(this, 3248); }
 // Player::setBedRespawnPosition
-BlockPos const &Player::getSpawnPosition() const { return direct_access<BlockPos const>(this, 7740); }
+BlockPos &Player::getSpawnPosition() const { return direct_access<BlockPos>(this, 7740); }
 // ServerPlayer::ServerPlayer
 NetworkIdentifier const &Player::getNetworkIdentifier() const {
-  return direct_access<NetworkIdentifier const>(this, 8536);
+  return direct_access<class NetworkIdentifier const>(this, 8536);
 }
 // AddPlayerPacket::AddPlayerPacket
-std::string const &Player::getDeviceId() const { return direct_access<std::string>(this, 8360); }
+std::string &Player::getDeviceId() const { return direct_access<std::string>(this, 8360); }
 // ServerNetworkHandler::_createNewPlayer
-std::string const &Player::getClientPlatformId() const { return direct_access<std::string>(this, 3256); }
+std::string &Player::getClientPlatformId() const { return direct_access<std::string>(this, 3256); }
 // ServerNetworkHandler::_createNewPlayer
-std::string const &Player::getPlatformOfflineId() const { return direct_access<std::string>(this, 3192); }
+std::string &Player::getPlatformOfflineId() const { return direct_access<std::string>(this, 3192); }
 // ServerNetworkHandler::_createNewPlayer
-std::string const &Player::getClientPlatformOnlineId() const { return direct_access<std::string>(this, 4120); }
+std::string &Player::getClientPlatformOnlineId() const { return direct_access<std::string>(this, 4120); }
 // RaidBossComponent::_sendBossEvent
 unsigned char Player::getClientSubId() const { return direct_access<unsigned char>(this, 4112); }
 

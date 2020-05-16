@@ -13,13 +13,13 @@ class BlockActor {
   char unknown[200];
 
 public:
-  BUILD_ACCESS(class Block, block, 16);
-  BUILD_ACCESS(unsigned int, repair_cost, 40);
-  BUILD_ACCESS(Vec3, block_pos, 44);
-  BUILD_ACCESS(class AABB, aabb, 56);
-  BUILD_ACCESS(enum BlockActorType, type, 84);
-  BUILD_ACCESS(std::string, custom_name, 96);
-  BUILD_ACCESS(bool, movable, 165);
+  BUILD_ACCESS_MUT(class Block, Block, 16);
+  BUILD_ACCESS_MUT(unsigned int, RepairCost_, 40);
+  BUILD_ACCESS_MUT(Vec3, BlockPos, 44);
+  BUILD_ACCESS_MUT(class AABB, AABB, 56);
+  BUILD_ACCESS_MUT(enum BlockActorType, Type, 84);
+  BUILD_ACCESS_MUT(std::string, CustomName_, 96);
+  BUILD_ACCESS_MUT(bool, Movable, 165);
 
   MCAPI BlockActor(enum BlockActorType, class BlockPos const &, std::string const &);
   MCAPI virtual ~BlockActor();

@@ -10,9 +10,9 @@ class SignBlockActor : public BlockActor {
   char pad[352];
 
 public:
-  BUILD_ACCESS(TextObjectRoot, text_object, 304);
-  BUILD_ACCESS(std::string, text_single, 240);
-  BUILD_ACCESS(std::string, text_owner, 208);
+  BUILD_ACCESS_MUT(TextObjectRoot, TextObject, 304);
+  BUILD_ACCESS_MUT(std::string, Single, 240);
+  BUILD_ACCESS_MUT(std::string, Owner, 208);
 
   MCAPI SignBlockActor(class BlockPos const &);
   MCAPI virtual void load(class Level &, class CompoundTag const &, class DataLoadHelper &) override;

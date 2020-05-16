@@ -18,10 +18,24 @@
 #include <modutils.h>
 
 class Dimension;
+enum class ActorType;
+enum class InputMode;
+enum class ActorLocation;
+enum class MaterialType;
+enum class ActorEvent;
+enum class ArmorSlot;
+enum class ArmorMaterialType;
+enum class ArmorTextureType;
+enum class LevelSoundEvent;
+enum class ItemUseMethod;
+enum class PaletteColor;
+enum class ActorFlags;
 
 class Actor {
 
 public:
+  enum class InitializationMethod;
+
   MCAPI virtual void reloadHardcoded(enum InitializationMethod, class VariantParameterList const &);
   MCAPI virtual void reloadHardcodedClient(enum InitializationMethod, class VariantParameterList const &);
   MCAPI virtual void initializeComponents(enum InitializationMethod, class VariantParameterList const &);
@@ -413,16 +427,9 @@ public:
         &old, dim);
   }
 
-  BUILD_ACCESS(class BlockSource *, region, 800);
-  BASEAPI ActorRuntimeID getRuntimeID() const;
-  BASEAPI SimpleContainer &getEquipmentContainer();
-  BASEAPI SimpleContainer &getHandContainer();
-  BASEAPI SynchedActorData &getEntityData() const;
-};
-
-class Mob : public Actor {
-public:
-  inline void sendInventory(bool a0) const {
-    return CallServerClassMethod<void>("?sendInventory@Mob@@UEAAX_N@Z", this, a0);
-  }
+  BUILD_ACCESS_COMPAT(BlockSource *, Region);
+  BUILD_ACCESS_COMPAT(ActorRuntimeID, RuntimeID);
+  BUILD_ACCESS_COMPAT(SimpleContainer &, EquipmentContainer);
+  BUILD_ACCESS_COMPAT(SimpleContainer &, HandContainer);
+  BUILD_ACCESS_COMPAT(SynchedActorData &, EntityData);
 };

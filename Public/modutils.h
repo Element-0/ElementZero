@@ -19,10 +19,20 @@ template <typename Ret, typename Type> Ret &direct_access(Type *type, size_t off
   return *u.target;
 }
 
+#define AS_FIELD(type, name, fn) __declspec(property(get = fn)) type name
+
 #define FAKE_FIELD(type, name)                                                                                         \
-  __declspec(property(get = get_##name)) type &name;                                                                   \
-  type &get_##name()
+  AS_FIELD(type, name, get##name);                                                                                     \
+  type get##name()
 
 #define BUILD_ACCESS(type, name, offset)                                                                               \
-  __declspec(property(get = get_##name)) type &name;                                                                   \
-  type &get_##name() { return direct_access<type>(this, offset); }
+  AS_FIELD(type, name, get##name);                                                                                     \
+  type get##name() const { return direct_access<type>(this, offset); }
+
+#define BUILD_ACCESS_MUT(type, name, offset)                                                                           \
+  AS_FIELD(type &, name, get##name);                                                                                   \
+  type &get##name() const { return direct_access<type>(this, offset); }
+
+#define BUILD_ACCESS_COMPAT(type, name)                                                                                \
+  AS_FIELD(type, name, get##name);                                                                                     \
+  BASEAPI type get##name() const;
