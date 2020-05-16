@@ -54,8 +54,6 @@ THook(
   return original(type, pos, block);
 }
 
-template <typename T, auto... ts> T create() { return {ts...}; }
-
 void PreInit() {
   VTableHook::Create<&BlockLegacy::use>("??_7SignBlock@@6B@")
       ->Replace(
