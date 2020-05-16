@@ -117,6 +117,14 @@ public:
   MCAPI void _read(class ReadOnlyBinaryStream &);
 
   inline unsigned char getStackSize() const { return count; }
+  AS_FIELD(short, Id, getId);
+  AS_FIELD(short, Aux, getAuxValue);
+  AS_FIELD(int, IdAux, getIdAux);
+  AS_FIELD(std::string, Name, getName);
+  AS_FIELD(std::string, HoverName, getHoverName);
+  AS_FIELD(std::string, RawNameId, getRawNameId);
+  AS_FIELD(std::string, DescriptionId, getDescriptionId);
+  DEF_FIELD_RW(std::string, CustomName);
 
   inline std::vector<std::string> getCustomLore() const {
     std::vector<std::string> ret;
