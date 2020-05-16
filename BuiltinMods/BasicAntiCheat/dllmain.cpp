@@ -58,20 +58,6 @@ TClasslessInstanceHook(
 }
 
 TClasslessInstanceHook(
-    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVCommandBlockUpdatePacket@@@Z",
-    NetworkIdentifier *netid, void *packet) {
-  auto &db = Mod::PlayerDatabase::GetInstance();
-  if (auto it = db.Find(*netid); it) {
-    if (it->player->canUseOperatorBlocks()) {
-      original(this, netid, packet);
-    } else {
-      LOGI("\"%s\"(%d) has been detected using: command block exploit") % it->name % it->xuid;
-      (mAntiCheat.*EmitDetected)(SIG("detected"), "edit_block", *it);
-    }
-  }
-}
-
-TClasslessInstanceHook(
     void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVMobEquipmentPacket@@@Z",
     NetworkIdentifier *netid, MobEquipmentPacket *packet) {
   auto &db = Mod::PlayerDatabase::GetInstance();
