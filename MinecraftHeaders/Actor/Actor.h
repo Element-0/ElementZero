@@ -432,4 +432,5 @@ public:
   BUILD_ACCESS_COMPAT(SimpleContainer &, EquipmentContainer);
   BUILD_ACCESS_COMPAT(SimpleContainer &, HandContainer);
   BUILD_ACCESS_COMPAT(SynchedActorData &, EntityData);
+  BUILD_ACCESS_COMPAT(class Dimension *, Dimension);
 };
