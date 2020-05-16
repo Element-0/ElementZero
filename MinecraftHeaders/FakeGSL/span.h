@@ -12,20 +12,21 @@ public:
   union {
     __m128i val;
     struct {
-      T *a, *b;
+      size_t len;
+      T *target;
     };
   };
 
-  span(T *a, T *b) : a(a), b(b) {}
+  span(T *target, size_t len) : len(len), target(target) {}
 
-  T *begin() const { return a; }
-  T *end() const { return b; }
-  bool empty() const { return a == b; }
-  size_t size() const { return b - a; }
+  T *begin() const { return target; }
+  T *end() const { return target + len; }
+  bool empty() const { return len == 0; }
+  size_t size() const { return len; }
 
-  T *data() const { return a; }
+  T *data() const { return target; }
 };
 
-template <typename T> span<T, (size_t) -1> make_span(T *target, size_t len) { return {target, target + len}; }
+template <typename T> span<T, (size_t) -1> make_span(T *target, size_t len) { return {target, len}; }
 
 } // namespace gsl
