@@ -7,9 +7,9 @@
 #include "yaml.h"
 
 // On dll load
-void dllenter();
+extern "C" void dllenter() __attribute__((weak));
 // On dll unload (PS: You should never use any minecraft interface or mod api in this function)
-void dllexit();
+extern "C" void dllexit() __attribute__((weak));
 
 // Called if config is present
 extern "C" __declspec(dllexport) void ApplySettings(YAML::Node const &node);
@@ -41,10 +41,10 @@ extern "C" __declspec(dllexport) void AfterReload();
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
   switch (ul_reason_for_call) {
-  case DLL_PROCESS_ATTACH: dllenter(); break;
+  case DLL_PROCESS_ATTACH: if (dllenter) dllenter(); break;
   case DLL_THREAD_ATTACH: break;
   case DLL_THREAD_DETACH: break;
-  case DLL_PROCESS_DETACH: dllexit(); break;
+  case DLL_PROCESS_DETACH: if (dllexit) dllexit(); break;
   }
   return TRUE;
 }
