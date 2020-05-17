@@ -22,10 +22,16 @@ protected:
   }
 
 public:
+  MCAPI static std::string const WILDCARD_TOKEN;
+  MCAPI static bool validRange(int, int, int, class CommandOutput &);
+  MCAPI void run(class CommandOrigin const &, class CommandOutput &) const;
   MCAPI virtual ~Command();
   virtual void execute(CommandOrigin const &, CommandOutput &) = 0;
 
 protected:
-  //??$checkHasTargets@VActor@@@Command@@KA_NAEBV?$CommandSelectorResults@VActor@@@@AEAVCommandOutput@@@Z
+  MCAPI static bool isWildcard(class CommandSelectorBase const &);
+  MCAPI bool shouldSendTelemetry(class CommandOrigin const &) const;
+  MCAPI static bool isTemplateLockedAction(class CommandOrigin const &);
+  MCAPI void sendTelemetry(class CommandOrigin const &, class CommandOutput const &) const;
   template <typename T> MCAPI static bool checkHasTargets(CommandSelectorResults<T> const &, CommandOutput &);
 };
