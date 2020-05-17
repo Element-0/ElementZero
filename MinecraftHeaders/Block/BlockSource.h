@@ -8,6 +8,10 @@
 
 #include <hook.h>
 
+enum class MaterialType;
+enum class TickingQueueType;
+enum class ActorType;
+
 class BlockSource {
   char pad[224 - 8];
 
