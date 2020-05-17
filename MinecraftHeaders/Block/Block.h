@@ -5,6 +5,8 @@
 #include "BlockLegacy.h"
 #include "../dll.h"
 
+#include <modutils.h>
+
 class Block {
 public:
   unsigned short aux;
@@ -15,4 +17,19 @@ public:
 
   MCAPI virtual ~Block();
   MCAPI virtual enum BlockRenderLayer getRenderLayer() const;
+
+  template <typename T> MCAPI T getState(class ItemState const &) const;
+  template <typename T> MCAPI class Block const *setState(class ItemState const &, T) const;
+
+  MCAPI bool isSlabBlock(void) const;
+  MCAPI bool isSolidBlockingBlock(void) const;
+  MCAPI bool hasState(class ItemState const &) const;
+  MCAPI class Block const &keepState(class ItemState const &) const;
+  MCAPI class BlockLegacy const &getLegacyBlock(void) const;
+  MCAPI class Block const &copyState(class Block const &, class ItemState const &) const;
+  MCAPI bool isSolidBlockingBlockAndNotSignalSource(void) const;
+  MCAPI void spawnResources(class BlockSource &, class BlockPos const &, float, int) const;
+  MCAPI std::string toDebugString(void) const;
+
+  AS_FIELD(class BlockLegacy const &, LegacyBlock, getLegacyBlock);
 };
