@@ -140,11 +140,11 @@ static_assert(sizeof(ComplexInventoryTransaction) == 104);
 
 class ItemUseInventoryTransaction : public ComplexInventoryTransaction {
 public:
-  int actionType = 0;
+  enum class Type { USE_ITEM_ON, USE_ITEM, DESTROY } actionType;
   NetworkBlockPosition pos;
-  uint32_t unk   = 0;
-  BlockFace face = (BlockFace) 0;
-  uint32_t slot = 0;
+  uint32_t block_runtime_id;
+  BlockFace face;
+  uint32_t slot;
   ItemStack itemInHand;
   Vec3 playerPos, clickPos;
 
