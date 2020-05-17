@@ -212,3 +212,14 @@ declare module "ez:economy" {
     reason: string
   ): void;
 }
+
+declare module "ez:network-stats" {
+  export function getNetworkStats(
+    player: PlayerEntry
+  ): {
+    ping: number;
+    avgping: number;
+    packetloss: number;
+    avgpacketloss: number;
+  };
+}
