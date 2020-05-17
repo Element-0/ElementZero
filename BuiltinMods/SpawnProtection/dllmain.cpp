@@ -1,5 +1,8 @@
 #include <algorithm>
 
+#include <Block/BlockSource.h>
+#include <Block/Block.h>
+#include <Block/BlockLegacy.h>
 #include <Actor/Player.h>
 #include <Math/BlockPos.h>
 #include <Net/NetworkIdentifier.h>
@@ -74,7 +77,27 @@ void checkInventoryTransaction(
     switch (transaction.type) {
     case ComplexInventoryTransaction::Type::ITEM_USE: {
       auto &data = (ItemUseInventoryTransaction const &) transaction;
-      if (data.actionType == 0 && !Check(entry.player, data.pos.x, data.pos.z)) {
+      switch (data.actionType) {
+      case ItemUseInventoryTransaction::Type::USE_ITEM_ON:
+        if (!Check(entry.player, data.pos.x, data.pos.z)) {
+          auto &block  = entry.player->Region->getBlock(data.pos);
+          auto &legacy = block.LegacyBlock;
+          if (!legacy.isInteractiveBlock() || entry.player->isSneaking()) {
+            data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
+            token("Blocked by SpawnProtection");
+          }
+        }
+        break;
+      case ItemUseInventoryTransaction::Type::USE_ITEM: break;
+      case ItemUseInventoryTransaction::Type::DESTROY:
+        if (!Check(entry.player, data.pos.x, data.pos.z)) {
+          data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
+          token("Blocked by SpawnProtection");
+        }
+        break;
+      }
+      if (data.actionType == ItemUseInventoryTransaction::Type::DESTROY &&
+          !Check(entry.player, data.pos.x, data.pos.z)) {
         data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
         token("Blocked by SpawnProtection");
       }
