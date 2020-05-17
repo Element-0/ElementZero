@@ -99,8 +99,7 @@ public:
   MCAPI bool setBlock(
       class BlockPos const &, class Block const &, int, class std::shared_ptr<class BlockActor>,
       struct ActorBlockSyncMessage const *);
-  MCAPI void fetchBlockEntities(
-      class AABB const &, class std::vector<class BlockActor *, class std::allocator<class BlockActor *>> &);
+  MCAPI void fetchBlockEntities(class AABB const &, class std::vector<class BlockActor *> &);
   MCAPI class std::vector<class AABB> &fetchCollisionShapes(class AABB const &, float *, bool, class Actor *);
   MCAPI class std::vector<class Actor *> const &fetchEntities2(enum ActorType, class AABB const &, bool);
   MCAPI class std::vector<class Actor *> const &fetchEntities(enum ActorType, class AABB const &, class Actor *);

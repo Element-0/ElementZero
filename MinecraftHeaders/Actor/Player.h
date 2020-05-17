@@ -215,12 +215,10 @@ public:
   MCAPI virtual class AnimationComponent &getAnimationComponent(void);
   MCAPI virtual enum CommandPermissionLevel getCommandPermissionLevel(void) const;
   MCAPI virtual void reloadHardcoded(enum Actor::InitializationMethod, class VariantParameterList const &);
-  MCAPI virtual class std::unique_ptr<class Packet, struct std::default_delete<class Packet>> getAddPacket(void);
-  MCAPI virtual class std::vector<class ItemStack const *, class std::allocator<class ItemStack const *>>
-  getAllHand(void) const;
+  MCAPI virtual class std::unique_ptr<class Packet> getAddPacket(void);
+  MCAPI virtual class std::vector<class ItemStack const *> getAllHand(void) const;
   MCAPI virtual void initializeComponents(enum Actor::InitializationMethod, class VariantParameterList const &);
-  MCAPI virtual class std::vector<class ItemStack const *, class std::allocator<class ItemStack const *>>
-  getAllEquipment(void) const;
+  MCAPI virtual class std::vector<class ItemStack const *> getAllEquipment(void) const;
   MCAPI virtual std::string getFormattedNameTag(void) const;
 
   bool isInRaid(void) const;
