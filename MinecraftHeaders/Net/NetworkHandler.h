@@ -43,6 +43,7 @@ public:
   };
   MCAPI void disconnect();
   MCAPI void runEvents();
+  MCAPI class NetworkPeer *getPeerForUser(class NetworkIdentifier const &);
 };
 
 static_assert(offsetof(NetworkHandler::Connection, packet_recoder) == 160);

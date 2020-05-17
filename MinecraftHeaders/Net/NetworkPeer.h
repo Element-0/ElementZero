@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <functional>
 
@@ -9,7 +10,11 @@ class NetworkPeer {
 public:
   enum class Reliability : int {};
   enum class DataStatus : int { OK, BUSY };
-  struct NetworkStatus;
+  struct NetworkStatus {
+    int level;
+    int ping, avgping;
+    double packetloss, avgpacketloss;
+  };
 
   virtual ~NetworkPeer();
   virtual void sendPacket(std::string, NetworkPeer::Reliability, int) = 0;

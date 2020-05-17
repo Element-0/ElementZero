@@ -14,6 +14,7 @@ class Minecraft;
 class MinecraftCommands;
 class AppPlatform;
 class ServerNetworkHandler;
+class NetworkHandler;
 class Level;
 namespace RakNet {
 class RakPeer;
@@ -34,6 +35,7 @@ template <> BASEAPI ServerInstance *LocateService<ServerInstance>();
 template <> BASEAPI Minecraft *LocateService<Minecraft>();
 template <> BASEAPI MinecraftCommands *LocateService<MinecraftCommands>();
 template <> BASEAPI ServerNetworkHandler *LocateService<ServerNetworkHandler>();
+template <> BASEAPI NetworkHandler *LocateService<NetworkHandler>();
 template <> BASEAPI Level *LocateService<Level>();
 template <> BASEAPI AppPlatform *LocateService<AppPlatform>();
 template <> BASEAPI RakNet::RakPeer *LocateService<RakNet::RakPeer>();

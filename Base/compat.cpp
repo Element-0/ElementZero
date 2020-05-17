@@ -88,6 +88,10 @@ template <> ServerNetworkHandler *LocateService<ServerNetworkHandler>() {
   return LocateService<Minecraft>()->getServerNetworkHandler();
 }
 
+template <> NetworkHandler *LocateService<NetworkHandler>() {
+  return direct_access<std::unique_ptr<NetworkHandler>>(LocateService<ServerInstance>(), 40).get();
+}
+
 template <> MinecraftCommands *LocateService<MinecraftCommands>() { return LocateService<Minecraft>()->getCommands(); }
 
 MinecraftCommands *Minecraft::getCommands() { return direct_access<MinecraftCommands *>(this, 160); }
