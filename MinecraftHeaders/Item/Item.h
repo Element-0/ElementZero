@@ -137,4 +137,11 @@ public:
   BASEAPI bool getAllowOffhand() const;
   DEF_FIELD_RW(bool, AllowOffhand);
   BUILD_ACCESS(short, Id, 112);
+  BUILD_ACCESS(std::string, RawNameId, 152);
+  BUILD_ACCESS(class HashedString *, FullItemName, 216);
+  BUILD_ACCESS(class BlockLegacy *, LegacyBlock, 376);
+  BUILD_ACCESS(enum CreativeItemCategory, CreativeCategory, 384);
+  BUILD_ACCESS(class FoodItemComponent *, Food, 400);
+  BUILD_ACCESS(class SeedItemComponent *, Seed, 408);
+  BUILD_ACCESS(class CameraItemComponent *, Camera, 416);
 };
