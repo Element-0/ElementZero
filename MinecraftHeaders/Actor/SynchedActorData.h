@@ -46,6 +46,16 @@ public:
     }
   }
   template <typename T> void set(DataItem::Id id, T const &value) { set<T>(_find(id), value); }
+
+  // T = int64_t | signed char
+  template <typename T> MCAPI void setFlag(unsigned short id, int32_t bit);
+  template <typename T> inline void setFlag(DataItem::Id id, int32_t bit) { setFlag((unsigned short) id, bit); }
+  template <typename T> MCAPI void clearFlag(unsigned short id, int32_t bit);
+  template <typename T> inline void clearFlag(DataItem::Id id, int32_t bit) { setFlag((unsigned short) id, bit); }
+  template <typename T> inline bool getFlag(DataItem::Id id, int32_t bit) {
+    if (auto item = _find(id)) { return static_cast<DataItem2<T> *>(item)->getFlag(bit); }
+    return false;
+  }
 };
 
 static_assert(offsetof(SynchedActorData, start) == 24);

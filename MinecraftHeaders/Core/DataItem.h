@@ -170,3 +170,25 @@ public:
   DataItem2(Id id, T const &value) : DataItem(DataTypeMap::typeFor<T>, id, true), value(value) {}
   MCAPI std::unique_ptr<DataItem> clone() const override;
 };
+
+template <> class DataItem2<int8_t> : public DataItem {
+public:
+  int8_t value;
+  DataItem2(Id id, int8_t const &value) : DataItem(DataTypeMap::typeFor<int8_t>, id, true), value(value) {}
+  MCAPI std::unique_ptr<DataItem> clone() const override;
+
+  inline bool getFlag(int32_t bit) const { return (1 << bit) & value; }
+  inline void setFlag(int32_t bit) { value |= 1 << bit; }
+  inline void clearFlag(int32_t bit) { value &= ~(1 << bit); }
+};
+
+template <> class DataItem2<int32_t> : public DataItem {
+public:
+  int32_t value;
+  DataItem2(Id id, int32_t const &value) : DataItem(DataTypeMap::typeFor<int32_t>, id, true), value(value) {}
+  MCAPI std::unique_ptr<DataItem> clone() const override;
+
+  inline bool getFlag(int32_t bit) const { return (1 << bit) & value; }
+  inline void setFlag(int32_t bit) { value |= 1 << bit; }
+  inline void clearFlag(int32_t bit) { value &= ~(1 << bit); }
+};
