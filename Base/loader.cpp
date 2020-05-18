@@ -126,7 +126,7 @@ void loadMods(YAML::Node &cfg_node) {
       auto handle = LoadLibrary(next->path().c_str());
       if (!handle) {
         LPSTR messageBuffer = nullptr;
-        size_t size         = FormatMessageA(
+        FormatMessageA(
             FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
             GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &messageBuffer, 0, NULL);
         LOGE("Failed to load mod: %s: %s") % next->path() % messageBuffer;
