@@ -189,12 +189,12 @@ void Instance::createBossActor() {
   pkt.uid    = unqid;
   pkt.rid    = unqid;
   pkt.def_id = ActorDefinitionIdentifier{"minecraft:agent"};
-  syncedata.append<int64_t>(DataItem::Id::FLAGS, 0);
-  syncedata.append<short>(DataItem::Id::AIR, 400);
-  syncedata.append<short>(DataItem::Id::MAX_AIR, 400);
-  syncedata.append<int64_t>(DataItem::Id::LEAD_HOLDER, -1);
-  syncedata.append<std::string>(DataItem::Id::NAMETAG, cfg.text);
-  syncedata.append<float>(DataItem::Id::SCALE, 0);
+  syncedata.append<int64_t>(ActorDataIDs::FLAGS, 0);
+  syncedata.append<short>(ActorDataIDs::AIR, 400);
+  syncedata.append<short>(ActorDataIDs::MAX_AIR, 400);
+  syncedata.append<int64_t>(ActorDataIDs::LEAD_HOLDER, -1);
+  syncedata.append<std::string>(ActorDataIDs::NAMETAG, cfg.text);
+  syncedata.append<float>(ActorDataIDs::SCALE, 0);
   pkt.syncedata = &syncedata;
   cfg.entry.player->sendNetworkPacket(pkt);
 }
@@ -264,7 +264,7 @@ void Instance::updateBossActorPosition() {
 void Instance::updateBossActorName() {
   SetActorDataPacket pkt;
   pkt.rid = unqid;
-  pkt.items.emplace_back(std::make_unique<DataItem2<std::string>>(DataItem::Id::NAMETAG, cfg.text));
+  pkt.items.emplace_back(std::make_unique<DataItem2<std::string>>(ActorDataIDs::NAMETAG, cfg.text));
   cfg.entry.player->sendNetworkPacket(pkt);
 }
 

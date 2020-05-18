@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -9,17 +10,15 @@
 class SynchedActorData {
 public:
   std::vector<std::unique_ptr<DataItem>> items;
-  DataItem::Id start, end;
+  uint16_t start, end;
 
-  void _setDirty(DataItem::Id pos) {
-    start = (DataItem::Id) std::min((unsigned short) pos, (unsigned short) start);
-    end   = (DataItem::Id) std::max((unsigned short) pos, (unsigned short) end);
+  void _setDirty(uint16_t pos) {
+    start = std::min(pos, start);
+    end   = std::max(pos, end);
   }
 
-  DataItem &_get(DataItem::Id pos) { return *items[(unsigned int) pos]; }
-  DataItem *_find(DataItem::Id pos) {
-    return items.size() > (unsigned int) pos ? &*items[(unsigned int) pos] : nullptr;
-  }
+  DataItem &_get(uint16_t pos) { return *items[pos]; }
+  DataItem *_find(uint16_t pos) { return items.size() > pos ? &*items[pos] : nullptr; }
 
   bool isDirty() const { return start <= end; }
 
@@ -28,9 +27,18 @@ public:
     _setDirty(item.getId());
   }
 
-  void markDirty(DataItem::Id id) {}
+  void markDirty(uint16_t id) { _setDirty(id); }
 
-  template <typename T> void append(DataItem::Id id, T const &value) {
+  void _resizeToContain(uint16_t id) {
+    if (items.size() <= id) items.resize(id);
+  }
+
+  template <typename T> void define(uint16_t id, T const &value) {
+    _resizeToContain(id);
+    items[id] = std::move(std::make_unique<DataItem2<T>>(id, value));
+  }
+
+  template <typename T> void append(uint16_t id, T const &value) {
     items.emplace_back(std::make_unique<DataItem2<T>>(id, value));
   }
 
@@ -45,14 +53,12 @@ public:
       }
     }
   }
-  template <typename T> void set(DataItem::Id id, T const &value) { set<T>(_find(id), value); }
+  template <typename T> void set(uint16_t id, T const &value) { set<T>(_find(id), value); }
 
   // T = int64_t | signed char
-  template <typename T> MCAPI void setFlag(unsigned short id, int32_t bit);
-  template <typename T> inline void setFlag(DataItem::Id id, int32_t bit) { setFlag((unsigned short) id, bit); }
-  template <typename T> MCAPI void clearFlag(unsigned short id, int32_t bit);
-  template <typename T> inline void clearFlag(DataItem::Id id, int32_t bit) { setFlag((unsigned short) id, bit); }
-  template <typename T> inline bool getFlag(DataItem::Id id, int32_t bit) {
+  template <typename T> MCAPI void setFlag(uint16_t id, int32_t bit);
+  template <typename T> MCAPI void clearFlag(uint16_t id, int32_t bit);
+  template <typename T> inline bool getFlag(uint16_t id, int32_t bit) {
     if (auto item = _find(id)) { return static_cast<DataItem2<T> *>(item)->getFlag(bit); }
     return false;
   }

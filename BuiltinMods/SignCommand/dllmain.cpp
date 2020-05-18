@@ -70,6 +70,9 @@ static inline void trim(std::string &s) {
 }
 
 void PreInit() {
+  VTableHook::Create<&BlockLegacy::isInteractiveBlock>("??_7SignBlock@@6B@")
+      ->Replace(
+          "?isInteractiveBlock@BlockLegacy@@UEBA_NXZ", +[](void *) { return true; });
   VTableHook::Create<&BlockLegacy::use>("??_7SignBlock@@6B@")
       ->Replace(
           "?use@BlockLegacy@@UEBA_NAEAVPlayer@@AEBVBlockPos@@@Z",

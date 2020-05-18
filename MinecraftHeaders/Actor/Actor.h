@@ -31,6 +31,56 @@ enum class ItemUseMethod;
 enum class PaletteColor;
 enum class ActorFlags;
 
+enum class ActorFlags {
+  ONFIRE              = 0,
+  SNEAKING            = 1,
+  RIDING              = 2,
+  SPRINTING           = 3,
+  ACTION              = 4,
+  INVISIBLE           = 5,
+  TEMPTED             = 6,
+  INLOVE              = 7,
+  SADDLED             = 8,
+  POWERED             = 9,
+  IGNITED             = 10,
+  BABY                = 11, // disable head scaling
+  CONVERTING          = 12,
+  CRITICAL            = 13,
+  CAN_SHOW_NAMETAG    = 14,
+  ALWAYS_SHOW_NAMETAG = 15,
+  IMMOBILE            = 16,
+  NO_AI               = 16,
+  SILENT              = 17,
+  WALLCLIMBING        = 18,
+  CAN_CLIMB           = 19,
+  SWIMMER             = 20,
+  CAN_FLY             = 21,
+  RESTING             = 22,
+  SITTING             = 23,
+  ANGRY               = 24,
+  INTERESTED          = 25,
+  CHARGED             = 26,
+  TAMED               = 27,
+  LEASHED             = 28,
+  SHEARED             = 29,
+  GLIDING             = 30,
+  ELDER               = 31,
+  MOVING              = 32,
+  BREATHING           = 33,
+  CHESTED             = 34,
+  STACKABLE           = 35,
+  SHOWBASE            = 36,
+  REARING             = 37,
+  VIBRATING           = 38,
+  IDLING              = 39,
+  EVOKER_SPELL        = 40,
+  CHARGE_ATTACK       = 41,
+  WASD_CONTROLLED     = 43,
+  CAN_POWER_JUMP      = 44,
+  LINGER              = 45,
+  GRAVITY             = 46,
+};
+
 class Actor {
 
 public:

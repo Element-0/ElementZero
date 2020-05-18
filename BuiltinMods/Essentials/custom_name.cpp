@@ -29,12 +29,7 @@ void ChatHandler(
 
 static void updateNametag(Player *player, std::string const &tag) {
   auto &data = player->getEntityData();
-  auto &item = (std::unique_ptr<DataItem2<std::string>> &) data.items[(int) DataItem::Id::NAMETAG];
-  item->value = tag;
-  SetActorDataPacket pkt;
-  pkt.rid = player->getRuntimeID();
-  pkt.items.emplace_back(std::make_unique<DataItem2<std::string>>(DataItem::Id::NAMETAG, tag));
-  LocateService<Level>()->getPacketSender().sendBroadcast(pkt);
+  data.set<std::string>(ActorDataIDs::NAMETAG, tag);
 }
 
 enum class Action { Set, Clear };
