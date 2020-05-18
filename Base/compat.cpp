@@ -30,8 +30,9 @@ SynchedActorData &Actor::getEntityData() const { return direct_access<SynchedAct
 SimpleContainer &Actor::getEquipmentContainer() const { return direct_access<SimpleContainer>(this, 1400); }
 // Actor::Actor
 SimpleContainer &Actor::getHandContainer() const { return direct_access<SimpleContainer>(this, 1672); }
+// xref to Actor::transferTickingArea
 class Dimension *Actor::getDimension() const {
-  return direct_access<class Dimension *>(this, 816);
+  return direct_access<class Dimension *>(this, 808);
 }
 // Player::GetSelectedItem
 PlayerInventoryProxy &Player::getInventory() const { return *direct_access<PlayerInventoryProxy *>(this, 3528); }
