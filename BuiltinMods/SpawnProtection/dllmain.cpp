@@ -96,11 +96,6 @@ void checkInventoryTransaction(
         }
         break;
       }
-      if (data.actionType == ItemUseInventoryTransaction::Type::DESTROY &&
-          !Check(entry.player, data.pos.x, data.pos.z)) {
-        data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
-        token("Blocked by SpawnProtection");
-      }
     } break;
     case ComplexInventoryTransaction::Type::ITEM_USE_ON_ACTOR: {
       auto &data    = (ItemUseOnActorInventoryTransaction const &) transaction;
