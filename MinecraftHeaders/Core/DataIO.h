@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <cstring>
 #include <string>
 #include <string_view>
@@ -18,7 +19,7 @@ public:
   virtual char readByte()                     = 0;
   virtual short readShort()                   = 0;
   virtual int readInt()                       = 0;
-  virtual long long readLongLong()            = 0;
+  virtual int64_t readLongLong()              = 0;
   virtual bool readBytes(void *, std::size_t) = 0;
   virtual std::size_t numBytesLeft() const    = 0;
 };
@@ -34,7 +35,7 @@ public:
   virtual void writeByte(char)                       = 0;
   virtual void writeShort(short)                     = 0;
   virtual void writeInt(int)                         = 0;
-  virtual void writeLongLong(long long)              = 0;
+  virtual void writeLongLong(int64_t)                = 0;
   virtual void writeBytes(void const *, std::size_t) = 0;
 };
 
@@ -49,7 +50,7 @@ public:
   MCAPI virtual char readByte();
   MCAPI virtual short readShort();
   MCAPI virtual int readInt();
-  MCAPI virtual long long readLongLong();
+  MCAPI virtual int64_t readLongLong();
   virtual bool readBytes(void *, std::size_t) = 0;
   virtual std::size_t numBytesLeft() const    = 0;
 };
@@ -65,7 +66,7 @@ public:
   MCAPI virtual void writeByte(char);
   MCAPI virtual void writeShort(short);
   MCAPI virtual void writeInt(int);
-  MCAPI virtual void writeLongLong(long long);
+  MCAPI virtual void writeLongLong(int64_t);
   virtual void writeBytes(void const *, std::size_t) = 0;
 };
 
@@ -83,7 +84,7 @@ public:
   MCAPI virtual char readByte();
   MCAPI virtual short readShort();
   MCAPI virtual int readInt();
-  MCAPI virtual long long readLongLong();
+  MCAPI virtual int64_t readLongLong();
   MCAPI virtual bool readBytes(void *, std::size_t);
   MCAPI virtual std::size_t numBytesLeft() const;
 };
@@ -102,7 +103,7 @@ public:
   MCAPI virtual void writeByte(char);
   MCAPI virtual void writeShort(short);
   MCAPI virtual void writeInt(int);
-  MCAPI virtual void writeLongLong(long long);
+  MCAPI virtual void writeLongLong(int64_t);
   MCAPI virtual void writeBytes(void const *, std::size_t);
 };
 
@@ -160,7 +161,7 @@ public:
   MCAPI virtual char readByte();
   MCAPI virtual short readShort();
   MCAPI virtual int readInt();
-  MCAPI virtual long long readLongLong();
+  MCAPI virtual int64_t readLongLong();
   MCAPI virtual bool readBytes(void *, std::size_t);
   MCAPI bool readBigEndinanBytes(void *, std::size_t);
 };
@@ -174,7 +175,7 @@ public:
   MCAPI virtual void writeByte(char);
   MCAPI virtual void writeShort(short);
   MCAPI virtual void writeInt(int);
-  MCAPI virtual void writeLongLong(long long);
+  MCAPI virtual void writeLongLong(int64_t);
   MCAPI virtual void writeReverseBytes(void const *, std::size_t);
 };
 
