@@ -171,11 +171,6 @@ public:
   MCAPI ~ItemStack();
   MCAPI static ItemStack fromTag(CompoundTag const &);
 
-  ItemStack &operator=(ItemStack const &rhs) {
-    operator=(rhs);
-    return *this;
-  }
-
 protected:
   MCAPI void reinit(Item const &, int, int);
 
