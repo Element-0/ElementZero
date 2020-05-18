@@ -1,3 +1,4 @@
+#include "Core/mce.h"
 #include <stdexcept>
 
 #include <sqlite3.h>
@@ -201,6 +202,30 @@ struct Database {
   Database(std::string const &filename) {
     SqliteErrorCode{"Failed to open database:"} =
         sqlite3_open_v2(filename.c_str(), &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, nullptr);
+    SqliteErrorCode{"Failed to register function:"} = sqlite3_create_function_v2(
+        db, "str2uuid", 1, true, nullptr,
+        +[](sqlite3_context *ctx, int, sqlite3_value **argv) {
+          auto local = mce::UUID::fromString((char const *) sqlite3_value_text(argv[0]));
+          auto uuid  = new mce::UUID;
+          memcpy(uuid, &local, sizeof local);
+          sqlite3_result_blob(ctx, uuid, sizeof *uuid, [](void *ptr) { delete (mce::UUID *) ptr; });
+        },
+        nullptr, nullptr, nullptr);
+    SqliteErrorCode{"Failed to register function:"} = sqlite3_create_function_v2(
+        db, "uuid2str", 1, true, nullptr,
+        +[](sqlite3_context *ctx, int, sqlite3_value **argv) {
+          auto blob = sqlite3_value_blob(argv[0]);
+          auto size = sqlite3_value_bytes(argv[0]);
+          if (size == sizeof(mce::UUID)) {
+            mce::UUID uuid;
+            memcpy(&uuid, blob, sizeof uuid);
+            auto str = uuid.asString();
+            sqlite3_result_text(ctx, str.c_str(), str.length(), SQLITE_TRANSIENT);
+          } else {
+            sqlite3_result_error(ctx, "not a uuid", 0);
+          }
+        },
+        nullptr, nullptr, nullptr);
   }
 
   ~Database() {
