@@ -191,7 +191,7 @@ public:
   MCAPI virtual std::size_t numBytesLeft() const;
 };
 
-class RakDataOutput : BytesDataOutput {
+class RakDataOutput : public BytesDataOutput {
 public:
   RakNet::BitStream &stream;
   inline RakDataOutput(RakNet::BitStream &stream) : stream(stream) {}
