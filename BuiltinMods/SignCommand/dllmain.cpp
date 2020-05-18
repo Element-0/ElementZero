@@ -1,5 +1,7 @@
 
 #include <memory>
+#include <string>
+#include <sstream>
 #include <stdexcept>
 
 #include <Item/ItemStack.h>
@@ -54,6 +56,19 @@ THook(
   return original(type, pos, block);
 }
 
+static inline void ltrim(std::string &s) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) { return !std::isspace(ch); }));
+}
+
+static inline void rtrim(std::string &s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) { return !std::isspace(ch); }).base(), s.end());
+}
+
+static inline void trim(std::string &s) {
+  ltrim(s);
+  rtrim(s);
+}
+
 void PreInit() {
   VTableHook::Create<&BlockLegacy::use>("??_7SignBlock@@6B@")
       ->Replace(
@@ -63,9 +78,20 @@ void PreInit() {
               if (auto me = dynamic_cast<MySignBlockActor *>(ba)) {
                 if (player.canUseOperatorBlocks()) {
                   auto &stack = player.getSelectedItem();
-                  if (stack.Id == VanillaItems::mStick->Id) {
-                    me->command = stack.CustomName;
-                    auto pkt    = TextPacket::createTranslatedMessageWithParams("signcommand.set");
+                  if (stack.Id == VanillaItems::mWritable_book->Id) {
+                    auto &tag   = *stack.tag;
+                    auto &pages = *tag.getList("pages");
+                    std::string commands;
+                    for (auto &page : pages.value) {
+                      auto &obj = *(CompoundTag *) page.get();
+                      auto str  = obj.getString("text");
+                      trim(str);
+                      commands += str;
+                      commands += '\n';
+                    }
+                    rtrim(commands);
+                    me->command = commands;
+                    auto pkt    = TextPacket::createTranslatedMessageWithParams("signcommand.set", {commands});
                     player.sendNetworkPacket(pkt);
                     return true;
                   }
@@ -77,7 +103,11 @@ void PreInit() {
                 orig->worldPosition = player.getPos();
                 orig->dim           = player.Dimension;
                 orig->actor         = &player;
-                Mod::CommandSupport::GetInstance().ExecuteCommand(std::move(orig), me->command);
+                std::stringstream ss{me->command};
+                std::string line;
+                while (std::getline(ss, line, '\n')) {
+                  Mod::CommandSupport::GetInstance().ExecuteCommand(std::move(orig->custom_clone()), line);
+                }
               }
             return true;
           });

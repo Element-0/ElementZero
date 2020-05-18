@@ -94,7 +94,10 @@ public:
   Dimension *getDimension() const override { return dim; }
   Actor *getEntity() const override { return actor; }
   CommandPermissionLevel getPermissionsLevel() const override { return level; }
-  std::unique_ptr<CommandOrigin> clone() const override { return std::make_unique<CustomCommandOrigin>(*this); }
+  std::unique_ptr<CustomCommandOrigin> custom_clone(Json::Value *new_result = nullptr) const {
+    return std::make_unique<CustomCommandOrigin>(*this);
+  }
+  std::unique_ptr<CommandOrigin> clone() const override { return custom_clone(); }
   CommandOriginType getOriginType() const override { return type; }
   bool canUseCommandsWithoutCheatsEnabled() const override { return true; }
   bool isSelectorExpansionAllowed() const override { return allowSelectorExpansion; }
