@@ -103,13 +103,13 @@ void PreInit() {
                 auto orig           = std::make_unique<Mod::CustomCommandOrigin>();
                 orig->name          = "sign";
                 orig->pos           = pos;
-                orig->worldPosition = player.getPos();
+                orig->worldPosition = {(float) pos.x, (float) pos.y, (float) pos.z};
                 orig->dim           = player.Dimension;
                 orig->actor         = &player;
                 std::stringstream ss{me->command};
                 std::string line;
                 while (std::getline(ss, line, '\n')) {
-                  Mod::CommandSupport::GetInstance().ExecuteCommand(std::move(orig->custom_clone()), line);
+                  Mod::CommandSupport::GetInstance().ExecuteCommand(orig->custom_clone(), line);
                 }
               }
             return true;
