@@ -9,7 +9,7 @@
 
 Run windows version of BDS in linux with Mod support (Yes, it is also can be run in windows)
 
-(More information) :point_right: [Wiki](https://github.com/Element-0/ElementZero/wiki)
+## Installation and usage instructions :point_right: [Wiki](https://github.com/Element-0/ElementZero/wiki)
 
 ## FAQ
 
