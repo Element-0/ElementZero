@@ -3,6 +3,7 @@
 #include <Block/BlockSource.h>
 #include <Block/Block.h>
 #include <Block/BlockLegacy.h>
+#include <Block/VanillaBlockTypes.h>
 #include <Actor/Player.h>
 #include <Math/BlockPos.h>
 #include <Net/NetworkIdentifier.h>
@@ -40,6 +41,7 @@ void AfterReload() {}
 void checkAction(Mod::PlayerEntry const &, Mod::PlayerAction const &, Mod::CallbackToken<std::string> &);
 void checkInventoryTransaction(
     Mod::PlayerEntry const &, ComplexInventoryTransaction const &, Mod::CallbackToken<std::string> &);
+void checkItemFrameDrop(Mod::PlayerEntry const &, BlockPos const &, Mod::CallbackToken<std::string> &);
 
 void PreInit() {
   mode = settings.AllowOperator ? Mode::Permissive : Mode::Enforce;
@@ -47,6 +49,8 @@ void PreInit() {
   Mod::AuditSystem::GetInstance().AddListener(SIG("action"), {Mod::RecursiveEventHandlerAdaptor(checkAction)});
   Mod::AuditSystem::GetInstance().AddListener(
       SIG("inventory_transaction"), {Mod::RecursiveEventHandlerAdaptor(checkInventoryTransaction)});
+  Mod::AuditSystem::GetInstance().AddListener(
+      SIG("item_frame_drop"), {Mod::RecursiveEventHandlerAdaptor(checkItemFrameDrop)});
 }
 
 static bool Check(Player *player, int x, int z) {
@@ -82,7 +86,8 @@ void checkInventoryTransaction(
         if (!Check(entry.player, data.pos.x, data.pos.z)) {
           auto &block  = entry.player->Region->getBlock(data.pos);
           auto &legacy = block.LegacyBlock;
-          if (!legacy.isInteractiveBlock() || entry.player->isSneaking()) {
+          if (!legacy.isInteractiveBlock() || legacy.BlockID == VanillaBlockTypes::mItemFrame->BlockID ||
+              entry.player->isSneaking()) {
             data.onTransactionError(*entry.player, InventoryTransactionError::Unexcepted);
             token("Blocked by SpawnProtection");
           }
@@ -107,5 +112,11 @@ void checkInventoryTransaction(
     } break;
     default: break;
     }
+  }
+}
+
+void checkItemFrameDrop(Mod::PlayerEntry const &entry, BlockPos const &pos, Mod::CallbackToken<std::string> &token) {
+  if (entry.player->getDimensionId() == 0) {
+    if (!Check(entry.player, pos.x, pos.z)) token("Blocked by SpawnProtection");
   }
 }
