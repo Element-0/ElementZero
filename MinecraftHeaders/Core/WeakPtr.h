@@ -17,7 +17,8 @@ public:
   }
   inline ~WeakPtr() { reset(); }
 
-  inline operator bool() const { return counter; }
+  inline operator bool() const { return counter && counter->value; }
   inline T &operator*() { return *counter->value; }
   inline T *operator->() { return counter->value; }
+  inline T *get() const { return counter->value; }
 };
