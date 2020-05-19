@@ -9,7 +9,15 @@
 
 Run windows version of BDS in linux with Mod support (Yes, it is also can be run in windows)
 
-(More information) :point_right: [Wiki](https://github.com/Element-0/ElementZero/wiki)
+## Installation and usage instructions :point_right: [Wiki](https://github.com/Element-0/ElementZero/wiki)
+
+## Features
+
+0. Compatiable with official BDS
+1. And support behavior pack with custom item/recipes/scripts (* vanilla server *does* support them, but disabled in code)
+2. Can be run in windows and linux (with wine)
+3. Native modding support
+4. /transferserver is back!
 
 ## FAQ
 
@@ -22,15 +30,8 @@ A: No, because Microsoft uses Chakra.dll, which contains a lot of references to 
 Q: How it works?<br>
 A: I created a dll that simply forwards all APIs to the open source version of Chakra engine i.e. ChakraCore. And this version can run directly under wine.
 
-## Features
 
-0. Compatiable with official BDS
-1. And support behavior pack with custom item/recipes/scripts (* vanilla server *does* support them, but disabled in code)
-2. Can be run in windows and linux (with wine)
-3. Native modding support
-4. /transferserver is back!
-
-## Build and install
+## Build and install (optional)
 
 0. Download bedrock dedicated server binary
 1. Generate bedrock_server_mod.lib (see below)
