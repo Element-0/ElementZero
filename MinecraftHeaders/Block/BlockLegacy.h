@@ -6,6 +6,8 @@
 
 #include "../dll.h"
 
+#include <modutils.h>
+
 class BlockLegacy {
 public:
   MCAPI virtual ~BlockLegacy();
@@ -183,4 +185,6 @@ public:
   MCAPI virtual void setVisualShape(class Vec3 const &, class Vec3 const &);
   MCAPI virtual class Block const *tryLegacyUpgrade(unsigned short) const;
   MCAPI virtual bool dealsContactDamage(class Actor const &, class Block const &, bool) const;
+
+  BUILD_ACCESS(unsigned short, BlockID, 260);
 };
