@@ -24,6 +24,16 @@ void InitDatabase() {
       "dimension INTEGER, "
       "blocked TEXT, "
       "data BLOB)");
+  database->exec(
+      "CREATE TABLE IF NOT EXISTS audit_item_frame ("
+      "time INTEGER DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'now')), "
+      "session BLOB, "
+      "player BLOB, "
+      "dimension INTEGER, "
+      "blocked TEXT, "
+      "x INTEGER, "
+      "y INTEGER, "
+      "z INTEGER)");
   database->exec("PRAGMA journal_mode = WAL");
   database->exec("PRAGMA synchronous = NORMAL");
 }

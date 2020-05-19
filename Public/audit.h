@@ -26,7 +26,9 @@ class AuditSystem : public RecursiveEventEmitter<
                         "action"_sig, PlayerEntry const &, PlayerAction const &, CallbackToken<std::string> &>,
                     public RecursiveEventEmitter<
                         "inventory_transaction"_sig, PlayerEntry const &, ComplexInventoryTransaction const &,
-                        CallbackToken<std::string> &> {
+                        CallbackToken<std::string> &>,
+                    public RecursiveEventEmitter<
+                        "item_frame_drop"_sig, PlayerEntry const &, BlockPos const &, CallbackToken<std::string> &> {
   AUDITAPI AuditSystem();
 
 public:
@@ -35,6 +37,7 @@ public:
   USING_RECEVENTEMITTER("action", PlayerEntry const &, PlayerAction const &, CallbackToken<std::string> &);
   USING_RECEVENTEMITTER(
       "inventory_transaction", PlayerEntry const &, ComplexInventoryTransaction const &, CallbackToken<std::string> &);
+  USING_RECEVENTEMITTER("item_frame_drop", PlayerEntry const &, BlockPos const &, CallbackToken<std::string> &);
 };
 
 } // namespace Mod
