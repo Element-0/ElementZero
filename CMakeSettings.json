@@ -4,7 +4,7 @@
       "name": "RelWithDebInfo",
       "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
-      "inheritEnvironments": ["clang_cl_x64"],
+      "inheritEnvironments": [ "clang_cl_x64" ],
       "buildRoot": "${projectDir}\\Build",
       "installRoot": "${projectDir}\\Dist",
       "cmakeCommandArgs": "",
@@ -14,15 +14,18 @@
       "variables": [
         {
           "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake"
+          "value": "${projectDir}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake",
+          "type": "STRING"
         },
         {
           "name": "ChakraCore",
-          "value": "${projectDir}\\vcpkg\\installed\\elementzero\\bin\\ChakraCore.dll"
+          "value": "${projectDir}\\vcpkg\\installed\\elementzero\\bin\\ChakraCore.dll",
+          "type": "STRING"
         },
         {
           "name": "FUNCHOOK_DLL",
-          "value": "${projectDir}\\vcpkg\\installed\\elementzero\\bin\\funchook.dll"
+          "value": "${projectDir}\\vcpkg\\installed\\elementzero\\bin\\funchook.dll",
+          "type": "STRING"
         },
         {
           "name": "VCPKG_TARGET_TRIPLET",
