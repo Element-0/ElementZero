@@ -31,6 +31,7 @@ jobs:
       run: |
         Invoke-WebRequest -Uri "https://prereleases.llvm.org/win-snapshots/LLVM-11.0.0-2663a25f-win64.exe" -OutFile "C:\LLVM.exe"
         C:\LLVM.exe /S
+        ls C:/Program Files/LLVM/bin
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
         echo "::set-env name=PATH::C:/Program Files/LLVM/bin;$env:PATH"
