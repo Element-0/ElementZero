@@ -12,11 +12,12 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
         submodules: 'recursive'
 
-    - name: run-vcpkg
+    - name: Install vcpkg
       uses: lukka/run-vcpkg@v2
       with:
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
@@ -27,14 +28,13 @@ jobs:
       with:
         arch: x64
 
-    - name: install llvm 11.0
+    - name: Install llvm 11.0
       run: |
         Write-Host ('Downloading LLVM')
         Invoke-WebRequest -Uri "https://prereleases.llvm.org/win-snapshots/LLVM-11.0.0-2663a25f-win64.exe" -OutFile "C:\LLVM.exe"
         Write-Host ('Installing LLVM')
-        Start-Process C:\LLVM.exe -Wait -ArgumentList @('/S', '/D:C:\LLVM')
+        Start-Process C:\LLVM.exe -Wait -ArgumentList @('/S', '/D=C:\LLVM')
         Write-Host ('Installed LLVM')
-        ls C:/LLVM
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
         echo "::set-env name=PATH::C:/LLVM/bin;$env:PATH"
