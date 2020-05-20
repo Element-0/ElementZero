@@ -27,15 +27,14 @@ jobs:
       with:
         arch: x64
 
-    - name: install llvm
+    - name: install llvm 11.0
       run: |
-        Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-        scoop install llvm tar --global
-    - name: set environment
-      run: |
+        mkdir C:\LLVM
+        Invoke-WebRequest -Uri "https://prereleases.llvm.org/win-snapshots/LLVM-11.0.0-2663a25f-win64.exe" -OutFile "C:\LLVM.exe"
+        C:\LLVM.exe /S /D=C:\LLVM
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
-        echo "::set-env name=PATH::C:/ProgramData/scoop/shims;$env:PATH"
+        echo "::set-env name=PATH::C:/LLVM/bin;$env:PATH"
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
