@@ -29,12 +29,14 @@ jobs:
 
     - name: install llvm 11.0
       run: |
+        mkdir C:\LLVM
+        Write-Host ('Downloading LLVM')
         Invoke-WebRequest -Uri "https://prereleases.llvm.org/win-snapshots/LLVM-11.0.0-2663a25f-win64.exe" -OutFile "C:\LLVM.exe"
-        C:\LLVM.exe /S
-        ls C:/Program Files/LLVM/bin
+        Write-Host ('Installing LLVM')
+        Start-Process C:\LLVM.exe -Wait -ArgumentList @('/S', '/D:C:\LLVM')
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
-        echo "::set-env name=PATH::C:/Program Files/LLVM/bin;$env:PATH"
+        echo "::set-env name=PATH::C:\LLVM\bin;$env:PATH"
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
