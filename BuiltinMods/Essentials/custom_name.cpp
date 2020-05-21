@@ -139,7 +139,7 @@ static void onPlayerInitialized(Mod::PlayerEntry const &entry) {
   stmt.bindNoCopy(1, entry.uuid, sizeof entry.uuid);
   if (stmt.executeStep()) {
     std::string nametag = stmt.getColumn("nametag");
-    updateNametag(entry.player, nametag);
+    if (nametag.size()) updateNametag(entry.player, nametag);
   }
 }
 
