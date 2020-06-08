@@ -12,5 +12,4 @@ yaml-cpp
 chakracore
 msgpack
 flatbuffers
-ms-gsl
 funchook
