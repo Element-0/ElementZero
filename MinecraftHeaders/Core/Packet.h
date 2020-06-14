@@ -15,9 +15,9 @@ public:
   PacketReliability reliableOrdered = PacketReliability::RelibleOrdered; // 12
   unsigned char clientSubId         = 0;                                 // 16
   uint64_t unk24                    = 0;                                 // 24
-  unsigned compressible             = 0;                                 // 32
+  unsigned incompressible             = 0;                                 // 32
 
-  inline Packet(unsigned compress) : compressible(compress) {}
+  inline Packet(unsigned compress) : incompressible(!compress) {}
   inline Packet() {}
   inline virtual ~Packet() {}
   virtual MinecraftPacketIds getId() const              = 0;
