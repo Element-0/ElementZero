@@ -28,10 +28,10 @@ class WarpSystem
     : public Mod::RecursiveEventEmitter<"warp"_sig, Player *, WarpInfo const &, Mod::CallbackToken<std::string> &>,
       public Mod::RecursiveEventEmitter<
           "set_warp"_sig, mce::UUID const &, WarpInfo const &, Mod::CallbackToken<std::string> &> {
-  WarpSystem();
+  ESSAPI WarpSystem();
 
 public:
-  static WarpSystem &GetInstance();
+  ESSAPI static WarpSystem &GetInstance();
 
   ESSAPI int GetGlobalWarpCount();
   ESSAPI std::vector<WarpInfo> GetGlobalWarpList();
