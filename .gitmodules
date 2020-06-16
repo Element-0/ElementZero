@@ -4,3 +4,6 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/Element-0/vcpkg
+[submodule "Deps/mini_bus_cpp"]
+	path = Deps/mini_bus_cpp
+	url = https://github.com/CodeHz/mini_bus_cpp
