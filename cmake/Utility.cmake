@@ -34,6 +34,9 @@ function (def_mod name)
         CONFIGURE_DEPENDS *.cpp)
     set (IS_BASEMOD $<BOOL:${ARG_BASEMOD}>)
     add_library (${name} SHARED ${srcs})
+    if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include")
+        target_include_directories (${name} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+    endif ()
     target_compile_definitions (${name}
         PRIVATE MODNAME=${name} $<${IS_BASEMOD}:EZVERSION=\"${git_version}\">)
     target_link_libraries (${name}
