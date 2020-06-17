@@ -2,14 +2,11 @@
 #include <boost/functional/hash.hpp>
 
 #include <hook.h>
+#include <modutils.h>
 
 #include "../Core/mce.h"
 #include "../RakNet/RakNetTypes.h"
 #include "../dll.h"
-
-#ifndef BASEAPI
-#  define BASEAPI __declspec(dllimport)
-#endif
 
 class NetworkIdentifier {
 public:
