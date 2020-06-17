@@ -1,11 +1,12 @@
-#include <dllentry.h>
-#include <command.h>
-#include <log.h>
-
 #include <Actor/ActorType.h>
 #include <Actor/Player.h>
-#include <bossbar.h>
-#include <playerdb.h>
+
+#include <dllentry.h>
+
+#include <base/log.h>
+#include <base/playerdb.h>
+#include <mods/CommandSupport.h>
+#include <mods/BossBarSupport.h>
 
 #include "global.h"
 

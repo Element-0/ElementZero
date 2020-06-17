@@ -13,7 +13,6 @@
 #include "../Command/CommandPermissionLevel.h"
 #include "../dll.h"
 
-#include <base.h>
 #include <hook.h>
 #include <modutils.h>
 

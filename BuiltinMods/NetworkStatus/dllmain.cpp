@@ -1,13 +1,14 @@
-#include "playerdb.h"
 #include <Net/NetworkHandler.h>
 #include <Net/NetworkIdentifier.h>
 #include <Actor/Player.h>
 
 #include <dllentry.h>
-#include <command.h>
-#include <base.h>
-#include <scriptapi.h>
-#include <log.h>
+
+#include <base/base.h>
+#include <base/playerdb.h>
+#include <base/log.h>
+#include <mods/CommandSupport.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 DEF_LOGGER("NetworkStatus");
 

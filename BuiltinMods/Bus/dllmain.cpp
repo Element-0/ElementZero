@@ -1,6 +1,6 @@
 #include <dllentry.h>
-#include <log.h>
-#include <base.h>
+#include <base/base.h>
+#include <base/log.h>
 #include "global.h"
 
 DEF_LOGGER("Bus");

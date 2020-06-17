@@ -1,5 +1,5 @@
-#include <scriptapi.h>
-#include <anticheat.h>
+#include <mods/ScriptSupport/scriptapi.h>
+#include <mods/BasicAntiCheat.h>
 
 #include "../lazyapi.h"
 

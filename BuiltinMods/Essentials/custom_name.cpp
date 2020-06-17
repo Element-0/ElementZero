@@ -1,14 +1,15 @@
-#include "base.h"
 #include "pch.h"
 
 #include <memory>
-#include <sqlite3.h>
 #include <boost/scope_exit.hpp>
 
-#include "global.h"
-#include "playerdb.h"
+#include <sqlite3.h>
 
-#include <chat.h>
+#include <base/base.h>
+#include <base/playerdb.h>
+#include <mods/ChatAPI.h>
+
+#include "global.h"
 
 void ChatHandler(
     Mod::PlayerEntry const &entry, std::string &displayName, std::string &content,

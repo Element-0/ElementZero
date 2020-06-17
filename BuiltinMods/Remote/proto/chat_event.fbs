@@ -1,9 +1,0 @@
-include "uuid.fbs";
-
-namespace Mod.proto;
-
-table ChatEvent {
-  from: UUID (native_inline);
-  displayName: string;
-  content: string;
-}

@@ -4,9 +4,10 @@
 
 #include <dllentry.h>
 #include <hook.h>
-#include <base.h>
 #include <yaml.h>
-#include <log.h>
+
+#include <base/base.h>
+#include <base/log.h>
 
 DEF_LOGGER("FlatWorld");
 

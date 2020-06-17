@@ -1,7 +1,8 @@
+#include <Net/NetworkIdentifier.h>
+
 #include <dllentry.h>
 #include <hook.h>
-#include <log.h>
-#include <Net/NetworkIdentifier.h>
+#include <base/log.h>
 
 DEF_LOGGER("NoEncryption");
 

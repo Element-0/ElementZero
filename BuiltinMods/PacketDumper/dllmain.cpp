@@ -9,9 +9,10 @@
 
 #include <dllentry.h>
 #include <hook.h>
-#include <playerdb.h>
 #include <yaml.h>
-#include <base.h>
+
+#include <base/base.h>
+#include <base/playerdb.h>
 
 #include "boost/scope_exit.hpp"
 #include "global.h"

@@ -1,10 +1,12 @@
-#include "Core/mce.h"
 #include <stdexcept>
+
+#include <Core/mce.h>
 
 #include <sqlite3.h>
 
 #include <modutils.h>
-#include <scriptapi.h>
+
+#include <mods/ScriptSupport/scriptapi.h>
 
 using namespace Mod::Scripting;
 

@@ -1,8 +1,3 @@
-#include <dllentry.h>
-#include <playerdb.h>
-#include <hook.h>
-#include <log.h>
-#include <anticheat.h>
 #include <Net/NetworkIdentifier.h>
 #include <Packet/MobEquipmentPacket.h>
 #include <Packet/ActorFallPacket.h>
@@ -11,6 +6,13 @@
 #include <Item/Potion.h>
 #include <Item/ItemDescriptor.h>
 #include <Item/Item.h>
+
+#include <dllentry.h>
+#include <hook.h>
+
+#include <base/log.h>
+#include <base/playerdb.h>
+#include <mods/BasicAntiCheat.h>
 
 DEF_LOGGER("BAC");
 

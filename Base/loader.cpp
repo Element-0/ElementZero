@@ -1,9 +1,3 @@
-#include "loader.h"
-#include "Command/CommandOrigin.h"
-#include "Command/CommandOutput.h"
-#include "settings.hpp"
-#include "yaml.h"
-
 #include <exception>
 #include <filesystem>
 #include <list>
@@ -12,9 +6,17 @@
 #include <Windows.h>
 #include <Psapi.h>
 
-#include <log.h>
+#include <Command/CommandOrigin.h>
+#include <Command/CommandOutput.h>
+
 #include <hook.h>
-#include <base.h>
+
+#include <base/base.h>
+#include <base/log.h>
+
+#include "loader.h"
+#include "settings.hpp"
+#include "yaml.h"
 
 using namespace std::filesystem;
 

@@ -1,8 +1,8 @@
 #include <sstream>
 
-#include <log.h>
-#include <scriptapi.h>
-#include <scheduler.h>
+#include <base/log.h>
+#include <base/scheduler.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 #include "global.h"
 

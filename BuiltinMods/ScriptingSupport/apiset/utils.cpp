@@ -1,6 +1,4 @@
-#include <chakra_helper.h>
-
-#include <scriptapi.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 using namespace Mod::Scripting;
 

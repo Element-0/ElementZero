@@ -1,7 +1,8 @@
 #pragma once
 
-#include <yaml.h>
 #include <cstdint>
+
+#include <yaml.h>
 
 struct Settings {
   struct PosXZ {

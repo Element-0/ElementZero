@@ -1,8 +1,0 @@
-native_include "uuid_addition.h";
-
-namespace Mod.proto;
-
-struct UUID (native_type:"mce::UUID") {
-  low: uint64;
-  high: uint64;
-}

@@ -1,8 +1,9 @@
 #include <Script/ScriptEngine.h>
 
 #include <hook.h>
-#include <log.h>
-#include <scriptapi.h>
+
+#include <base/log.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 #include "global.h"
 

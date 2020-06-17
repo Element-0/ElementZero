@@ -2,9 +2,7 @@
 
 #include "../dll.h"
 
-#ifndef BASEAPI
-#  define BASEAPI __declspec(dllimport)
-#endif
+#include <modutils.h>
 
 class Level;
 class ServerNetworkHandler;

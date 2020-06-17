@@ -1,6 +1,5 @@
 #include <boost/scope_exit.hpp>
 
-#include <base.h>
 #include <Core/BinaryStream.h>
 #include <Math/BlockPos.h>
 #include <Net/NetworkIdentifier.h>
@@ -9,10 +8,12 @@
 #include <Packet/InventoryTransactionPacket.h>
 
 #include <dllentry.h>
-#include <playerdb.h>
-#include <command.h>
 #include <hook.h>
-#include <audit.h>
+
+#include <base/base.h>
+#include <base/playerdb.h>
+#include <mods/CommandSupport.h>
+#include <mods/Audit.h>
 
 #include "settings.h"
 

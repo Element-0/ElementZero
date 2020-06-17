@@ -1,6 +1,7 @@
-#include <scriptapi.h>
-#include <economy.h>
 #include <stdexcept>
+
+#include <mods/ScriptSupport/scriptapi.h>
+#include <mods/Economy.h>
 
 #include "../lazyapi.h"
 

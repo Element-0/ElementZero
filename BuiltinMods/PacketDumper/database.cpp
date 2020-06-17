@@ -2,7 +2,7 @@
 
 #include <SQLiteCpp/Database.h>
 
-#include <log.h>
+#include <base/log.h>
 
 #include "global.h"
 

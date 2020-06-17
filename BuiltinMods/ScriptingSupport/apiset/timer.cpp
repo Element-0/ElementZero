@@ -1,11 +1,10 @@
 #include <sstream>
 
-#include "ChakraCommon.h"
-#include "chakra_helper.h"
-#include "log.h"
-#include "scheduler.h"
+#include <ChakraCommon.h>
 
-#include <scriptapi.h>
+#include <base/log.h>
+#include <base/scheduler.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 using namespace Mod::Scripting;
 

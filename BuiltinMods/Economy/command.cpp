@@ -1,12 +1,5 @@
-#include <Command/Command.h>
-#include <Command/CommandOrigin.h>
-#include <Command/CommandOutput.h>
-#include <Command/CommandSelector.h>
-#include <Command/CommandSelectorResults.h>
-#include <Command/CommandPermissionLevel.h>
-
-#include <economy.h>
-#include <command.h>
+#include <mods/Economy.h>
+#include <mods/CommandSupport.h>
 
 #include "global.h"
 

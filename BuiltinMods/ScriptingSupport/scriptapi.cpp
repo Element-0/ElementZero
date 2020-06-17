@@ -1,4 +1,4 @@
-#include <scriptapi.h>
+#include <mods/ScriptSupport/scriptapi.h>
 #include "./lazyapi.h"
 
 using namespace Mod::Scripting;

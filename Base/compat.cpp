@@ -1,5 +1,3 @@
-#include <base.h>
-#include <modutils.h>
 #include <Actor/Player.h>
 #include <Core/Minecraft.h>
 #include <Container/SimpleContainer.h>
@@ -9,6 +7,10 @@
 #include <Net/NetworkIdentifier.h>
 #include <Net/ServerNetworkHandler.h>
 #include <RakNet/RakPeer.h>
+
+#include <modutils.h>
+
+#include <base/base.h>
 
 #include "loader.h"
 

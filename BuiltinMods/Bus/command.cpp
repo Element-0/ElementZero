@@ -1,7 +1,7 @@
 #include <Core/ServerInstance.h>
 
-#include <base.h>
-#include <command.h>
+#include <base/base.h>
+#include <mods/CommandSupport.h>
 
 #include "global.h"
 

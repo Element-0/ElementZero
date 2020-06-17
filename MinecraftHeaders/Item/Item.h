@@ -7,7 +7,6 @@
 #include "../dll.h"
 
 #include <hook.h>
-#include <base.h>
 #include <modutils.h>
 
 enum class BlockShape;

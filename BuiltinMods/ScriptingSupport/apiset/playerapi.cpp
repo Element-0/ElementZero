@@ -3,11 +3,11 @@
 #include <Core/mce.h>
 #include <boost/lexical_cast.hpp>
 
-#include <chakra_helper.h>
-#include <log.h>
-#include <playerdb.h>
 #include <modutils.h>
-#include <scriptapi.h>
+
+#include <base/log.h>
+#include <base/playerdb.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 using namespace Mod::Scripting;
 

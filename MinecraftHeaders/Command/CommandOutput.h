@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include <base.h>
+#include <modutils.h>
 
 #include "CommandOutputType.h"
 #include "CommandOutputParameter.h"

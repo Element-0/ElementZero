@@ -4,11 +4,10 @@
 #include <map>
 #include <string>
 
-#include <log.h>
-#include <scriptapi.h>
+#include <base/base.h>
+#include <base/log.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
-#include "base.h"
-#include "chakra_helper.h"
 #include "global.h"
 #include "lazyapi.h"
 

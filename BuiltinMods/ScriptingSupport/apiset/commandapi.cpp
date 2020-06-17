@@ -1,11 +1,11 @@
 #include <memory>
-
-#include <base.h>
+#include <stdexcept>
 
 #include <modutils.h>
-#include <scriptapi.h>
-#include <command.h>
-#include <stdexcept>
+
+#include <base/base.h>
+#include <mods/ScriptSupport/scriptapi.h>
+#include <mods/CommandSupport.h>
 
 using namespace Mod::Scripting;
 

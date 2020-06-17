@@ -2,9 +2,7 @@
 #include <Script/ScriptEngine.h>
 #include <Core/json.h>
 
-#include <chakra_helper.h>
-#include <scriptapi.h>
-#include <vector>
+#include <mods/ScriptSupport/scriptapi.h>
 
 namespace Mod::Scripting {
 

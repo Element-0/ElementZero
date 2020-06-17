@@ -1,6 +1,7 @@
-#include <command.h>
 #include <hook.h>
 #include <dllentry.h>
+
+#include <mods/CommandSupport.h>
 
 void (Mod::CommandSupport::*emitter)(sigt<"loaded"_sig>, CommandRegistry *);
 

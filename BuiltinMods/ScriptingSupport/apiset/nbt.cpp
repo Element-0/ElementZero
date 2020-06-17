@@ -1,10 +1,11 @@
+#include <memory>
+
 #include <Core/NBT.h>
 
-#include <chakra_helper.h>
-#include <log.h>
 #include <modutils.h>
-#include <memory>
-#include <scriptapi.h>
+
+#include <base/log.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 namespace Mod::Scripting {
 

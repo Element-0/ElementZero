@@ -14,11 +14,11 @@
 #include <Core/DataItem.h>
 #include <Core/PacketSender.h>
 
-#include <playerdb.h>
-#include <base.h>
-#include <scheduler.h>
-#include <bossbar.h>
-#include <log.h>
+#include <base/base.h>
+#include <base/playerdb.h>
+#include <base/scheduler.h>
+#include <base/log.h>
+#include <mods/BossBarSupport.h>
 
 #include "global.h"
 

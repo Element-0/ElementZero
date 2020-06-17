@@ -6,9 +6,9 @@
 #include <Scoreboard/ScoreboardId.h>
 #include <Scoreboard/IdentityDefinition.h>
 
-#include <playerdb.h>
 #include <dllentry.h>
-#include <scriptapi.h>
+#include <base/playerdb.h>
+#include <mods/ScriptSupport/scriptapi.h>
 
 void dllenter() {}
 void dllexit() {}

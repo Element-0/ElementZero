@@ -1,5 +1,5 @@
-#include <chakra_helper.h>
-#include <chat.h>
+#include <mods/ScriptSupport/chakra_helper.h>
+#include <mods/ChatAPI.h>
 
 #include "../lazyapi.h"
 

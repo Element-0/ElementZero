@@ -18,9 +18,10 @@
 
 #include <dllentry.h>
 #include <hook.h>
-#include <base.h>
-#include <command.h>
-#include <log.h>
+
+#include <base/base.h>
+#include <base/log.h>
+#include <mods/CommandSupport.h>
 
 DEF_LOGGER("SignCommand");
 

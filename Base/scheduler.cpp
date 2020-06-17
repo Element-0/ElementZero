@@ -15,9 +15,10 @@
 #include <Level/Level.h>
 #include <Core/AppPlatform.h>
 
-#include <scheduler.h>
 #include <hook.h>
-#include <base.h>
+
+#include <base/base.h>
+#include <base/scheduler.h>
 
 using namespace Mod::Scheduler;
 using namespace boost::multi_index;

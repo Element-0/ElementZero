@@ -2,7 +2,7 @@
 #include <string>
 #include <utility>
 
-#include <chakra_helper.h>
+#include <mods/ScriptSupport/chakra_helper.h>
 
 namespace Mod::Scripting {
 

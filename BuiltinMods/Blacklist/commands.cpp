@@ -4,17 +4,10 @@
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include <command.h>
-#include <Command/Command.h>
-#include <Command/CommandRegistry.h>
-#include <Command/CommandPermissionLevel.h>
-#include <Command/CommandFlag.h>
-#include <Command/CommandParameterData.h>
-#include <Command/CommandOutput.h>
-#include <Command/CommandOrigin.h>
+#include <base/playerdb.h>
 
-#include <playerdb.h>
-#include <blacklist.h>
+#include <mods/CommandSupport.h>
+#include <mods/Blacklist.h>
 
 #include "settings.h"
 #include "global.h"

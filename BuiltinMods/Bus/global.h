@@ -4,7 +4,7 @@
 
 #include <mini_bus.hpp>
 
-#include <mods/Bus/api.h>
+#include <mods/Bus.h>
 
 struct Settings {
   std::string name    = "element-zero";

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdio>
-#include "sig.h"
+#include <sig.h>
 
 #ifdef ModLoader_EXPORTS
 #  define HOOKAPI __declspec(dllexport)

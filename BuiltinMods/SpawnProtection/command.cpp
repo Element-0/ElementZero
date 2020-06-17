@@ -1,8 +1,4 @@
-#include <command.h>
-#include <Command/Command.h>
-#include <Command/CommandOrigin.h>
-#include <Command/CommandOutput.h>
-#include <Command/CommandRegistry.h>
+#include <mods/CommandSupport.h>
 
 #include "settings.h"
 

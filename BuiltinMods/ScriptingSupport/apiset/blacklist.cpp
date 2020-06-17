@@ -2,8 +2,8 @@
 
 #include <Core/mce.h>
 
-#include <scriptapi.h>
-#include <blacklist.h>
+#include <mods/ScriptSupport/scriptapi.h>
+#include <mods/Blacklist.h>
 
 #include "../lazyapi.h"
 

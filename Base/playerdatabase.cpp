@@ -3,17 +3,18 @@
 #include <boost/scope_exit.hpp>
 
 #include <RakNet/RakPeer.h>
+#include <Net/NetworkIdentifier.h>
 #include <Core/ExtendedCertificate.h>
 
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <sqlite3.h>
 
-#include <playerdb.h>
-#include <log.h>
 #include <modutils.h>
+#include <hook.h>
 
-#include "Net/NetworkIdentifier.h"
-#include "hook.h"
+#include <base/playerdb.h>
+#include <base/log.h>
+
 #include "settings.hpp"
 
 DEF_LOGGER("PlayerDB");

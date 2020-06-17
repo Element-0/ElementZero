@@ -6,7 +6,8 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 
 #include <hook.h>
-#include <log.h>
+
+#include <base/log.h>
 
 #include "settings.hpp"
 

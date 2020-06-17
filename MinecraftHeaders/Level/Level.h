@@ -3,7 +3,6 @@
 #include <functional>
 #include <string>
 
-#include <base.h>
 #include <modutils.h>
 
 #include "../Core/AutomaticID.h"

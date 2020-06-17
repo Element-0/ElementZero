@@ -6,7 +6,7 @@
 #include <boost/format.hpp>
 #include <iostream>
 #include <hook.h>
-#include <log.h>
+#include <base/log.h>
 
 DEF_LOGGER("debug");
 

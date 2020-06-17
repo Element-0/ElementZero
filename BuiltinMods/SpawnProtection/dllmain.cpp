@@ -12,10 +12,11 @@
 
 #include <dllentry.h>
 #include <hook.h>
-#include <log.h>
-#include <playerdb.h>
-#include <command.h>
-#include <audit.h>
+
+#include <base/log.h>
+#include <base/playerdb.h>
+#include <mods/CommandSupport.h>
+#include <mods/Audit.h>
 
 #include "settings.h"
 

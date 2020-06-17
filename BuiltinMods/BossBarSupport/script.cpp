@@ -1,8 +1,6 @@
-#include "chakra_helper.h"
-#include "playerdb.h"
-#include <scriptapi.h>
-#include <bossbar.h>
-#include <stdexcept>
+#include <base/playerdb.h>
+#include <mods/ScriptSupport/scriptapi.h>
+#include <mods/BossBarSupport.h>
 
 using namespace Mod::Scripting;
 using namespace Mod::Bossbar;

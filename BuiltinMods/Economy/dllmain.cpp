@@ -1,6 +1,7 @@
-#include <command.h>
 #include <yaml.h>
 #include <dllentry.h>
+
+#include <mods/CommandSupport.h>
 
 #include "global.h"
 

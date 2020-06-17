@@ -1,10 +1,8 @@
 #include <sstream>
-
-#include "chakra_helper.h"
-#include "log.h"
-
-#include <scriptapi.h>
 #include <stdexcept>
+
+#include <mods/ScriptSupport/scriptapi.h>
+#include <base/log.h>
 
 using namespace Mod::Scripting;
 

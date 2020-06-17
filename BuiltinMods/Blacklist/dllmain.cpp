@@ -4,13 +4,14 @@
 #include <boost/scope_exit.hpp>
 #include <boost/format.hpp>
 
-#include <hook.h>
-#include <log.h>
-#include <dllentry.h>
-#include <command.h>
-
 #include <Core/mce.h>
 #include <Net/NetworkIdentifier.h>
+
+#include <hook.h>
+#include <dllentry.h>
+
+#include <base/log.h>
+#include <mods/CommandSupport.h>
 
 #include "settings.h"
 #include "global.h"

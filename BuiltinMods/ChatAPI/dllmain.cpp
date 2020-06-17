@@ -10,11 +10,12 @@
 #include <Actor/Player.h>
 #include <Level/Level.h>
 
-#include <chat.h>
-#include <playerdb.h>
-#include <log.h>
 #include <hook.h>
 #include <dllentry.h>
+
+#include <base/playerdb.h>
+#include <base/log.h>
+#include <mods/ChatAPI.h>
 
 void dllenter() {}
 void dllexit() {}

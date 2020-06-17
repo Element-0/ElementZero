@@ -5,8 +5,9 @@
 
 #include <dllentry.h>
 #include <yaml.h>
-#include <log.h>
-#include <scheduler.h>
+
+#include <base/log.h>
+#include <base/scheduler.h>
 
 struct Settings {
   std::vector<std::string> List;

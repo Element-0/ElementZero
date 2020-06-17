@@ -31,9 +31,10 @@
 #include <Packet/SetActorDataPacket.h>
 #include <Level/Level.h>
 
-#include <command.h>
 #include <hook.h>
-#include <playerdb.h>
-#include <log.h>
-#include <scheduler.h>
-#include <essentials.h>
+
+#include <base/playerdb.h>
+#include <base/log.h>
+#include <base/scheduler.h>
+#include <mods/CommandSupport.h>
+#include <mods/Essentials.h>

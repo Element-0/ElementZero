@@ -1,6 +1,7 @@
 #include <dllentry.h>
 #include <hook.h>
-#include <log.h>
+
+#include <base/log.h>
 
 DEF_LOGGER("CrashHandler");
 

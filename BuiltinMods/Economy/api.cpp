@@ -2,8 +2,8 @@
 
 #include <SQLiteCpp/SQLiteCpp.h>
 
-#include <economy.h>
-#include <playerdb.h>
+#include <base/playerdb.h>
+#include <mods/Economy.h>
 
 #include "global.h"
 
