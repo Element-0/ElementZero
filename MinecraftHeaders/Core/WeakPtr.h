@@ -19,6 +19,8 @@ public:
 
   inline operator bool() const { return counter && counter->value; }
   inline T &operator*() { return *counter->value; }
+  inline T const &operator*() const { return *counter->value; }
   inline T *operator->() { return counter->value; }
+  inline T const *operator->() const { return counter->value; }
   inline T *get() const { return counter->value; }
 };

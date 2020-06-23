@@ -4,7 +4,7 @@
 #include <string>
 
 enum class PacketReliability { Relible, RelibleOrdered };
-enum class PacketReadResult {};
+enum class StreamReadResult {};
 enum class MinecraftPacketIds {};
 class BinaryStream;
 class ReadOnlyBinaryStream;
@@ -23,6 +23,6 @@ public:
   virtual MinecraftPacketIds getId() const              = 0;
   virtual std::string getName() const                   = 0;
   virtual void write(BinaryStream &) const              = 0;
-  virtual PacketReadResult read(ReadOnlyBinaryStream &) = 0;
+  virtual StreamReadResult read(ReadOnlyBinaryStream &) = 0;
   virtual bool disallowBatching() const { return false; }
 };

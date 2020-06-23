@@ -192,5 +192,5 @@ public:
   MCAPI virtual MinecraftPacketIds getId() const;
   MCAPI virtual std::string getName() const;
   MCAPI virtual void write(BinaryStream &) const;
-  MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
+  MCAPI virtual StreamReadResult read(ReadOnlyBinaryStream &);
 };

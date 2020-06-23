@@ -186,7 +186,7 @@ struct ScriptItemStack {
   inline ScriptItemStack(ItemStack const &stack) : stack(stack) {}
 
   inline JsValueRef GetEnchants() const {
-    auto vec = stack.getEnchantsFromUserData().getAllEnchants();
+    auto vec = stack.constructItemEnchantsFromUserData().getAllEnchants();
     return ToJsArray(vec);
   }
 

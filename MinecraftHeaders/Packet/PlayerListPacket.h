@@ -17,7 +17,7 @@ public:
   MCAPI virtual MinecraftPacketIds getId() const;
   MCAPI virtual std::string getName() const;
   MCAPI virtual void write(BinaryStream &) const;
-  MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
+  MCAPI virtual StreamReadResult read(ReadOnlyBinaryStream &);
 };
 
 class PlayerListEntry {
@@ -31,7 +31,7 @@ public:
 
   MCAPI ~PlayerListEntry();
   MCAPI void write(BinaryStream &) const;
-  MCAPI PacketReadResult read(ReadOnlyBinaryStream &);
+  MCAPI StreamReadResult read(ReadOnlyBinaryStream &);
 };
 
 enum PlayerListPacketType { Add, Remove };

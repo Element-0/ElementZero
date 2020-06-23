@@ -55,8 +55,7 @@ public:
     pkt.xuid       = xuid;
     return pkt;
   }
-  MCAPI static TextPacket
-  createTextObjectMessage(TextObjectRoot const &, std::string const &xuid = "", std::string const &unk2 = "");
+  MCAPI static TextPacket createTextObjectMessage(TextObjectRoot const &);
 
   static inline TextPacket
   createTranslatedMessageWithParams(std::string const &text, std::initializer_list<std::string> args = {}) {
@@ -69,7 +68,7 @@ public:
   MCAPI virtual MinecraftPacketIds getId() const;
   MCAPI virtual std::string getName() const;
   MCAPI virtual void write(BinaryStream &) const;
-  MCAPI virtual PacketReadResult read(ReadOnlyBinaryStream &);
+  MCAPI virtual StreamReadResult read(ReadOnlyBinaryStream &);
 };
 
 static_assert(offsetof(TextPacket, type) == 40);

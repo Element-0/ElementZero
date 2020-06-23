@@ -10,7 +10,7 @@ class Value;
 
 class ITextObject {
 public:
-  MCAPI virtual ~ITextObject();
+  virtual ~ITextObject() {}
   virtual std::string asString() const = 0;
   virtual Json::Value asJsonValue() const = 0;
 };

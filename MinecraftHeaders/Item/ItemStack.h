@@ -74,7 +74,7 @@ public:
   MCAPI short getAuxValue(void) const;
   MCAPI class ItemDescriptor getDescriptor(void) const;
   MCAPI unsigned char getMaxStackSize(void) const;
-  MCAPI class ItemEnchants getEnchantsFromUserData(void) const;
+  MCAPI class ItemEnchants constructItemEnchantsFromUserData(void) const;
   MCAPI std::string getName(void) const;
   MCAPI std::string getHoverName(void) const;
   MCAPI std::string getRawNameId(void) const;
@@ -169,11 +169,7 @@ public:
   ItemStack(ItemStack const &rhs) : ItemStackBase(rhs) {}
   MCAPI ~ItemStack();
   MCAPI static ItemStack fromTag(CompoundTag const &);
-
-protected:
   MCAPI void reinit(Item const &, int, int);
-
-public:
   MCAPI void reinit(BlockLegacy const &, int);
 };
 

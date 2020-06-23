@@ -25,7 +25,7 @@ public:
   MCAPI bool isSolidBlockingBlock(void) const;
   MCAPI bool hasState(class ItemState const &) const;
   MCAPI class Block const &keepState(class ItemState const &) const;
-  MCAPI class BlockLegacy const &getLegacyBlock(void) const;
+  inline class BlockLegacy const &getLegacyBlock(void) const { return *legacy; }
   MCAPI class Block const &copyState(class Block const &, class ItemState const &) const;
   MCAPI bool isSolidBlockingBlockAndNotSignalSource(void) const;
   MCAPI void spawnResources(class BlockSource &, class BlockPos const &, float, int) const;

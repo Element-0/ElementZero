@@ -34,7 +34,6 @@ public:
   MCAPI virtual void onChanged(class BlockSource &);
   MCAPI virtual bool isMovable(class BlockSource &);
   MCAPI virtual bool isCustomNameSaved();
-  MCAPI virtual std::unique_ptr<class Packet> getUpdatePacket(class BlockSource &);
   MCAPI virtual void onPlace(class BlockSource &);
   MCAPI virtual void onMove();
   MCAPI virtual void onRemoved(class BlockSource &);

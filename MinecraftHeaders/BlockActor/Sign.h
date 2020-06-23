@@ -18,13 +18,14 @@ public:
   MCAPI virtual void load(class Level &, class CompoundTag const &, class DataLoadHelper &) override;
   MCAPI virtual bool save(class CompoundTag &) const override;
   MCAPI virtual void onChanged(class BlockSource &) override;
-  MCAPI virtual std::unique_ptr<class Packet> getUpdatePacket(class BlockSource &) override;
   MCAPI virtual float getShadowRadius(class BlockSource &) const override;
   MCAPI virtual std::string getImmersiveReaderText(class BlockSource &) override;
-  MCAPI virtual void _onUpdatePacket(class CompoundTag const &, class BlockSource &) override;
 
   MCAPI void setMessage(TextObjectRoot text, std::string owner);
   MCAPI void setMessage(std::string text, std::string owner);
+
+protected:
+  MCAPI virtual void _onUpdatePacket(class CompoundTag const &, class BlockSource &) override;
 };
 
 static_assert(sizeof(SignBlockActor) == 560);

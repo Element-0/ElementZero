@@ -9,7 +9,7 @@ class Player;
 
 class ServerNetworkHandler {
 public:
-  MCAPI void disconnectClient(NetworkIdentifier const &, std::string const &reason, bool hide);
+  MCAPI void disconnectClient(NetworkIdentifier const &, unsigned char subid, std::string const &reason, bool hide);
   MCAPI void updateServerAnnouncement();
 
   void forceDisconnectClient(Player *player, bool hide) {

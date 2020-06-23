@@ -60,7 +60,7 @@ unsigned char Player::getClientSubId() const { return direct_access<unsigned cha
 #pragma endregion
 
 void NetworkIdentifier::kick(std::string const &reason) const {
-  LocateService<ServerNetworkHandler>()->disconnectClient(*this, reason, reason.empty());
+  LocateService<ServerNetworkHandler>()->disconnectClient(*this, 0, reason, reason.empty());
 }
 
 void Player::kick() { LocateService<ServerNetworkHandler>()->forceDisconnectClient(this, true); }
