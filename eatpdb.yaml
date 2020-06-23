@@ -14,3 +14,5 @@ filter: !blacklist
   - name: "??3@YAXPEAX_K@Z"
   - name: "?_Facet_Register@std@@YAXPEAV_Facet_base@1@@Z"
   - regex: ".*printf$"
+  - regex: "JsonSchemaChildOption"
+  - regex: "JsonSchemaNode"
