@@ -127,7 +127,8 @@ std::optional<Mod::OfflinePlayerEntry> Mod::PlayerDatabase::FindOffline(mce::UUI
 
 TClasslessInstanceHook(
     Player *,
-    "?_createNewPlayer@ServerNetworkHandler@@AEAAAEAVServerPlayer@@AEBVNetworkIdentifier@@AEBVConnectionRequest@@@Z",
+    "?_createNewPlayer@ServerNetworkHandler@@AEAAAEAVServerPlayer@@AEBVNetworkIdentifier@@"
+    "AEBVSubClientConnectionRequest@@E@Z",
     NetworkIdentifier *id, void *req) {
   auto player  = original(this, id, req);
   auto &cert   = player->getCertificate();

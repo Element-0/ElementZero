@@ -50,7 +50,10 @@ template <> Level *LocateService<Level>() { return LocateService<Minecraft>()->g
 template <> RakNet::RakPeer *LocateService<RakNet::RakPeer>() { return mRakPeer; }
 template <> AppPlatform *LocateService<AppPlatform>() { return mAppPlatform; }
 
-TClasslessInstanceHook(void, "?initialize@AppPlatform@@QEAAXXZ") { mAppPlatform = (AppPlatform *) this; }
+TClasslessInstanceHook(void, "?initialize@AppPlatform@@QEAAXXZ") {
+  mAppPlatform = (AppPlatform *) this;
+  original(this);
+}
 
 TInstanceHook(
     int,

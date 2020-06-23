@@ -106,7 +106,7 @@ RakNet::SystemAddress NetworkIdentifier::getRealAddress() const {
 }
 
 TClasslessInstanceHook(bool, "?loadLevelData@DBStorage@@UEAA_NAEAVLevelData@@@Z", void *data) {
-  auto path = direct_access<std::string>(this, 144);
+  auto &path = direct_access<std::string>(this, 160);
   worldHook(std::filesystem::weakly_canonical(path));
   return original(this, data);
 }
