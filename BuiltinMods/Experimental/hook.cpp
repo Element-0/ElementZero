@@ -1,6 +1,7 @@
 #include <functional>
 
 #include <Core/core.h>
+#include <Level/LevelData.h>
 
 #include <hook.h>
 
@@ -8,31 +9,41 @@
 
 #include "global.h"
 
-TClasslessInstanceHook(bool, "?_isFeatureEnabled@EducationOptions@@AEBA_NW4EducationFeature@@@Z", int v) {
+DEF_LOGGER("Experimental");
+
+THook(bool, "?isBaseCodeBuilderEnabled@EducationOptions@@SA_NXZ") {
   if (settings.education_feature) return true;
-  return original(this, v);
+  return original();
 }
-TClasslessInstanceHook(bool, "?isChemistryEnabled@EducationOptions@@SA_NXZ") {
+THook(bool, "?isChemistryEnabled@EducationOptions@@SA_NXZ") {
   if (settings.education_feature) return true;
-  return original(this);
+  return original();
+}
+THook(bool, "?isCodeBuilderEnabled@EducationOptions@@SA_NXZ") {
+  if (settings.education_feature) return true;
+  return original();
 }
 TClasslessInstanceHook(bool, "?isEnabled@FeatureToggles@@QEBA_NW4FeatureOptionID@@@Z", int id) {
   if (settings.force_experimental_gameplay) return true;
   return original(this, id);
 }
-THook(void, "??0LevelSettings@@QEAA@AEBV0@@Z", char *lhs, char *rhs) {
-  rhs[76] = settings.force_experimental_gameplay;
-  rhs[36] = settings.education_feature;
-  original(lhs, rhs);
+TClasslessInstanceHook(bool, "?hasExperimentalGameplayEnabled@LevelData@@QEBA_NXZ", int id) {
+  if (settings.force_experimental_gameplay) return true;
+  return original(this, id);
 }
-
+TClasslessInstanceHook(bool, "?hasExperimentalGameplayEnabled@Level@@QEBA_NXZ", int id) {
+  if (settings.force_experimental_gameplay) return true;
+  return original(this, id);
+}
 TClasslessInstanceHook(
-    void,
-    "?setStack@ResourcePackManager@@QEAAXV?$unique_ptr@VResourcePackStack@@U?$default_delete@VResourcePackStack@@@std@@"
-    "@std@@W4ResourcePackStackType@@_N@Z",
-    void *ptr, int type, bool flag) {
-  ((char *) this)[227] = settings.force_experimental_gameplay;
-  original(this, ptr, type, flag);
+    LevelData,
+    "?getLevelData@ExternalFileLevelStorageSource@@UEBA?AVLevelData@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$"
+    "allocator@D@2@@std@@@Z",
+    std::string const &level_name) {
+  auto data                                = original(this, level_name);
+  data.mEducationFeaturesEnabled           = settings.education_feature;
+  data.mGameRules.rules[18].value.val_bool = true;
+  return data;
 }
 
 TClasslessInstanceHook(
