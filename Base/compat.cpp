@@ -88,7 +88,7 @@ template <> ServerNetworkHandler *LocateService<ServerNetworkHandler>() {
 }
 
 template <> NetworkHandler *LocateService<NetworkHandler>() {
-  return direct_access<std::unique_ptr<NetworkHandler>>(LocateService<ServerInstance>(), 40).get();
+  return direct_access<std::unique_ptr<NetworkHandler>>(LocateService<ServerInstance>(), 152).get();
 }
 
 template <> MinecraftCommands *LocateService<MinecraftCommands>() { return LocateService<Minecraft>()->getCommands(); }

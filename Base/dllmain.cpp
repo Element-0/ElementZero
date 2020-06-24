@@ -42,8 +42,8 @@ mce::UUID const &SessionUUID() {
 
 template <> DedicatedServer *LocateService<DedicatedServer>() { return mDedicatedServer; }
 template <> ServerInstance *LocateService<ServerInstance>() {
-  static auto ptr =
-      GetServerSymbol<ServerInstance *>("?mService@?$ServiceLocator@VServerInstance@@@@0PEAVServerInstance@@EA");
+  static auto ptr = GetServerSymbol<ServerInstance *>(
+      "?mService@?$ServiceLocator@VServerInstance@@@@0V?$NonOwnerPointer@VServerInstance@@@Bedrock@@A");
   return *ptr;
 }
 template <> Level *LocateService<Level>() { return LocateService<Minecraft>()->getLevel(); }
