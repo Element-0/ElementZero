@@ -213,7 +213,7 @@ TClasslessInstanceHook(
     }
     return false;
   }
-  auto &name = *(std::string *) ((char *) &id - 64); // HACK
+  auto &name = *(std::string *) ((char *) &id + 192); // HACK
   auto xuid  = std::stoll(id.xuid);
   auto uuid  = (char const *) &id.uuid;
   if (queryForUUID(uuid, name, it) || queryForXUID(xuid, name, it)) goto logip;
