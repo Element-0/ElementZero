@@ -3,6 +3,7 @@
 #include <boost/scope_exit.hpp>
 
 #include <RakNet/RakPeer.h>
+#include <Actor/ServerPlayer.h>
 #include <Net/NetworkIdentifier.h>
 #include <Core/ExtendedCertificate.h>
 
@@ -126,9 +127,9 @@ std::optional<Mod::OfflinePlayerEntry> Mod::PlayerDatabase::FindOffline(mce::UUI
 }
 
 TClasslessInstanceHook(
-    Player *,
-    "?_createNewPlayer@ServerNetworkHandler@@AEAAAEAVServerPlayer@@AEBVNetworkIdentifier@@"
-    "AEBVSubClientConnectionRequest@@E@Z",
+    std::unique_ptr<ServerPlayer>,
+    "?createNewPlayer@ServerNetworkHandler@@QEAA?AV?$unique_ptr@VServerPlayer@@U?$default_delete@VServerPlayer@@@std@@@"
+    "std@@AEBVNetworkIdentifier@@AEBVConnectionRequest@@@Z",
     NetworkIdentifier *id, void *req) {
   auto player  = original(this, id, req);
   auto &cert   = player->getCertificate();
@@ -139,7 +140,7 @@ TClasslessInstanceHook(
   try {
     auto xuid = std::stoull(ExtendedCertificate::getXuid(cert));
     LOGV("%s joined (from %s)") % name % address;
-    auto ref = container->emplace(Mod::PlayerEntry{player, name, xuid, uuid, *id});
+    auto ref = container->emplace(Mod::PlayerEntry{player.get(), name, xuid, uuid, *id});
     (db.*emitter<"joined"_sig>) (SIG("joined"), *ref.first);
     static SQLite::Statement stmt_user{*sqldb, "INSERT OR REPLACE INTO user VALUES (?, ?, ?)"};
     static SQLite::Statement stmt_login{*sqldb, "INSERT INTO login (uuid, address) VALUES (?, ?)"};
@@ -162,7 +163,7 @@ TClasslessInstanceHook(
     LOGV("illegal connection from %s (name: %s)") % address % name;
     player->kick();
   }
-  return player;
+  return std::move(player);
 }
 
 TClasslessInstanceHook(
