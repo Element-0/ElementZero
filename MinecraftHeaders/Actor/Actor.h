@@ -29,6 +29,7 @@ enum class LevelSoundEvent;
 enum class ItemUseMethod;
 enum class PaletteColor;
 enum class ActorFlags;
+enum class ActorDamageCause;
 
 enum class ActorFlags {
   ONFIRE               = 0,
@@ -105,10 +106,15 @@ class Actor {
 public:
   enum class InitializationMethod;
 
+protected:
   MCAPI virtual void reloadHardcoded(enum InitializationMethod, class VariantParameterList const &);
   MCAPI virtual void reloadHardcodedClient(enum InitializationMethod, class VariantParameterList const &);
   MCAPI virtual void initializeComponents(enum InitializationMethod, class VariantParameterList const &);
   MCAPI virtual void reloadComponents(enum InitializationMethod, class VariantParameterList const &);
+  MCAPI virtual void _serverInitItemStackIds();
+  MCAPI virtual void _doInitialMove();
+
+public:
   MCAPI virtual bool hasComponent(class Util::HashString const &) const;
   MCAPI virtual ~Actor();
   MCAPI virtual void reset(void);
@@ -132,6 +138,7 @@ public:
   MCAPI virtual class Vec3 getInterpolatedRidingOffset(float) const;
   MCAPI virtual void checkBlockCollisions(class AABB const &);
   MCAPI virtual void checkBlockCollisions(void);
+  MCAPI virtual bool isFireImmune(void) const;
   MCAPI virtual bool breaksFallingBlocks(void) const;
   MCAPI virtual void blockedByShield(class ActorDamageSource const &, class Actor &);
   MCAPI virtual void moveRelative(float, float, float, float);
@@ -227,6 +234,7 @@ public:
   MCAPI virtual void rideLanded(class Vec3 const &, class Vec3 const &);
   MCAPI virtual bool shouldRender(void) const;
   MCAPI virtual bool isInvulnerableTo(class ActorDamageSource const &) const;
+  MCAPI virtual ActorDamageCause getBlockDamageCause(class Block const &) const;
   MCAPI virtual void actuallyHurt(int, class ActorDamageSource const *, bool);
   MCAPI virtual void animateHurt(void);
   MCAPI virtual bool doFireHurt(int);
@@ -280,6 +288,7 @@ public:
   MCAPI virtual void playSynchronizedSound(enum LevelSoundEvent, class Vec3 const &, int, bool);
   MCAPI virtual void onSynchedDataUpdate(int);
   MCAPI virtual bool canAddRider(class Actor &) const;
+  MCAPI virtual bool canPickupItem(class ItemStack const &) const = 0;
   MCAPI virtual bool canBePulledIntoVehicle(void) const;
   MCAPI virtual bool inCaravan(void) const;
   MCAPI virtual bool isLeashableType(void);
@@ -336,6 +345,8 @@ public:
   MCAPI virtual void die(class ActorDamageSource const &);
   MCAPI virtual bool shouldTick(void) const;
   MCAPI virtual void updateEntitySpecificMolangVariables(class RenderParams &);
+  MCAPI virtual bool shouldTryMakeStepSound();
+  MCAPI virtual float getNextStep(float);
   MCAPI virtual bool canMakeStepSound(void) const;
   MCAPI virtual void outOfWorld(void);
   MCAPI virtual bool _hurt(class ActorDamageSource const &, int, bool, bool);
@@ -358,7 +369,6 @@ public:
   MCAPI virtual void _doAutoAttackOnTouch(class Actor &);
 
   MCAPI bool isRiding(void) const;
-  MCAPI bool isFireImmune(void) const;
   MCAPI bool isRider(class Actor const &) const;
   MCAPI bool isUnderWaterfall(void) const;
   MCAPI bool isInsideBorderBlock(float) const;
