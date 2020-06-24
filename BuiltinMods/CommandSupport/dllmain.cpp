@@ -48,6 +48,9 @@ template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<in
 template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<float>() {
   return GETID("?id@?1???$type_id@VCommandRegistry@@M@@YA?AV?$typeid_t@VCommandRegistry@@@@XZ@4V1@A");
 }
+template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<RelativeFloat>() {
+  return GETID("?id@?1???$type_id@VCommandRegistry@@VRelativeFloat@@@@YA?AV?$typeid_t@VCommandRegistry@@@@XZ@4V1@A");
+}
 template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<std::string>() {
   return GETID(
       "?id@?1???$type_id@VCommandRegistry@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@@YA?AV?$"

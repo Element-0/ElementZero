@@ -7,6 +7,7 @@
 #include <Core/type_id.h>
 #include <Core/Util.h>
 #include <Core/json.h>
+#include <Core/RelativeFloat.h>
 #include <Core/MCRESULT.h>
 #include <Command/MinecraftCommands.h>
 #include <Command/Command.h>
@@ -58,6 +59,7 @@ public:
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<bool>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<int>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<float>();
+template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<RelativeFloat>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<std::string>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<CommandItem>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<Json::Value>();
