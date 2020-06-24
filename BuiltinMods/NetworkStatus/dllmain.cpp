@@ -15,7 +15,7 @@ DEF_LOGGER("NetworkStatus");
 struct NetworkStatus : Command {
   void execute(const CommandOrigin &orig, CommandOutput &outp) override {
     if (orig.getOriginType() != CommandOriginType::Player) {
-      outp.error("commands.generic.error.invalidPlayer", {"/balance"});
+      outp.error("commands.generic.error.invalidPlayer", {"/net-stat"});
       return;
     }
     auto ent    = (Player *) orig.getEntity();
