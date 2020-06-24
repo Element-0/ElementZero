@@ -370,6 +370,8 @@ public:
   MCAPI int getStrength(void) const;
   MCAPI int getMarkVariant(void) const;
   MCAPI int getControllingSeat(void);
+  MCAPI BlockSource &getRegion(void) const;
+  MCAPI ActorRuntimeID getRuntimeID(void) const;
   MCAPI int getRiderIndex(class Actor &) const;
   MCAPI int getStructuralIntegrity(void) const;
   MCAPI class Vec3 getViewVector(float) const;
@@ -496,8 +498,8 @@ public:
         &old, dim);
   }
 
-  BUILD_ACCESS_COMPAT(BlockSource *, Region);
-  BUILD_ACCESS_COMPAT(ActorRuntimeID, RuntimeID);
+  AS_FIELD(BlockSource *, Region, getRegion);
+  AS_FIELD(ActorRuntimeID, RuntimeID, getRuntimeID);
   BUILD_ACCESS_COMPAT(SimpleContainer &, EquipmentContainer);
   BUILD_ACCESS_COMPAT(SimpleContainer &, HandContainer);
   BUILD_ACCESS_COMPAT(SynchedActorData &, EntityData);
