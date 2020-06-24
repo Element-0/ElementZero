@@ -2,6 +2,8 @@
 
 #include "Actor.h"
 
+#include <bitset>
+
 enum class LevelSoundEvent;
 enum class TravelType;
 
@@ -11,6 +13,7 @@ public:
     return CallServerClassMethod<void>("?sendInventory@Mob@@UEAAX_N@Z", this, a0);
   }
 
+  // Only list addition methods
   virtual void knockback(class Actor *, int, float, float, float, float, float);
   virtual void resolveDeathLoot(int, class ActorDamageSource const &);
   virtual void spawnAnim(void);
@@ -20,6 +23,7 @@ public:
   virtual void playAmbientSound(void);
   virtual enum LevelSoundEvent getAmbientSound(void);
   virtual int getAmbientSoundPostponeTicks(void);
+  virtual int getAmbientSoundPostponeTicksRange(void);
   virtual struct TextureUVCoordinateSet const *getItemInHandIcon(class ItemStack const &, int);
   virtual float getSpeed(void) const;
   virtual void setSpeed(float);
@@ -36,7 +40,6 @@ public:
   virtual bool isLookingAtAnEntity(void);
   virtual bool checkSpawnRules(bool);
   virtual bool checkSpawnObstruction(void) const;
-  virtual bool shouldDespawn(void) const;
   virtual float getAttackAnim(float);
   virtual int getItemUseDuration(void);
   virtual float getItemUseStartupProgress(void);
@@ -61,20 +64,25 @@ public:
   virtual int getArmorValue(void);
   virtual float getArmorCoverPercentage(void) const;
   virtual void hurtArmor(int);
+  virtual void setDamagedArmor(enum ArmorSlot, class ItemStack const &);
+  virtual void sendArmorDamage(class std::bitset<4> const &);
+  virtual void sendArmor(class std::bitset<4> const &);
   virtual void containerChanged(int);
+  virtual void updateEquipment(void);
   virtual int clearEquipment(void);
   virtual class std::vector<class ItemStack const *> getAllArmor(void) const;
   virtual class std::vector<int> getAllArmorID(void) const;
   virtual class std::vector<class ItemStack const *> getAllHand(void) const;
   virtual class std::vector<class ItemStack const *> getAllEquipment(void) const;
   virtual int getArmorTypeHash(void);
+  virtual void dropEquipment(class ActorDamageSource const &, int);
+  virtual void dropEquipment(void);
+  virtual void clearVanishEnchantedItems(void);
   virtual void sendInventory(bool);
-  virtual void sendArmor(void);
   virtual int getDamageAfterMagicAbsorb(class ActorDamageSource const &, int);
   virtual bool createAIGoals(void);
   virtual void onBorn(class Actor &, class Actor &);
-  virtual bool setItemSlot(enum EquipmentSlot, class ItemStack const &);
-  virtual void goDownInWater(void);
+  virtual bool setItemSlot(enum EquipmentSlot, class ItemStack const &);;
   virtual void setTransitioningSitting(bool);
   virtual void attackAnimation(class Actor *, float);
   virtual int getAttackTime(void);
@@ -91,75 +99,12 @@ public:
   virtual void _serverAiMobStep(void);
   virtual int getDamageAfterEnchantReduction(class ActorDamageSource const &, int);
   virtual int getDamageAfterArmorAbsorb(class ActorDamageSource const &, int);
-  virtual void dropEquipment(class ActorDamageSource const &, int);
-  virtual void dropEquipment(void);
   virtual void dropBags(void);
   virtual void dropContainer(void);
   virtual void tickDeath(void);
   virtual void _endJump(void);
   virtual void updateGliding(void);
   virtual bool _allowAscendingScaffolding(void) const;
-
-  // SHARED WITH Actor
-  virtual void rideTick(void);
-  virtual void outOfWorld(void);
-  virtual void _onSizeUpdated(void);
-  virtual void causeFallDamage(float);
-  virtual bool _hurt(class ActorDamageSource const &, int, bool, bool);
-  virtual void _removeRider(struct ActorUniqueID const &, bool, bool);
-  virtual void addAdditionalSaveData(class CompoundTag &);
-  virtual void _playStepSound(class BlockPos const &, class Block const &);
-  virtual void updateEntitySpecificMolangVariables(class RenderParams &);
-  virtual void readAdditionalSaveData(class CompoundTag const &, class DataLoadHelper &);
-
-  virtual void kill(void);
-  virtual void swing(void);
-  virtual void baseTick(void);
-  virtual bool isAlive(void) const;
-  virtual bool inCaravan(void) const;
-  virtual bool isJumping(void) const;
-  virtual void normalTick(void);
-  virtual void setOnFire(int);
-  virtual void animateHurt(void);
-  virtual float getYHeadRot(void) const;
-  virtual bool isBlocking(void) const;
-  virtual bool isImmobile(void) const;
-  virtual bool isPickable(void);
-  virtual bool isSleeping(void) const;
-  virtual bool doFireHurt(int);
-  virtual int getDeathTime(void) const;
-  virtual bool isShootable(void);
-  virtual bool canPowerJump(void) const;
-  virtual bool isSurfaceMob(void) const;
-  virtual void stopRiding(bool, bool, bool);
-  virtual void updateEquipment(void);
-  virtual bool attack(class Actor &);
-  virtual void addRider(class Actor &);
-  virtual void setTarget(class Actor *);
-  virtual bool canBePulledIntoVehicle(void) const;
-  virtual float getInterpolatedBodyRot(float) const;
-  virtual float getInterpolatedBodyYaw(float) const;
-  virtual float getInterpolatedHeadRot(float) const;
-  virtual void playerTouch(class Player &);
-  virtual bool startRiding(class Actor &);
-  virtual void teleportTo(class Vec3 const &, bool, int, int);
-  virtual void die(class ActorDamageSource const &);
-  virtual void lerpTo(class Vec3 const &, class Vec2 const &, int);
-  virtual float getYawSpeedInDegreesPerSecond(void) const;
-  virtual void setEquippedSlot(enum ArmorSlot, int, int);
-  virtual void handleEntityEvent(enum ActorEvent, int);
-  virtual float getArmorColorInSlot(enum ArmorSlot, int) const;
-  virtual bool hasComponent(class Util::HashString const &) const;
-  virtual void renderDebugServerState(class Options const &);
-  virtual void actuallyHurt(int, class ActorDamageSource const *, bool);
-  virtual void setEquippedSlot(enum ArmorSlot, class ItemStack const &);
-  virtual void blockedByShield(class ActorDamageSource const &, class Actor &);
-  virtual enum ArmorMaterialType getArmorMaterialTypeInSlot(enum ArmorSlot) const;
-  virtual enum ArmorTextureType getArmorMaterialTextureTypeInSlot(enum ArmorSlot) const;
-  virtual void reloadHardcoded(enum Actor::InitializationMethod, class VariantParameterList const &);
-  virtual void initializeComponents(enum Actor::InitializationMethod, class VariantParameterList const &);
-  virtual void reloadHardcodedClient(enum Actor::InitializationMethod, class VariantParameterList const &);
-  virtual void buildDebugInfo(std::string &) const;
 
   enum class TravelType;
 
