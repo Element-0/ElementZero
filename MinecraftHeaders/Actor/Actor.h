@@ -288,7 +288,7 @@ public:
   MCAPI virtual void playSynchronizedSound(enum LevelSoundEvent, class Vec3 const &, int, bool);
   MCAPI virtual void onSynchedDataUpdate(int);
   MCAPI virtual bool canAddRider(class Actor &) const;
-  MCAPI virtual bool canPickupItem(class ItemStack const &) const = 0;
+  MCAPI virtual bool canPickupItem(class ItemStack const &) const;
   MCAPI virtual bool canBePulledIntoVehicle(void) const;
   MCAPI virtual bool inCaravan(void) const;
   MCAPI virtual bool isLeashableType(void);
