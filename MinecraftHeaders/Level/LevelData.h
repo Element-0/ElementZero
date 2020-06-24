@@ -1,10 +1,13 @@
 #pragma once
 
 #include <string>
+#include <variant>
+#include <unordered_map>
 
 #include "../Core/json.h"
 #include "../Core/SemVersion.h"
 #include "../Core/NBT.h"
+#include "../Core/StringKey.h"
 #include "../Math/BlockPos.h"
 #include "AdventureSettings.h"
 #include "WorldTemplateLevelData.h"
@@ -15,7 +18,31 @@
 #include "GameType.h"
 #include "Difficulty.h"
 #include "GeneratorType.h"
+#include "SpawnSettings.h"
 
+#include <modutils.h>
+
+#include "../dll.h"
+
+class LevelDataValue : public std::variant<
+                           int, bool, float, std::string, GeneratorType, GameType, BlockPos, unsigned int,
+                           std::unique_ptr<CompoundTag>> {
+public:
+  using variant::variant;
+};
+
+namespace LevelDataKeys {
+extern MCAPI StringKey EDUCATION_OID;
+extern MCAPI StringKey GAME_TYPE;
+extern MCAPI StringKey GENERATOR;
+extern MCAPI StringKey LIMITED_WORLD_DEPTH;
+extern MCAPI StringKey LIMITED_WORLD_WIDTH;
+extern MCAPI StringKey LOADED_PLAYER_TAG;
+extern MCAPI StringKey SEED;
+extern MCAPI StringKey SPAWN_POS;
+}; // namespace LevelDataKeys
+
+// ref: LevelData::getTagData
 class LevelData {
 public:
   AdventureSettings mAdventureSettings;
@@ -28,14 +55,11 @@ public:
   int mNetworkVersion;
   SemVersion mInventoryVersion;
   Tick mTick;
-  unsigned mSeed;
-  BlockPos mSpawnPos;
   bool mHasSpawnPos;
   BlockPos mLimitedWorldOrigin;
   int mDayCycleTime;
   uint64_t mLastPlayedTime;
-  CompoundTag mDefaultPlayerTag;
-  unsigned mServerTickRange;
+  unsigned mServerChunkTickRange = 4;
   float mRainLevel;
   unsigned mRainTime;
   float mLightningLevel;
@@ -43,15 +67,14 @@ public:
   unsigned mNetherScale;
   GameVersion mLastOpenedWithVersion;
   GameType mGameType;
-  Difficulty mDifficulty;
   bool mForceGameType;
   bool mSpawnMobs;
-  GeneratorType mGeneratorType;
   Json::Value mFlatGenerator;
   int mWorldStartCount;
   bool mHasBeenLoadedInCreative;
   int mEducationEditionOffer;
   bool mEducationFeaturesEnabled;
+  bool mSingleUseWorld;
   bool mConfirmedPlatformLockedContent;
   bool mMultiplayerGameIntent;
   bool mMultiplayerGameMode;
@@ -66,7 +89,6 @@ public:
   bool mLockedBehaviorPack;
   bool mLockedResourcePack;
   bool mFromLockedTemplate;
-  std::string mEducationOid;
   std::string mEducationProductId;
   bool mUseMsaGamertagsOnly;
   bool mBonusChestEnabled;
@@ -75,33 +97,90 @@ public:
   bool mCenterMapsToOrigin;
   bool mRequiresCopiedPackRemovalCheck;
   bool mOnlySpawnV1Villagers;
+  char mNetherType;
+  SpawnSettings mSpawnSettings;
+  std::unordered_map<StringKey, LevelDataValue> mKV, mAltKV;
+  std::string mBiomeOverride;
+
+private:
+  template <typename T> T const *_extractValue(StringKey const &) const;
+
+public:
+  template <typename T> inline T const *extractValue(StringKey const &key) const { return _extractValue<T>(key); }
+  template <typename T> inline void setValue(StringKey const &key, T value) { mKV[key] = LevelDataValue(value); }
+
+  inline BlockPos getSpawnPos() const {
+    if (auto value = extractValue<BlockPos>(LevelDataKeys::SPAWN_POS))
+      return *value;
+    else
+      return BlockPos::ZERO;
+  }
+  inline void setSpawnPos(BlockPos const &pos) { setValue(LevelDataKeys::SPAWN_POS, pos); }
+
+  inline GameType getGameType() const {
+    if (auto value = extractValue<::GameType>(LevelDataKeys::GAME_TYPE))
+      return *value;
+    else
+      return GameType::Survival;
+  }
+  inline void setGameType(GameType type) { setValue(LevelDataKeys::GAME_TYPE, type); }
+
+  inline unsigned getSeed() const {
+    if (auto value = extractValue<unsigned>(LevelDataKeys::SEED))
+      return *value;
+    else
+      return 0;
+  }
+  inline void setSeed(unsigned seed) { setValue(LevelDataKeys::SEED, seed); }
+
+  inline GeneratorType getWorldGenerator() const {
+    if (auto value = extractValue<GeneratorType>(LevelDataKeys::GENERATOR))
+      return *value;
+    else
+      return GeneratorType::Normal;
+  }
+  inline void setWorldGenerator(GeneratorType seed) { setValue(LevelDataKeys::SEED, seed); }
+
+  inline int getLimitedWorldWidth() const {
+    if (auto value = extractValue<int>(LevelDataKeys::LIMITED_WORLD_WIDTH))
+      return *value;
+    else
+      return 0;
+  }
+  inline void setLimitedWorldWidth(int value) { setValue(LevelDataKeys::LIMITED_WORLD_WIDTH, value); }
+
+  inline int getLimitedWorldDepth() const {
+    if (auto value = extractValue<int>(LevelDataKeys::LIMITED_WORLD_DEPTH))
+      return *value;
+    else
+      return 0;
+  }
+  inline void setLimitedWorldDepth(int value) { setValue(LevelDataKeys::LIMITED_WORLD_DEPTH, value); }
+
+  int getSpawnDimension() const { return mSpawnSettings.dim; }
+  void setSpawnDimension(int v) { mSpawnSettings.dim = v; }
+
+  DEF_FIELD_RW(unsigned, Seed);
+  DEF_FIELD_RW(GeneratorType, WorldGenerator);
+  DEF_FIELD_RW(int, LimitedWorldWidth);
+  DEF_FIELD_RW(int, LimitedWorldDepth);
+  DEF_FIELD_RW(BlockPos, SpawnPos);
+  DEF_FIELD_RW(GameType, GameType);
+  DEF_FIELD_RW(int, SpawnDimension);
 };
 
+static_assert(offsetof(LevelData, mGameRules) == 288);
+static_assert(offsetof(LevelData, mAbilities) == 312);
 static_assert(offsetof(LevelData, mName) == 632);
 static_assert(offsetof(LevelData, mGameVersion) == 672);
 static_assert(offsetof(LevelData, mNetworkVersion) == 728);
+static_assert(offsetof(LevelData, mInventoryVersion) == 736);
 static_assert(offsetof(LevelData, mTick) == 848);
-static_assert(offsetof(LevelData, mSpawnPos) == 860);
-static_assert(offsetof(LevelData, mLastPlayedTime) == 896);
-static_assert(offsetof(LevelData, mDefaultPlayerTag) == 904);
-static_assert(offsetof(LevelData, mServerTickRange) == 928);
-static_assert(offsetof(LevelData, mRainTime) == 936);
-static_assert(offsetof(LevelData, mNetherScale) == 948);
-static_assert(offsetof(LevelData, mLastOpenedWithVersion) == 952);
-static_assert(offsetof(LevelData, mGameType) == 1008);
-static_assert(offsetof(LevelData, mSpawnMobs) == 1017);
-static_assert(offsetof(LevelData, mFlatGenerator) == 1024);
-static_assert(offsetof(LevelData, mWorldStartCount) == 1040);
-static_assert(offsetof(LevelData, mHasBeenLoadedInCreative) == 1044);
-static_assert(offsetof(LevelData, mEducationEditionOffer) == 1048);
-static_assert(offsetof(LevelData, mEducationFeaturesEnabled) == 1052);
-static_assert(offsetof(LevelData, mXBLBroadcastIntent) == 1060);
-static_assert(offsetof(LevelData, mPlatformBroadcastIntent) == 1068);
-static_assert(offsetof(LevelData, mCommandsEnabled) == 1076);
-static_assert(offsetof(LevelData, mTexturepacksRequired) == 1077);
-static_assert(offsetof(LevelData, mEducationOid) == 1088);
-static_assert(offsetof(LevelData, mForceGameType) == 1016);
-static_assert(offsetof(LevelData, mBonusChestEnabled) == 1153);
-static_assert(offsetof(LevelData, mCenterMapsToOrigin) == 1156);
-static_assert(offsetof(LevelData, mRequiresCopiedPackRemovalCheck) == 1157);
-static_assert(offsetof(LevelData, mOnlySpawnV1Villagers) == 1158);
+static_assert(offsetof(LevelData, mLimitedWorldOrigin) == 860);
+static_assert(offsetof(LevelData, mDayCycleTime) == 872);
+static_assert(offsetof(LevelData, mServerChunkTickRange) == 888);
+static_assert(offsetof(LevelData, mSingleUseWorld) == 1005);
+static_assert(offsetof(LevelData, mEducationProductId) == 1040);
+static_assert(offsetof(LevelData, mNetherType) == 1079);
+static_assert(offsetof(LevelData, mSpawnSettings) == 1080);
+static_assert(offsetof(LevelData, mKV) == 1128);

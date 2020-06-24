@@ -22,5 +22,6 @@ public:
 };
 
 class GameRules {
+public:
   std::vector<GameRule> rules;
 };

@@ -11,6 +11,7 @@ public:
 
   static BlockPos MIN;
   static BlockPos MAX;
+  static BlockPos ZERO;
 
   BlockPos operator+(BlockPos const &rhs) const noexcept { return {x + rhs.x, y + rhs.y, z + rhs.z}; }
   constexpr bool operator==(BlockPos const &rhs) const noexcept { return x == rhs.x && y == rhs.y && z == rhs.z; }
@@ -22,3 +23,4 @@ inline BlockPos BlockPos::MIN = {
     std::numeric_limits<int>::min(), std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
 inline BlockPos BlockPos::MAX = {
     std::numeric_limits<int>::max(), std::numeric_limits<int>::max(), std::numeric_limits<int>::max()};
+inline BlockPos BlockPos::ZERO = {0, 0, 0};

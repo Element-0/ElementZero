@@ -10,7 +10,8 @@ class HashedString {
   std::string str;
 
 public:
-  std::string const &getString() const { return str; }
+  uint64_t getHash() const noexcept { return hash; }
+  std::string const &getString() const noexcept { return str; }
 
   MCAPI HashedString(HashedString const &rhs);
   MCAPI HashedString(HashedString &&rhs);
