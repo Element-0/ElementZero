@@ -10,6 +10,7 @@
 #include "../Container/SimpleContainer.h"
 #include "../Core/AutomaticID.h"
 #include "../Core/Util.h"
+#include "../Core/RelativeFloat.h"
 #include "../Command/CommandPermissionLevel.h"
 #include "../dll.h"
 
@@ -142,7 +143,9 @@ public:
   MCAPI virtual bool breaksFallingBlocks(void) const;
   MCAPI virtual void blockedByShield(class ActorDamageSource const &, class Actor &);
   MCAPI virtual void moveRelative(float, float, float, float);
-  MCAPI virtual void teleportTo(class Vec3 const &, bool, int, int);
+  MCAPI virtual void teleportTo(
+      class Vec3 const &, bool, int /*ActorType*/, int /*MinecraftEventing::TeleportationCause*/,
+      ActorUniqueID const &);
   MCAPI virtual bool tryTeleportTo(class Vec3 const &, bool, bool, int, int);
   MCAPI virtual void chorusFruitTeleport(class Vec3 &);
   MCAPI virtual void lerpTo(class Vec3 const &, class Vec2 const &, int);
@@ -502,10 +505,13 @@ public:
         "?getEntityName@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBVActor@@@Z", this);
   }
 
-  void teleport(Vec3 const &target, Vec3 const &old, AutomaticID<Dimension, int> dim) {
-    CallServerClassMethod<void>(
-        "?teleport@TeleportCommand@@AEBAXAEAVActor@@VVec3@@PEAV3@V?$AutomaticID@VDimension@@H@@@Z", this, this, target,
-        &old, dim);
+  void teleport(
+      Vec3 target, Vec3 const &old, AutomaticID<Dimension, int> dim, RelativeFloat yaw = {0}, RelativeFloat pitch = {0},
+      int flag = 0, ActorUniqueID const &id = ActorUniqueID::INVALID_ID) {
+    CallServerFunction<void>(
+        "?teleport@TeleportCommand@@SAXAEAVActor@@VVec3@@PEAV3@V?$AutomaticID@VDimension@@H@@VRelativeFloat@@"
+        "4HAEBUActorUniqueID@@@Z",
+        this, target, &old, dim, yaw, pitch, flag, &id);
   }
 
   AS_FIELD(BlockSource *, Region, getRegion);
