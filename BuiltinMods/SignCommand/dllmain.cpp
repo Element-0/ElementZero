@@ -78,7 +78,7 @@ void PreInit() {
       ->Replace(
           "?use@BlockLegacy@@UEBA_NAEAVPlayer@@AEBVBlockPos@@@Z",
           +[](BlockLegacy *self, class Player &player, const class BlockPos &pos) {
-            if (auto ba = player.Region->getBlockEntity(pos))
+            if (auto ba = player.Region.getBlockEntity(pos))
               if (auto me = dynamic_cast<MySignBlockActor *>(ba)) {
                 if (player.canUseOperatorBlocks()) {
                   auto &stack = player.getSelectedItem();
