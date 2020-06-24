@@ -10,7 +10,7 @@
 
 class HudContainerManagerModel;
 
-class PlayerInventoryProxy : public ContainerSizeChangeListener, public ContainerContentChangeListener {
+class PlayerInventory : public ContainerSizeChangeListener, public ContainerContentChangeListener {
 public:
   int selectedSlot = 0;
   ItemStack item;
@@ -25,8 +25,3 @@ public:
   MCAPI void createTransactionContext(
       std::function<void(Container &, int, const ItemStack &, const ItemStack &)>, std::function<void()>);
 };
-
-static_assert(offsetof(PlayerInventoryProxy, selectedSlot) == 16);
-static_assert(offsetof(PlayerInventoryProxy, selectedContainerId) == 160);
-static_assert(offsetof(PlayerInventoryProxy, invectory) == 168);
-static_assert(offsetof(PlayerInventoryProxy, complexItems) == 176);

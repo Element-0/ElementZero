@@ -33,7 +33,7 @@ class Dimension *Actor::getDimension() const {
   return direct_access<class Dimension *>(this, 808);
 }
 // Player::getSelectedItem
-PlayerInventoryProxy &Player::getInventory() const { return *direct_access<PlayerInventoryProxy *>(this, 2928); }
+PlayerInventory &Player::getInventory() const { return *direct_access<PlayerInventory *>(this, 2928); }
 // Player::Player
 Certificate &Player::getCertificate() const { return *direct_access<class Certificate *>(this, 2736); }
 // Player::setBedRespawnPosition

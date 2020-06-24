@@ -7,7 +7,7 @@
 #include "Actor.h"
 #include "Mob.h"
 #include "../Core/ExtendedCertificate.h"
-#include "../Container/PlayerInventoryProxy.h"
+#include "../Container/PlayerInventory.h"
 #include "../Container/EnderChestContainer.h"
 #include "../Math/Vec3.h"
 #include "../Math/BlockPos.h"
@@ -187,7 +187,7 @@ public:
   void clearRespawnPosition(void);
   void recheckSpawnPosition(void);
 
-  BUILD_ACCESS_COMPAT(PlayerInventoryProxy &, Inventory);
+  BUILD_ACCESS_COMPAT(PlayerInventory &, Inventory);
   BUILD_ACCESS_COMPAT(class Certificate &, Certificate);
   BUILD_ACCESS_COMPAT(class NetworkIdentifier const &, NetworkIdentifier);
   BUILD_ACCESS_COMPAT(class BlockPos &, SpawnPosition);

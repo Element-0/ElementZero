@@ -10,6 +10,7 @@
 class ReadOnlyBinaryStream {
 public:
   size_t read_pointer{};
+  bool unk;
   std::string ownbuf, *pbuf;
   ReadOnlyBinaryStream(std::string &&buffer) : ownbuf(std::move(buffer)), pbuf{&ownbuf} {}
   MCAPI ReadOnlyBinaryStream(std::string const &buffer, bool owned);
@@ -75,15 +76,14 @@ private:
   MCAPI virtual bool read(void *, std::uint64_t);
 };
 
-static_assert(offsetof(ReadOnlyBinaryStream, pbuf) == 48);
+static_assert(offsetof(ReadOnlyBinaryStream, pbuf) == 56);
 
 class BinaryStream : public ReadOnlyBinaryStream {
 public:
-  std::string writebuf;
-  bool flag;
+  std::string writebuf, *pwbuf;
 
   MCAPI BinaryStream();
-  MCAPI BinaryStream(std::string &, bool mux);
+  MCAPI BinaryStream(std::string &, bool owned);
 
   inline void reset() {
     writebuf.clear();
@@ -119,4 +119,5 @@ public:
   inline void writeVarInt64(int64_t val) { writeUnsignedVarInt64(val > 0 ? 2 * val : ~(2 * val)); }
 };
 
-static_assert(offsetof(BinaryStream, flag) == 88);
+static_assert(offsetof(BinaryStream, writebuf) == 64);
+static_assert(offsetof(BinaryStream, pwbuf) == 96);

@@ -8,6 +8,7 @@
 #include "../Level/Tick.h"
 #include "../Core/json.h"
 #include "../Core/NBT.h"
+#include "ItemStackNetIdVariant.h"
 #include "../dll.h"
 
 #include <hook.h>
@@ -44,7 +45,7 @@ public:
   uint16_t aux_value{};
   unsigned char count{};
   bool flag35{};
-  std::chrono::steady_clock::time_point time{};
+  std::chrono::steady_clock::time_point create_time{};
   bool flag48{};
   std::vector<BlockLegacy *> blv56;
   uint64_t unk80{};
@@ -159,6 +160,8 @@ public:
 };
 class ItemStack : public ItemStackBase {
 public:
+  ItemStackNetIdVariant var_id;
+
   MCAPI ItemStack();
   ItemStack(Item const &item) : ItemStackBase(item) {}
   MCAPI ItemStack(Item const &, int);
@@ -173,5 +176,5 @@ public:
   MCAPI void reinit(BlockLegacy const &, int);
 };
 
-static_assert(offsetof(ItemStackBase, time) == 40);
 static_assert(sizeof(ItemStackBase) == 136);
+static_assert(sizeof(ItemStack) == 144);

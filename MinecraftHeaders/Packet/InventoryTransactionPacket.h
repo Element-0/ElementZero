@@ -8,11 +8,13 @@
 #include "../Core/NBT.h"
 #include "../Core/Packet.h"
 #include "../Core/ContainerID.h"
+#include "../Container/ContainerEnumName.h"
 #include "../Math/NetworkBlockPosition.h"
 #include "../Math/BlockFace.h"
 #include "../Actor/Player.h"
 #include "../Actor/ActorRuntimeID.h"
 #include "../Item/ItemStack.h"
+#include "../Item/SimpleClientNetId.h"
 #include "../dll.h"
 
 class ReadOnlyBinaryStream;
@@ -155,6 +157,11 @@ public:
   MCAPI virtual void onTransactionError(Player &, InventoryTransactionError) const;
 };
 
+static_assert(offsetof(ItemUseInventoryTransaction, itemInHand) == 136);
+static_assert(offsetof(ItemUseInventoryTransaction, playerPos) == 280);
+static_assert(offsetof(ItemUseInventoryTransaction, clickPos) == 292);
+static_assert(sizeof(ItemUseInventoryTransaction) == 304);
+
 class ItemUseOnActorInventoryTransaction : public ComplexInventoryTransaction {
 public:
   ActorRuntimeID actorId;
@@ -170,6 +177,9 @@ public:
   MCAPI virtual void onTransactionError(Player &, InventoryTransactionError) const;
 };
 
+static_assert(offsetof(ItemUseOnActorInventoryTransaction, playerPos) == 264);
+static_assert(offsetof(ItemUseOnActorInventoryTransaction, clickPos) == 276);
+
 class ItemReleaseInventoryTransaction : public ComplexInventoryTransaction {
 public:
   int actionType;
@@ -184,9 +194,14 @@ public:
   MCAPI virtual void onTransactionError(Player &, InventoryTransactionError) const;
 };
 
+static_assert(offsetof(ItemReleaseInventoryTransaction, playerPos) == 256);
+
 class InventoryTransactionPacket : public Packet {
 public:
+  SimpleClientNetId<ItemStackLegacyRequestIdTag, int, 0> client_id;
+  std::vector<std::pair<ContainerEnumName, std::vector<unsigned char>>> container;
   std::unique_ptr<ComplexInventoryTransaction> transaction;
+  bool flag;
 
   inline ~InventoryTransactionPacket() {}
   MCAPI virtual MinecraftPacketIds getId() const;
@@ -194,3 +209,6 @@ public:
   MCAPI virtual void write(BinaryStream &) const;
   MCAPI virtual StreamReadResult read(ReadOnlyBinaryStream &);
 };
+
+static_assert(offsetof(InventoryTransactionPacket, client_id) == 40);
+static_assert(offsetof(InventoryTransactionPacket, transaction) == 72);
