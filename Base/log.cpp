@@ -224,7 +224,7 @@ void generalLog(unsigned int pri, std::string_view area, char const *source, uns
         insert_temp.bindNoCopy(2, area.data());
         insert_temp.bindNoCopy(3, source);
         insert_temp.bind(4, line);
-        insert_temp.bindNoCopy(5, data);
+        insert_temp.bindNoCopy(5, content);
         insert_temp.exec();
         insert_temp.reset();
         insert_temp.clearBindings();
