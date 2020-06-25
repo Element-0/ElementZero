@@ -15,6 +15,7 @@ public:
   MCAPI Json::Value asJsonValue() const;
 
   MCAPI void addChild(std::unique_ptr<ITextObject>);
+  template <typename T, typename... TS> inline void addChild(TS... ts) { addChild(std::make_unique<T>(ts...)); }
   MCAPI void clear();
   MCAPI bool isEmpty() const;
 };
