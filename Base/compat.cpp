@@ -77,7 +77,7 @@ ActorUniqueID Level::getNewUniqueID() const {
 // RaidBossComponent::_sendBossEvent
 PacketSender &Level::getPacketSender() const { return *direct_access<PacketSender *>(this, 2096); }
 
-LevelDataWrapper &Level::GetLevelDataWrapper() { return direct_access<LevelDataWrapper>(this, 536); }
+LevelDataWrapper &Level::GetLevelDataWrapper() { return direct_access<LevelDataWrapper>(this, 544); }
 
 template <> Minecraft *LocateService<Minecraft>() {
   return *GetServerSymbol<Minecraft *>("?mGame@ServerCommand@@1PEAVMinecraft@@EA");

@@ -24,10 +24,9 @@
 
 #include "../dll.h"
 
-class LevelDataValue : public std::variant<
-                           int, bool, float, std::string, GeneratorType, GameType, BlockPos, unsigned int,
-                           std::unique_ptr<CompoundTag>> {
-public:
+struct LevelDataValue : public std::variant<
+                            int, bool, float, std::string, GeneratorType, GameType, BlockPos, unsigned int,
+                            std::unique_ptr<CompoundTag>> {
   using variant::variant;
 };
 
@@ -106,7 +105,15 @@ private:
   template <typename T> T const *_extractValue(StringKey const &) const;
 
 public:
-  template <typename T> inline T const *extractValue(StringKey const &key) const { return _extractValue<T>(key); }
+  inline LevelDataValue const *getValue(StringKey const &key) const {
+    if (auto kv = mKV.find(key); kv != mKV.end()) return &kv->second;
+    if (auto kv = mAltKV.find(key); kv != mAltKV.end()) return &kv->second;
+    return nullptr;
+  }
+  template <typename T> inline T const *extractValue(StringKey const &key) const {
+    auto val = getValue(key);
+    return std::get_if<T>(val);
+  }
   template <typename T> inline void setValue(StringKey const &key, T value) { mKV[key] = LevelDataValue(value); }
 
   inline BlockPos getSpawnPos() const {
