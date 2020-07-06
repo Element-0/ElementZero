@@ -51,27 +51,6 @@ TClasslessInstanceHook(
 }
 
 TClasslessInstanceHook(
-    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVMobEquipmentPacket@@@Z",
-    NetworkIdentifier *netid, MobEquipmentPacket *packet) {
-  auto &db = Mod::PlayerDatabase::GetInstance();
-  auto it  = db.Find(*netid);
-  if (!it) return;
-  // is offhand container
-  if (packet->containerId == 119) {
-    auto &stack = packet->stack;
-    // detect if it can be offhand
-    if (auto item = stack.getItem(); item) {
-      if (!item->AllowOffhand || stack.getStackSize() > stack.getMaxStackSize()) {
-        LOGI("\"%s\"(%d) has been detected using: offhand") % it->name % it->xuid;
-        (mAntiCheat.*EmitDetected)(SIG("detected"), "offhand", *it);
-        return;
-      }
-    }
-  }
-  original(this, netid, packet);
-}
-
-TClasslessInstanceHook(
     void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVActorFallPacket@@@Z", NetworkIdentifier *netid,
     ActorFallPacket *packet) {
   if (packet->fallDistance < 0.1) {
