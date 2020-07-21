@@ -85,7 +85,7 @@ void checkInventoryTransaction(
       switch (data.actionType) {
       case ItemUseInventoryTransaction::Type::USE_ITEM_ON:
         if (!Check(entry.player, data.pos.x, data.pos.z)) {
-          auto &block  = entry.player->Region.getBlock(data.pos);
+          auto &block  = direct_access<BlockSource *>(entry.player, 0x320)->getBlock(data.pos);
           auto &legacy = block.LegacyBlock;
           if (!legacy.isInteractiveBlock() || legacy.BlockID == VanillaBlockTypes::mItemFrame->BlockID ||
               entry.player->isSneaking()) {

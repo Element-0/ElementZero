@@ -383,7 +383,6 @@ public:
   MCAPI int getStrength(void) const;
   MCAPI int getMarkVariant(void) const;
   MCAPI int getControllingSeat(void);
-  MCAPI BlockSource &getRegion(void) const;
   MCAPI ActorRuntimeID getRuntimeID(void) const;
   MCAPI int getRiderIndex(class Actor &) const;
   MCAPI int getStructuralIntegrity(void) const;
@@ -514,7 +513,6 @@ public:
         this, target, &old, dim, yaw, pitch, flag, &id);
   }
 
-  AS_FIELD(BlockSource *, Region, getRegion);
   AS_FIELD(ActorRuntimeID, RuntimeID, getRuntimeID);
   BUILD_ACCESS_COMPAT(SimpleContainer &, EquipmentContainer);
   BUILD_ACCESS_COMPAT(SimpleContainer &, HandContainer);
