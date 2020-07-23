@@ -185,6 +185,9 @@ public:
   MCAPI virtual void setVisualShape(class Vec3 const &, class Vec3 const &);
   MCAPI virtual class Block const *tryLegacyUpgrade(unsigned short) const;
   MCAPI virtual bool dealsContactDamage(class Actor const &, class Block const &, bool) const;
-
-  BUILD_ACCESS(unsigned short, BlockID, 260);
+  
+  BUILD_ACCESS(unsigned short, BlockID, 268);
+  BUILD_ACCESS(class Block**,Block, 514);
+  template <typename T> MCAPI T getState(class ItemState const &,unsigned short) const;
+  class Block const &getDefaultState(void)const;
 };
