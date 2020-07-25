@@ -12,4 +12,5 @@ public:
   std::unordered_map<ScoreboardId, int> smap;
   std::string name, name2;
   ObjectiveCriteria *Criteria;
+  MCAPI struct ScoreInfo getPlayerScore(struct ScoreboardId const &) const;
 };
