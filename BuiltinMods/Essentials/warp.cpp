@@ -324,7 +324,8 @@ class GlobalWarpCommand : public Command {
 
 public:
   void execute(CommandOrigin const &origin, CommandOutput &output) {
-    if (origin.getOriginType() != CommandOriginType::Player) {
+    auto pent = Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
+    if (!pent) {
       output.error("commands.generic.error.invalidPlayer", {"/global-warp"});
       return;
     }
@@ -332,7 +333,7 @@ public:
       output.error("commands.warp.error.format");
       return;
     }
-    auto ent = *Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
+    auto ent = *pent;
     switch (setOrDel) {
     case SetOrDel::set: {
       auto dim = ent.player->getDimensionId().value;
