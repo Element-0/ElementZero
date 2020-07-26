@@ -276,15 +276,16 @@ public:
   }
 
   void execute(CommandOrigin const &origin, CommandOutput &output) {
-    if (origin.getOriginType() != CommandOriginType::Player) {
-      if (action == Action::List) {
-        printGlobalList(origin, output);
-        return;
-      }
-      output.error("commands.generic.error.invalidPlayer", {"/warp"});
+    if (action == Action::List) {
+      printGlobalList(origin, output);
       return;
     }
-    auto ent = *Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
+    auto pent = Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
+    if (!pent) {
+      output.error("commands.generic.error.invalidPlayer", {"/global-warp"});
+      return;
+    }
+    auto ent = *pent;
     switch (action) {
     case Action::To: handleTo(ent, origin, output); break;
     case Action::List:
