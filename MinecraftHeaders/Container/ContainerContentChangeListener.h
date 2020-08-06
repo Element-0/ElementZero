@@ -1,6 +1,7 @@
 #pragma once
 
-struct ContainerContentChangeListener {
+class ContainerContentChangeListener {
+public:
   virtual void ContainerContentChanged(int) = 0;
   virtual ~ContainerContentChangeListener(){};
 };
