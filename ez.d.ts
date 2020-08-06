@@ -77,10 +77,10 @@ declare module "ez:command" {
    */
   export function executeCommand(
     data: string
-  ): { statusMessage: string; [key: string]: any };
+  ): { statusMessage: string;[key: string]: any };
 }
 
-declare type ItemStack = {
+declare interface ItemStack {
   readonly raw_name: string;
   readonly name: string;
   readonly hover_name: string;
@@ -94,14 +94,14 @@ declare type ItemStack = {
   dump(): ArrayBuffer;
   equals(stack: ItemStack): boolean;
   toString(): string;
-};
+}
 
-declare type EnchantmentInstance = {
+declare interface EnchantmentInstance {
   type: number;
   level: number;
   name(): string;
   toString(): string;
-};
+}
 
 declare module "ez:inventory" {
   export function getOffHandItem(player: PlayerEntry): ItemStack;
@@ -112,27 +112,27 @@ declare module "ez:inventory" {
   export function getInventoryItems(
     player: PlayerEntry
   ): [
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-  ];
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+    ];
   // prettier-ignore
   export function getEnderChestItems(
     player: PlayerEntry
   ): [
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-    ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
-  ];
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+      ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack, ItemStack,
+    ];
 }
 
 declare module "ez:utils" {
   export function delay(time: number): Promise<void>;
 }
 
-declare type BossBar = {
+declare interface BossBar {
   /**
    * Detect if the bossbar still valid
    * It will be invalid after player left or having been destoryed
@@ -143,7 +143,7 @@ declare type BossBar = {
   show(): void;
   hide(): void;
   destory(): void;
-};
+}
 
 declare module "ez:bossbar" {
   export function create(
@@ -162,7 +162,7 @@ declare type Sqlite3BindType =
   | ArrayBufferView;
 declare type Sqlite3ColumnType = number | null | string | ArrayBuffer;
 
-declare type Sqlite3Statement = {
+declare interface Sqlite3Statement {
   reset(): void;
   clearBindings(): void;
   bind(index: number | string, value: Sqlite3BindType): void;
@@ -180,13 +180,13 @@ declare type Sqlite3Statement = {
     obj: Record<string, Sqlite3BindType>,
     fn: (...columns: Array<Sqlite3ColumnType>) => boolean | void
   ): void;
-};
+}
 
-declare type Sqlite3Database = {
+declare interface Sqlite3Database {
   exec(sql: string): void;
 
   prepare(sql: string): Sqlite3Statement;
-};
+}
 
 declare module "ez:sqlite3" {
   export function open(filename: string): Sqlite3Database;
