@@ -17,13 +17,6 @@ jobs:
       with:
         submodules: 'recursive'
 
-    - name: Install vcpkg
-      uses: lukka/run-vcpkg@v2
-      with:
-        vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-        vcpkgArguments: '@${{ github.workspace }}/vcpkg.txt'
-        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
-
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
@@ -38,6 +31,13 @@ jobs:
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
         echo "::set-env name=PATH::C:/LLVM/bin;$env:PATH"
+
+    - name: Install vcpkg
+      uses: lukka/run-vcpkg@v2
+      with:
+        vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+        vcpkgArguments: '@${{ github.workspace }}/vcpkg.txt'
+        appendedCacheKey: ${{ hashFiles(env.vcpkgResponseFile) }}
 
     - name: Cache lib artifacts
       uses: actions/cache@v1
@@ -82,7 +82,7 @@ jobs:
       uses: lukka/run-cmake@v2
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
-    
+
     - name: Install & Packaging
       run: |
         cd /d/a/_temp/RelWithDebInfo
