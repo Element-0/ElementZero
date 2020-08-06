@@ -85,7 +85,7 @@ static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string
   native["onPlayerJoined"] = +[](JsValueRef ref) {
     if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
     auto &db = Mod::PlayerDatabase::GetInstance();
-    db.AddListener(SIG("joined"), [=, fn{ValueHolder{ref}}](Mod::PlayerEntry const &entry) {
+    db.AddListener(SIG("joined"), [=, fn{LeakedHolder{ref}}](Mod::PlayerEntry const &entry) {
       JsValueRef ar[] = {GetUndefined(), ToJs(entry)};
       JsValueRef res;
       JsCallFunction(*fn, ar, 2, &res);
@@ -95,7 +95,7 @@ static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string
   native["onPlayerInitialized"] = +[](JsValueRef ref) {
     if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
     auto &db = Mod::PlayerDatabase::GetInstance();
-    db.AddListener(SIG("initialized"), [=, fn{ValueHolder{ref}}](Mod::PlayerEntry const &entry) {
+    db.AddListener(SIG("initialized"), [=, fn{LeakedHolder{ref}}](Mod::PlayerEntry const &entry) {
       JsValueRef ar[] = {GetUndefined(), ToJs(entry)};
       JsValueRef res;
       JsCallFunction(*fn, ar, 2, &res);
@@ -105,7 +105,7 @@ static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string
   native["onPlayerLeft"] = +[](JsValueRef ref) {
     if (GetJsType(ref) != JsFunction) throw std::runtime_error{"Require function argument"};
     auto &db = Mod::PlayerDatabase::GetInstance();
-    db.AddListener(SIG("left"), [=, fn{ValueHolder{ref}}](Mod::PlayerEntry const &entry) {
+    db.AddListener(SIG("left"), [=, fn{LeakedHolder{ref}}](Mod::PlayerEntry const &entry) {
       JsValueRef ar[] = {GetUndefined(), ToJs(entry)};
       JsValueRef res;
       JsCallFunction(*fn, ar, 2, &res);

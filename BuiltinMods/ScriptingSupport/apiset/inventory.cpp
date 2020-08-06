@@ -9,7 +9,7 @@
 namespace Mod::Scripting {
 
 JsValueRef ScriptEnchantmentInstance::InitProto() {
-  static ValueHolder temp = IIFE([] {
+  static LeakedHolder temp = IIFE([] {
     JsObjectWrapper proto;
     proto["type"]     = JsObjectWrapper::PropertyDesc{&ScriptEnchantmentInstance::GetType};
     proto["name"]     = JsObjectWrapper::PropertyDesc{&EnchantmentInstance::getName};
@@ -34,7 +34,7 @@ JsValueRef ScriptItemStack::Dump() const {
 }
 
 JsValueRef ScriptItemStack::InitProto() {
-  static ValueHolder temp = IIFE([] {
+  static LeakedHolder temp = IIFE([] {
     JsObjectWrapper proto;
     proto["raw_name"]          = JsObjectWrapper::PropertyDesc{&ItemStack::getRawNameId};
     proto["name"]              = JsObjectWrapper::PropertyDesc{&ItemStack::getName};

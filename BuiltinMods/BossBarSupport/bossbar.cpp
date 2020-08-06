@@ -62,7 +62,7 @@ struct Set : Mod::AuxHolder {
 };
 
 JsValueRef Handle::InitProto() {
-  static ValueHolder temp = IIFE([] {
+  static LeakedHolder temp = IIFE([] {
     JsObjectWrapper proto;
     proto["valid"]         = &Handle::Valid;
     proto["show"]          = &Handle::Show;

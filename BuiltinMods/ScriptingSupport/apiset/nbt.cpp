@@ -10,7 +10,7 @@
 namespace Mod::Scripting {
 
 JsValueRef ScriptNBT::InitProto() {
-  static ValueHolder temp = IIFE([] {
+  static LeakedHolder temp = IIFE([] {
     JsObjectWrapper proto;
     proto["type"] = JsObjectWrapper::PropertyDesc{&ScriptNBT::type};
     proto["toString"] = &ScriptNBT::toString;

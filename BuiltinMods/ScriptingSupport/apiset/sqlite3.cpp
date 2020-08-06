@@ -174,7 +174,7 @@ struct Stmt {
   }
 
   static JsValueRef InitProto() {
-    static ValueHolder proto = IIFE([] {
+    static LeakedHolder proto = IIFE([] {
       JsObjectWrapper temp;
       temp["reset"]         = &Stmt::Reset;
       temp["clearBindings"] = &Stmt::ClearBindings;
@@ -247,7 +247,7 @@ struct Database {
   }
 
   static JsValueRef InitProto() {
-    static ValueHolder proto = IIFE([] {
+    static LeakedHolder proto = IIFE([] {
       JsObjectWrapper temp;
       temp["exec"]    = &Database::Exec;
       temp["prepare"] = &Database::Prepare;
