@@ -4,3 +4,6 @@
 [submodule "Deps/mini_bus_cpp"]
 	path = Deps/mini_bus_cpp
 	url = https://github.com/CodeHz/mini_bus_cpp
+[submodule "Deps/boost-cmake"]
+	path = Deps/boost-cmake
+	url = https://github.com/Element-0/boost-cmake
