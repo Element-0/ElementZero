@@ -1,6 +1,4 @@
 find_package (SQLiteCpp CONFIG REQUIRED)
-set (Boost_NO_SYSTEM_PATHS ON)
-set (Boost_NO_BOOST_CMAKE ON)
 find_package (Boost 1.72.0 REQUIRED)
 find_and_install_package (sqlite3 sqlite3)
 find_and_install_package (yaml-cpp yaml-cpp)

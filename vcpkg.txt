@@ -1,11 +1,5 @@
 --triplet
 elementzero
-boost-algorithm
-boost-core
-boost-format
-boost-multi-index
-boost-scope-exit
-boost-lexical-cast
 websocketpp
 sqlitecpp
 yaml-cpp
