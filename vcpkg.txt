@@ -1,9 +1,6 @@
 --triplet
 elementzero
-websocketpp
 sqlitecpp
 yaml-cpp
 chakracore
-msgpack
-flatbuffers
 funchook
