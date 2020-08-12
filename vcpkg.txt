@@ -4,9 +4,3 @@ sqlitecpp
 yaml-cpp
 chakracore
 funchook
-boost-algorithm	
-boost-core	
-boost-format	
-boost-multi-index	
-boost-scope-exit	
-boost-lexical-cast
