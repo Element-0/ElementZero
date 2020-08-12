@@ -82,6 +82,7 @@ jobs:
       uses: lukka/run-cmake@v2
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
+        cmakeAppendedArgs: -DBOOST_ROOT=${{ env.BOOST_ROOT_1_72_0 }}
 
     - name: Install & Packaging
       run: |
