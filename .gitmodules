@@ -7,3 +7,6 @@
 [submodule "Deps/boost-cmake"]
 	path = Deps/boost-cmake
 	url = https://github.com/Element-0/boost-cmake
+[submodule "Deps/SQLiteCpp"]
+	path = Deps/SQLiteCpp
+	url = https://github.com/SRombauts/SQLiteCpp
