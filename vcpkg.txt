@@ -1,6 +1,7 @@
 --triplet
 elementzero
 sqlitecpp
+sqlite3
 yaml-cpp
 chakracore
 funchook
