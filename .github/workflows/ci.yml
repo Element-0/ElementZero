@@ -82,7 +82,7 @@ jobs:
       uses: lukka/run-cmake@v2
       with:
         cmakeListsOrSettingsJson: CMakeSettingsJson
-        cmakeAppendedArgs: -DBOOST_ROOT=C:/hostedtoolcache/windows/Boost/1.72.0 -DBoost_INCLUDE_DIR=C:/hostedtoolcache/windows/Boost/1.72.0/include
+        cmakeAppendedArgs: -DBOOST_ROOT=C:/hostedtoolcache/windows/Boost/1.72.0 -DBoost_INCLUDE_DIR=C:/hostedtoolcache/windows/Boost/1.72.0/boost/include -DBOOST_LIBRARYDIR=C:/hostedtoolcache/windows/Boost/1.72.0/lib
 
     - name: Install & Packaging
       run: |
