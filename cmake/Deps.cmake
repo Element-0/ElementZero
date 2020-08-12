@@ -1,5 +1,5 @@
 find_package (SQLiteCpp CONFIG REQUIRED)
-find_package (Boost 1.72.0 REQUIRED)
+find_package (Boost 1.73.0 REQUIRED)
 find_and_install_package (sqlite3 sqlite3)
 find_and_install_package (yaml-cpp yaml-cpp)
 find_package (msgpack CONFIG REQUIRED)
