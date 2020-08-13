@@ -8,6 +8,7 @@ include (ExternalProject)
 include (EZToolchain)
 include (Deps)
 
+include_directories ("Deps/SQLiteCpp/sqlite3")
 generate_git_version (git_version)
 
 add_subdirectory ("Deps")
