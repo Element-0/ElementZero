@@ -25,8 +25,8 @@ struct RegisterAPI {
 
   inline RegisterAPI(char const *name, bool check, void (*t)()) {
     if (check)
-      GetPreloadList().emplace_back(name, t);
-    else
       GetMap().emplace(name, t);
+    else
+      GetPreloadList().emplace_back(name, t);
   }
 };
