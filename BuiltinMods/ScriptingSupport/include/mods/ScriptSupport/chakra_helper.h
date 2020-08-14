@@ -1,5 +1,6 @@
 #pragma once
 
+#include <corecrt_wstring.h>
 #include <cstdio>
 #include <locale>
 #include <codecvt>
@@ -59,6 +60,18 @@ inline JsValueRef ToJs(std::string const &str) {
   return ref;
 }
 
+inline JsValueRef ToJs(wchar_t const *str) {
+  JsValueRef ref;
+  ThrowError(JsCreateStringUtf16((const uint16_t *) str, wcslen(str), &ref));
+  return ref;
+}
+
+inline JsValueRef ToJs(std::wstring const &str) {
+  JsValueRef ref;
+  ThrowError(JsCreateStringUtf16((const uint16_t *) str.data(), str.length(), &ref));
+  return ref;
+}
+
 inline JsValueRef ToJs(std::string_view sv) {
   JsValueRef ref;
   ThrowError(JsCreateString(sv.data(), sv.size(), &ref));
@@ -112,6 +125,12 @@ inline JsPropertyIdRef ToJsP(char const *str) {
   return ref;
 }
 
+inline JsPropertyIdRef ToJsP(wchar_t const *str) {
+  JsPropertyIdRef ref;
+  ThrowError(JsGetPropertyIdFromName(str, &ref));
+  return ref;
+}
+
 inline JsPropertyIdRef ToJsP(std::string_view str) {
   JsPropertyIdRef ref;
   ThrowError(JsCreatePropertyId(str.data(), str.length(), &ref));
@@ -157,6 +176,12 @@ template <> inline std::string FromJs(JsValueRef ref) {
 }
 
 template <> inline int FromJs(JsValueRef ref) {
+  int val;
+  ThrowError(JsNumberToInt(ref, &val));
+  return val;
+}
+
+template <> inline unsigned int FromJs(JsValueRef ref) {
   int val;
   ThrowError(JsNumberToInt(ref, &val));
   return val;
@@ -498,7 +523,7 @@ struct JsObjectWrapper {
     std::string ToString() { return JsToString(get<>()); }
 
   private:
-    JsValueRef temp;
+    JsValueRef temp{};
 
     PropProxy(JsValueRef ref, JsPropertyIdRef name) : ref(ref), name(name) {}
 
@@ -548,6 +573,8 @@ struct JsObjectWrapper {
   }
 
   PropProxy operator[](char const *name) const { return {ref, ToJsP(name)}; }
+
+  PropProxy operator[](wchar_t const *name) const { return {ref, ToJsP(name)}; }
 
   void SetPrototype(JsValueRef target) { JsSetPrototype(ref, target); }
 
