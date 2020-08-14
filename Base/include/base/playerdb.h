@@ -104,10 +104,12 @@ public:
   BASEAPI std::optional<PlayerEntry> Find(uint64_t xuid);
   BASEAPI std::optional<PlayerEntry> Find(mce::UUID const &uuid);
   BASEAPI std::optional<PlayerEntry> Find(NetworkIdentifier const &netid);
+  BASEAPI std::optional<PlayerEntry> GeneralFind(std::string const &text);
 
   BASEAPI std::optional<OfflinePlayerEntry> FindOffline(std::string const &name);
   BASEAPI std::optional<OfflinePlayerEntry> FindOffline(uint64_t xuid);
   BASEAPI std::optional<OfflinePlayerEntry> FindOffline(mce::UUID const &uuid);
+  BASEAPI std::optional<OfflinePlayerEntry> GeneralFindOffline(std::string const &text);
 
   USING_EVENTEMITTER("joined", PlayerEntry const &);
   USING_EVENTEMITTER("initialized", PlayerEntry const &);

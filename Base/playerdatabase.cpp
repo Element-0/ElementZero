@@ -1,6 +1,7 @@
 #include <mutex>
 
 #include <boost/scope_exit.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <RakNet/RakPeer.h>
 #include <Actor/ServerPlayer.h>
@@ -16,6 +17,7 @@
 #include <base/playerdb.h>
 #include <base/log.h>
 
+#include "boost/lexical_cast.hpp"
 #include "settings.hpp"
 
 DEF_LOGGER("PlayerDB");
@@ -83,6 +85,16 @@ std::optional<Mod::PlayerEntry> Mod::PlayerDatabase::Find(NetworkIdentifier cons
   if (auto it = view.find(netid); it != view.end()) return *it;
   return {};
 }
+std::optional<Mod::PlayerEntry> Mod::PlayerDatabase::GeneralFind(std::string const &target) {
+  if (target.size() == 36) {
+    if (auto uuid = mce::UUID::fromString(target); !uuid.empty()) { return db.Find(uuid); }
+  }
+  try {
+    auto xuid = boost::lexical_cast<uint64_t>(target);
+    return db.Find(xuid);
+  } catch (boost::bad_lexical_cast const &bad) {}
+  return Find(target);
+}
 std::optional<Mod::OfflinePlayerEntry> Mod::PlayerDatabase::FindOffline(std::string const &name) {
   static SQLite::Statement find_by_name{*sqldb, "SELECT * FROM user WHERE name=? COLLATE NOCASE"};
   BOOST_SCOPE_EXIT_ALL() {
@@ -124,6 +136,16 @@ std::optional<Mod::OfflinePlayerEntry> Mod::PlayerDatabase::FindOffline(mce::UUI
     return {{name, xuid, uuid}};
   }
   return {};
+}
+std::optional<Mod::OfflinePlayerEntry> Mod::PlayerDatabase::GeneralFindOffline(std::string const &target) {
+  if (target.size() == 36) {
+    if (auto uuid = mce::UUID::fromString(target); !uuid.empty()) { return db.FindOffline(uuid); }
+  }
+  try {
+    auto xuid = boost::lexical_cast<uint64_t>(target);
+    return db.FindOffline(xuid);
+  } catch (boost::bad_lexical_cast const &bad) {}
+  return FindOffline(target);
 }
 
 TClasslessInstanceHook(
