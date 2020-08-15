@@ -78,6 +78,12 @@ declare module "ez:command" {
   export function executeCommand(
     data: string
   ): { statusMessage: string;[key: string]: any };
+
+  /**
+   * Set command handler for special `//` command
+   * @param handler handler function
+   */
+  export function setSlashCommandHandler(handler: (input: string) => string): void;
 }
 
 declare interface ItemStack {

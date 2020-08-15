@@ -57,17 +57,16 @@ public:
   };
 #pragma endregion struct definition
 
-  MCAPI void registerCommand(
-      std::string const &, char const *, CommandPermissionLevel, CommandFlag, CommandFlag);
-  MCAPI void registerAlias(std::string const &, std::string const &);
+  MCAPI void registerCommand(std::string const &, char const *, CommandPermissionLevel, CommandFlag, CommandFlag);
+  MCAPI void registerAlias(std::string, std::string);
 
 private:
   MCAPI Signature const *findCommand(std::string const &) const;
   MCAPI void registerOverloadInternal(Signature &, Overload &);
 
   template <typename Type>
-  MCAPI bool parse(
-      void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
+  MCAPI bool
+  parse(void *, ParseToken const &, CommandOrigin const &, int, std::string &, std::vector<std::string> &) const;
 
   MCAPI Symbol addEnumValuesInternal(
       std::string const &, std::vector<std::pair<uint64_t, uint64_t>> const &, typeid_t<CommandRegistry>,
@@ -84,7 +83,6 @@ private:
   MCAPI uint64_t getEnumData(CommandRegistry::ParseToken const &) const;
 
 public:
-
   // 128 std::vector<CommandRegistry::ParseRule>
   // 152 std::map<uint32_t, CommandRegistry::ParseTable>
   // 288 std::map<std::string, uint32_t>

@@ -1,7 +1,10 @@
 #include <hook.h>
 #include <dllentry.h>
 
+#include <base/log.h>
 #include <mods/CommandSupport.h>
+
+DEF_LOGGER("CommandSupport");
 
 void (Mod::CommandSupport::*emitter)(sigt<"loaded"_sig>, CommandRegistry *);
 
@@ -71,6 +74,9 @@ template <> typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<Co
   return GETID(
       "?id@?1???$type_id@VCommandRegistry@@V?$CommandSelector@VPlayer@@@@@@YA?AV?$typeid_t@VCommandRegistry@@@@XZ@4V1@"
       "A");
+}
+template <> COMMANDAPI typeid_t<CommandRegistry> Mod::CommandSupport::GetParameterTypeId<CommandRawText>() {
+  return GETID("?id@?1???$type_id@VCommandRegistry@@VCommandRawText@@@@YA?AV?$typeid_t@VCommandRegistry@@@@XZ@4V1@A");
 }
 
 void dllenter() {}

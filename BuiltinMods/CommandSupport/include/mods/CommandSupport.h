@@ -11,6 +11,7 @@
 #include <Core/MCRESULT.h>
 #include <Command/MinecraftCommands.h>
 #include <Command/Command.h>
+#include <Command/CommandRawText.h>
 #include <Command/CommandOutput.h>
 #include <Command/CommandContext.h>
 #include <Command/CommandRegistry.h>
@@ -65,6 +66,7 @@ template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTyp
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<Json::Value>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<CommandSelector<Actor>>();
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<CommandSelector<Player>>();
+template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<CommandRawText>();
 
 class CustomCommandOrigin : public CommandOrigin {
 public:

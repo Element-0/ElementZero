@@ -680,13 +680,19 @@ struct ValueHolder {
 
 // WORKAROUND FOR CALLBACK
 struct LeakedHolder {
-  JsValueRef ref;
+  JsValueRef ref{};
 
   LeakedHolder() {}
   LeakedHolder(JsValueRef ref) : ref(ref) {
     if (ref) JsAddRef(ref, nullptr);
   }
   JsValueRef operator*() const { return ref; }
+  operator bool() { return !!ref; }
+  LeakedHolder &operator=(JsValueRef rhs) {
+    if (ref) JsRelease(ref, nullptr);
+    ref = rhs;
+    return *this;
+  }
 };
 
 } // namespace Mod::Scripting
