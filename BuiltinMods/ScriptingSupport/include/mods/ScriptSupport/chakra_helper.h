@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ChakraCommon.h"
 #include <corecrt_wstring.h>
 #include <cstdio>
 #include <locale>
@@ -424,6 +425,8 @@ template <class... T> struct always_false : std::false_type {};
 struct JsObjectWrapper {
   JsValueRef ref;
 
+  JsValueRef *operator&() { return &ref; }
+
   struct PropertyDesc {
     std::function<JsValueRef(JsObjectWrapper)> get;
     std::function<void(JsObjectWrapper, JsValueRef)> set;
@@ -466,8 +469,61 @@ struct JsObjectWrapper {
     }
   };
 
+  struct IndexedPropProxy {
+    JsValueRef ref{}, temp{};
+    int idx{};
+
+    JsValueType type() { return GetJsType(fetch()); }
+    template <typename R> JsValueRef operator=(R &&val) {
+      using T = std::decay_t<R>;
+      if constexpr (std::is_same_v<T, JsValueRef>) {
+        set(val);
+        return val;
+      } else if constexpr (std::is_same_v<T, JsObjectWrapper> || std::is_same_v<T, JsConvertible>) {
+        set(val.ref);
+        return val.ref;
+      } else if constexpr (std::is_same_v<T, PropertyDesc>) {
+        define(val);
+        return nullptr;
+      } else if constexpr (HasJsConvertible<T>::value) {
+        JsConvertible o{val};
+        set(o.ref);
+        return o;
+      } else if constexpr (HasToJs<T>::value) {
+        auto o = ToJs(val);
+        set(o);
+        return o;
+      } else {
+        static_assert(always_false<T>::value, "Failed to assign type");
+      }
+    }
+
+    JsValueRef operator*() { return fetch(); }
+
+    template <typename T = JsValueRef> T get() {
+      if constexpr (std::is_same_v<T, JsValueRef>) {
+        return fetch();
+      } else if constexpr (std::is_same_v<T, JsObjectWrapper>) {
+        return JsObjectWrapper{fetch()};
+      } else {
+        return FromJs<T>(fetch());
+      }
+    }
+
+    std::string ToString() { return JsToString(get<>()); }
+
+  private:
+    IndexedPropProxy(JsValueRef ref, int idx) : ref(ref), idx(idx) {}
+    friend struct JsObjectWrapper;
+
+    JsValueRef fetch() {
+      if (!temp) JsGetIndexedProperty(ref, ToJs(idx), &temp);
+      return temp;
+    }
+  };
+
   struct PropProxy {
-    JsValueRef ref;
+    JsValueRef ref{};
     JsPropertyIdRef name;
 
     JsValueType type() { return GetJsType(fetch()); }
@@ -575,6 +631,8 @@ struct JsObjectWrapper {
   PropProxy operator[](char const *name) const { return {ref, ToJsP(name)}; }
 
   PropProxy operator[](wchar_t const *name) const { return {ref, ToJsP(name)}; }
+
+  IndexedPropProxy operator[](int idx) const { return {ref, idx}; }
 
   void SetPrototype(JsValueRef target) { JsSetPrototype(ref, target); }
 

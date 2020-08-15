@@ -122,10 +122,44 @@ public:
   }
 };
 
+class StringReadStream : public RuntimeClass<RuntimeClassFlags<ClassicCom>, ISequentialStream> {
+public:
+  std::string data;
+  std::string_view buf;
+
+  HRESULT STDMETHODCALLTYPE Read(
+      /* [annotation] */
+      _Out_writes_bytes_to_(cb, *pcbRead) void *pv,
+      /* [annotation][in] */
+      _In_ ULONG cb,
+      /* [annotation] */
+      _Out_opt_ ULONG *pcbRead) override {
+    if (buf.empty()) {
+      *pcbRead = 0;
+      return S_OK;
+    }
+    auto toread = std::min((size_t) cb, buf.size());
+    std::memcpy(pv, buf.data(), toread);
+    *pcbRead = (ULONG) toread;
+    return S_OK;
+  }
+
+  HRESULT STDMETHODCALLTYPE Write(
+      /* [annotation] */
+      _In_reads_bytes_(cb) const void *pv,
+      /* [annotation][in] */
+      _In_ ULONG cb,
+      /* [annotation] */
+      _Out_opt_ ULONG *pcbWritten) override {
+    return E_NOTIMPL;
+  }
+};
+
 class HttpRequestCallback : public RuntimeClass<RuntimeClassFlags<ClassicCom>, IXMLHTTPRequest2Callback> {
 public:
   std::shared_ptr<ValueHolder> resolve, reject, stage;
   SimpleBuffer buffer;
+  ISequentialStream *temp{};
 
   STDMETHODIMP
   OnRedirect(__RPC__in_opt IXMLHTTPRequest2 *pXHR, __RPC__in_string const WCHAR *pwszRedirectUrl) {
@@ -214,6 +248,7 @@ public:
     });
     Release();
     pXHR->Release();
+    if (temp) temp->Release();
     return S_OK;
   }
 
@@ -228,7 +263,42 @@ public:
     });
     Release();
     pXHR->Release();
+    if (temp) temp->Release();
     return S_OK;
+  }
+};
+
+struct HttpOption {
+  std::map<std::wstring, std::wstring> headers;
+  StringReadStream *reqBody{};
+
+  ~HttpOption() {
+    if (reqBody) reqBody->Release();
+  }
+
+  void readFromJs(JsObjectWrapper obj) {
+    auto oheaders = obj["headers"];
+    auto obody    = obj["body"];
+    if (oheaders.type() == JsObject) {
+      JsObjectWrapper arr, xheaders{*oheaders};
+      ThrowError(JsGetOwnPropertyNames(*oheaders, &arr));
+      auto length = arr["length"].get<int>();
+      LOGV("length %d") % length;
+      for (int i = 0; i < length; i++) {
+        auto key = arr[i].get<std::wstring>();
+        LOGV("key %s") % arr[i].get<std::string>();
+        auto value = xheaders[key.c_str()].get<std::wstring>();
+        headers.emplace(std::move(key), std::move(value));
+      }
+    }
+    if (obody.type() == JsArrayBuffer) {
+      ChakraBytePtr buffer;
+      unsigned int bufferLength;
+      JsGetArrayBufferStorage(*obody, &buffer, &bufferLength);
+      HR{"create body"} = MakeAndInitialize<StringReadStream>(&reqBody);
+      reqBody->data     = {(char *) buffer, (size_t) bufferLength};
+      reqBody->buf      = reqBody->data;
+    }
   }
 };
 
@@ -236,7 +306,7 @@ public:
 
 static RegisterQueue queue("HttpRequest", [](JsObjectWrapper global) {
   global["HttpRequest"] = [](JsValueRef callee, Arguments args) -> JsValueRef {
-    if (args.argumentCount == 2 || args.argumentCount == 3) {
+    if (args.size() == 2 || args.size() == 3) {
       if (GetJsType(args[0]) != JsString || GetJsType(args[1]) != JsString) {
         throw std::runtime_error{"Require (string, string[, object])"};
       }
@@ -249,6 +319,9 @@ static RegisterQueue queue("HttpRequest", [](JsObjectWrapper global) {
       IXMLHTTPRequest2 *spXHR;
       HttpRequestCallback *spXhrCallback;
 
+      HttpOption opt;
+      if (args.size() == 3 && GetJsType(args[2]) == JsObject) { opt.readFromJs(JsObjectWrapper{args[2]}); }
+
       HR{"create com object"} =
           CoCreateInstance(CLSID_FreeThreadedXMLHTTP60, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&spXHR));
       HR{"create callback object"} = MakeAndInitialize<HttpRequestCallback>(&spXhrCallback);
@@ -258,12 +331,18 @@ static RegisterQueue queue("HttpRequest", [](JsObjectWrapper global) {
 
       HR{"open http request"} = spXHR->Open(method.c_str(), url.c_str(), spXhrCallback, NULL, NULL, NULL, NULL);
 
-      // if (args.argumentCount == 3) { return GetUndefined(); } // todo
-      HR{"send http request"} = spXHR->Send(NULL, 0);
+      for (auto &[k, v] : opt.headers) { spXHR->SetRequestHeader(k.c_str(), v.c_str()); }
+
+      if (opt.reqBody) {
+        HR{"send http request"} = spXHR->Send(opt.reqBody, (ULONG) opt.reqBody->data.size());
+        opt.reqBody             = NULL;
+      } else {
+        HR{"send http request"} = spXHR->Send(NULL, 0);
+      }
 
       LOGV("%s %s") % methodc % urlc;
       return promise;
     }
-    return GetUndefined();
+    throw std::runtime_error{"Require (string, string[, object])"};
   };
 });
