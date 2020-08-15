@@ -41,7 +41,7 @@ struct HttpResponse {
   }
 
   static JsValueRef InitProto() {
-    static ValueHolder proto = IIFE([] {
+    static LeakedHolder proto = IIFE([] {
       JsObjectWrapper ResponseProto;
       ResponseProto["status"]     = JsObjectWrapper::PropertyDesc{&HttpResponse::GetStatus};
       ResponseProto["statusText"] = JsObjectWrapper::PropertyDesc{&HttpResponse::GetStatusText};
@@ -140,6 +140,7 @@ public:
     }
     auto toread = std::min((size_t) cb, buf.size());
     std::memcpy(pv, buf.data(), toread);
+    buf.remove_prefix(toread);
     *pcbRead = (ULONG) toread;
     return S_OK;
   }
@@ -295,6 +296,13 @@ struct HttpOption {
       ChakraBytePtr buffer;
       unsigned int bufferLength;
       JsGetArrayBufferStorage(*obody, &buffer, &bufferLength);
+      HR{"create body"} = MakeAndInitialize<StringReadStream>(&reqBody);
+      reqBody->data     = {(char *) buffer, (size_t) bufferLength};
+      reqBody->buf      = reqBody->data;
+    } else if (obody.type() == JsTypedArray) {
+      ChakraBytePtr buffer;
+      unsigned int bufferLength;
+      JsGetTypedArrayStorage(*obody, &buffer, &bufferLength, NULL, NULL);
       HR{"create body"} = MakeAndInitialize<StringReadStream>(&reqBody);
       reqBody->data     = {(char *) buffer, (size_t) bufferLength};
       reqBody->buf      = reqBody->data;

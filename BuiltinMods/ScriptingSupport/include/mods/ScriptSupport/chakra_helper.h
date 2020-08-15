@@ -270,6 +270,12 @@ struct Arguments {
   }
 };
 
+inline JsValueRef JsWrapError(JsErrorCode (*fn)(JsValueRef, JsValueRef *), std::string msg) {
+  JsValueRef ret;
+  ThrowError(fn(ToJs(msg), &ret));
+  return ret;
+}
+
 struct JsConvertible {
   JsValueRef ref;
 
@@ -297,8 +303,11 @@ struct JsConvertible {
           FnType &rfn = *(FnType *) state;
           try {
             return rfn(callee, {arguments, argumentCount, info});
+          } catch (JsValueRef ref) {
+            JsSetException(ref);
+            return GetUndefined();
           } catch (std::exception const &ex) {
-            JsSetException(ToJs(ex.what()));
+            JsSetException(JsWrapError(JsCreateError, ex.what()));
             return GetUndefined();
           }
         },
@@ -325,8 +334,11 @@ struct JsConvertible {
             } else {
               return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
             }
+          } catch (JsValueRef ref) {
+            JsSetException(ref);
+            return GetUndefined();
           } catch (std::exception const &ex) {
-            JsSetException(ToJs(ex.what()));
+            JsSetException(JsWrapError(JsCreateError, ex.what()));
             return GetUndefined();
           }
         },
@@ -363,8 +375,11 @@ struct JsConvertible {
             } else {
               return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
             }
+          } catch (JsValueRef ref) {
+            JsSetException(ref);
+            return GetUndefined();
           } catch (std::exception const &ex) {
-            JsSetException(ToJs(ex.what()));
+            JsSetException(JsWrapError(JsCreateError, ex.what()));
             return GetUndefined();
           }
         },
@@ -400,8 +415,11 @@ struct JsConvertible {
             } else {
               return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
             }
+          } catch (JsValueRef ref) {
+            JsSetException(ref);
+            return GetUndefined();
           } catch (std::exception const &ex) {
-            JsSetException(ToJs(ex.what()));
+            JsSetException(JsWrapError(JsCreateError, ex.what()));
             return GetUndefined();
           }
         },
