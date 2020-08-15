@@ -223,3 +223,24 @@ declare module "ez:network-stats" {
     avgpacketloss: number;
   };
 }
+
+/// Encode text in utf-8
+declare interface TextEncoder {
+  new();
+  encode(text: string): Uint8Array
+}
+
+/// Decode text in utf-8
+declare interface TextDecoder {
+  new();
+  decode(text: string): Uint8Array
+}
+
+declare interface HttpResponse {
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  data: ArrayBuffer;
+}
+
+declare function HttpRequest(method: "GET" | "POST" | "HEAD" | "PUT" | "PATCH" | "DELETE", url: string, init: { headers: Record<string, string>, body: ArrayBuffer }): Promise<HttpResponse>;
