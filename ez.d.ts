@@ -112,7 +112,7 @@ declare module "ez:command" {
   ): { statusMessage: string;[key: string]: any };
 
   /**
-   * Set command handler for special `//` command
+   * Set command handler for special `/!` command
    * @param handler handler function
    */
   export function setSlashCommandHandler(handler: (this: CommandOrigin, input: string) => string): void;
