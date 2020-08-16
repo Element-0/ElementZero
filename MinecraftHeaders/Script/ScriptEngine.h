@@ -12,6 +12,7 @@ class Value;
 
 class ScriptEngine {
 public:
+  virtual ~ScriptEngine();
   struct ScriptQueueData {
     std::string relative_path, virtual_path, content, uuid, version_code;
   };

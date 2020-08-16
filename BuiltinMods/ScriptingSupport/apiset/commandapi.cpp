@@ -3,6 +3,10 @@
 
 #include <modutils.h>
 
+#include <Math/Vec3.h>
+#include <Math/BlockPos.h>
+#include <Level/Dimension.h>
+
 #include <hook.h>
 #include <base/base.h>
 #include <base/log.h>
@@ -22,16 +26,40 @@ static CommandOutputParameter ToCommandOutputParameter(JsValueRef val) {
   }
 }
 
+template <typename T> static JsValueRef VecToJs(T const &vec) {
+  JsObjectWrapper obj;
+  obj["x"] = vec.x;
+  obj["y"] = vec.y;
+  obj["z"] = vec.z;
+  return obj.ref;
+}
+
+static JsValueRef DumpCommandOrigin(CommandOrigin const &orig) {
+  auto &db = Mod::PlayerDatabase::GetInstance();
+  JsObjectWrapper obj;
+  obj["type"] = (int) orig.getOriginType();
+  if (auto entity = orig.getEntity(); entity) {
+    if (auto player = db.Find((Player *) entity); player) { obj["player"] = *player; }
+  }
+  obj["name"]         = orig.getName();
+  obj["dimension"]    = orig.getDimension()->DimensionId.value;
+  obj["permissiono"]  = (int) orig.getPermissionsLevel();
+  obj["worldBuilder"] = orig.isWorldBuilder();
+  obj["blockpos"]     = VecToJs(orig.getBlockPosition());
+  obj["worldpos"]     = VecToJs(orig.getWorldPosition());
+  return *obj;
+}
+
 struct SlashCommand : Command {
   CommandRawText content;
 
-  void execute(const CommandOrigin &, CommandOutput &outp) override {
+  void execute(const CommandOrigin &orig, CommandOutput &outp) override {
     if (!holder) {
       outp.error("commands.error.not.implemented");
       return;
     }
     try {
-      JsValueRef arr[] = {GetUndefined(), ToJs(content.getText())};
+      JsValueRef arr[] = {DumpCommandOrigin(orig), ToJs(content.getText())};
       JsValueRef ret;
       ThrowError(JsCallFunction(*holder, arr, 2, &ret));
       switch (GetJsType(ret)) {

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "ScriptEngine.h"
+#include "ScriptCallbackInterface.h"
 
 namespace ScriptApi {
 class ScriptObjectHandle;
@@ -10,7 +11,7 @@ class ScriptVersionInfo;
 class ScriptReportItem;
 } // namespace ScriptApi
 
-class MinecraftServerScriptEngine : public ScriptEngine {
+class MinecraftServerScriptEngine : public ScriptEngine, public ScriptApi::ScriptCallbackInterface {
 public:
   virtual ~MinecraftServerScriptEngine();
   virtual bool initialize(void);
@@ -19,53 +20,6 @@ public:
   virtual bool onInfoReceived(std::string const &);
   virtual bool onWarnReceived(std::string const &);
   virtual bool onErrorReceived(std::string const &);
-  virtual void makeErrorResultObject(ScriptApi::ScriptObjectHandle &);
-  virtual void processLogCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processRegisterEventDataCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processCreateEventDataCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processListenForEventCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processBroadcastEventCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processCreateEntityCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processDestroyEntityCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processIsValidEntityCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processRegisterComponentCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processCreateComponentCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processDestroyComponentCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processHasComponentCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processGetComponentCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void processApplyComponentChangesCallback(
-      std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processRegisterQueryCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processAddFilterToQueryCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void processGetEntitiesFromQueryCallback(
-      std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processGetBlockCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processGetBlocksCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processExecuteCommandCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processRegisterSystemCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void processInfoCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processWarningCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
-  virtual void
-  processErrorCallback(std::vector<ScriptApi::ScriptObjectHandle> const &, ScriptApi::ScriptObjectHandle &);
   virtual bool helpDefineActor(struct ActorUniqueID const &, ScriptApi::ScriptObjectHandle &);
   virtual bool helpDefineActor(class Actor const &, ScriptApi::ScriptObjectHandle &);
   virtual bool helpGetActor(class ScriptObjectBinder const &, class Actor **);

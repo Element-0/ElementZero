@@ -7,7 +7,7 @@
 namespace ScriptApi {
 class ScriptObjectHandle {
 public:
-  JsValueRef ref;
+  JsValueRef ref{};
 
   ScriptObjectHandle() {}
   ScriptObjectHandle(JsValueRef ref) : ref(ref) {
