@@ -41,8 +41,8 @@ static JsValueRef DumpCommandOrigin(CommandOrigin const &orig) {
   if (auto entity = orig.getEntity(); entity) {
     if (auto player = db.Find((Player *) entity); player) { obj["player"] = *player; }
   }
-  obj["name"]         = orig.getName();
-  obj["dimension"]    = orig.getDimension()->DimensionId.value;
+  obj["name"] = orig.getName();
+  if (auto dim = orig.getDimension(); dim) obj["dimension"] = dim->DimensionId.value;
   obj["permission"]   = (int) orig.getPermissionsLevel();
   obj["worldBuilder"] = orig.isWorldBuilder();
   obj["blockpos"]     = VecToJs(orig.getBlockPosition());
@@ -89,16 +89,16 @@ struct SlashCommand : Command {
   static void setup(CommandRegistry *registry) {
     using namespace commands;
     registry->registerCommand(
-        "/", "commands.slash.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
-    registry->registerAlias("/", "slash");
-    registry->registerOverload<SlashCommand>("/", mandatory(&SlashCommand::content, "content"));
+        "!", "commands.slash.description", CommandPermissionLevel::Any, CommandFlagCheat, CommandFlagNone);
+    registry->registerAlias("!", "slash");
+    registry->registerOverload<SlashCommand>("!", optional(&SlashCommand::content, "content"));
   }
 };
 
 TClasslessInstanceHook(
     void *, "?parse@Parser@CommandRegistry@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
     std::string &input) {
-  if (input._Starts_with("//")) { input.replace(0, 2, "/slash "); }
+  if (input._Starts_with("/!")) { input.replace(0, 2, "/slash "); }
   return original(this, input);
 }
 

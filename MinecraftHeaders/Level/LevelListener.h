@@ -29,7 +29,7 @@ public:
   virtual void
   addTerrainSlideEffect(class BlockPos const &, class Block const &, class Vec3 const &, float, float, float);
   virtual void
-  addBreakingItemParticleEffect(class Vec3 const &, enum ParticleType, class TextureUVCoordinateSet const &, bool);
+  addBreakingItemParticleEffect(class Vec3 const &, enum ParticleType, struct TextureUVCoordinateSet const &, bool);
   virtual void playMusic(std::string const &, class Vec3 const &, float, float);
   virtual void playStreamingMusic(std::string const &, int, int, int);
   virtual void onEntityAdded(Actor &);

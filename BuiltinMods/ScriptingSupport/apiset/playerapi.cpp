@@ -22,7 +22,7 @@ JsValueRef PlayerBinding::GetVanillaObject() const {
 }
 
 JsValueRef PlayerBinding::InitProto() {
-  static ValueHolder proto = IIFE([] {
+  static LeakedHolder proto = IIFE([] {
     JsObjectWrapper PlayerProto;
     PlayerProto["xuid"]       = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetXUID};
     PlayerProto["uuid"]       = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetUUID};
@@ -39,7 +39,7 @@ JsValueRef PlayerBinding::InitProto() {
 }
 
 JsValueRef OfflinePlayerBinding::InitProto() {
-  static ValueHolder proto = IIFE([] {
+  static LeakedHolder proto = IIFE([] {
     JsObjectWrapper OfflinePlayerProto;
     OfflinePlayerProto["xuid"]      = JsObjectWrapper::PropertyDesc{&OfflinePlayerBinding::GetXUID};
     OfflinePlayerProto["uuid"]      = JsObjectWrapper::PropertyDesc{&OfflinePlayerBinding::GetUUID};
