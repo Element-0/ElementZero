@@ -50,6 +50,34 @@ struct ScriptAuxData : Mod::AuxHolder {
   }
 };
 
+struct EntityBinding {
+  ActorUniqueID id;
+
+  inline EntityBinding() = default;
+  inline EntityBinding(ActorUniqueID id) : id(id) {}
+
+  SCRIPTAPI Actor *TryFetch() const;
+  SCRIPTAPI Actor &Fetch() const;
+
+  inline std::string GetNameTag() const { return Fetch().getNameTag(); }
+  inline void SetNameTag(std::string tag) { return Fetch().setNameTag(tag); }
+  inline std::string GetEntityName() const { return Fetch().getEntityName(); }
+  inline Vec3 GetPos() const { return Fetch().getPos(); }
+  inline void SetPos(Vec3 pos) { Fetch().move(pos); }
+  inline void Kill() { return Fetch().kill(); }
+  inline bool IsValid() const { return !!TryFetch(); }
+  SCRIPTAPI JsValueRef GetVanillaObject() const;
+
+  SCRIPTAPI static JsValueRef InitProto();
+
+  inline static JsObjectWrapper Create(ActorUniqueID id) {
+    return JsObjectWrapper::FromExternalObject(new EntityBinding(id), InitProto());
+  }
+};
+
+inline JsValueRef ToJs(ActorUniqueID id) { return *EntityBinding::Create(id); }
+template <> struct HasToJs<ActorUniqueID> : std::true_type {};
+
 struct PlayerBinding {
   Mod::PlayerEntry entry;
 

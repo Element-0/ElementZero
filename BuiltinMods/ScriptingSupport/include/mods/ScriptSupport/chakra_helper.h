@@ -13,6 +13,9 @@
 
 #include <ChakraCore.h>
 
+#include <Math/Vec3.h>
+#include <Math/BlockPos.h>
+
 #include <modutils.h>
 #include <type_traits>
 
@@ -115,6 +118,17 @@ inline JsValueRef ToJs(JsNativeFunction fn) {
   return ref;
 }
 
+template <typename T> static JsValueRef VecToJs(T const &vec) {
+  JsObjectWrapper obj;
+  obj["x"] = vec.x;
+  obj["y"] = vec.y;
+  obj["z"] = vec.z;
+  return obj.ref;
+}
+
+inline JsValueRef ToJs(Vec3 vec) { return VecToJs(vec); }
+inline JsValueRef ToJs(BlockPos vec) { return VecToJs(vec); }
+
 template <typename T> inline JsValueRef ToJs(std::optional<T> opt) {
   if (opt) return ToJs(*opt);
   return GetUndefined();
@@ -211,6 +225,18 @@ template <> inline double FromJs(JsValueRef ref) {
   ThrowError(JsNumberToDouble(ref, &val));
   return val;
 }
+
+template <typename T> static T VecFromJs(JsValueRef ref) {
+  JsObjectWrapper obj{ref};
+  T vec;
+  vec.x = obj["x"].get<decltype(vec.x)>();
+  vec.y = obj["y"].get<decltype(vec.y)>();
+  vec.z = obj["z"].get<decltype(vec.z)>();
+  return vec;
+}
+
+template <> inline Vec3 FromJs(JsValueRef ref) { return VecFromJs<Vec3>(ref); }
+template <> inline BlockPos FromJs(JsValueRef ref) { return VecFromJs<BlockPos>(ref); }
 
 inline JsValueType GetJsType(JsValueRef ref) {
   JsValueType out;

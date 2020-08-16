@@ -26,14 +26,6 @@ static CommandOutputParameter ToCommandOutputParameter(JsValueRef val) {
   }
 }
 
-template <typename T> static JsValueRef VecToJs(T const &vec) {
-  JsObjectWrapper obj;
-  obj["x"] = vec.x;
-  obj["y"] = vec.y;
-  obj["z"] = vec.z;
-  return obj.ref;
-}
-
 static JsValueRef DumpCommandOrigin(CommandOrigin const &orig) {
   auto &db = Mod::PlayerDatabase::GetInstance();
   JsObjectWrapper obj;
