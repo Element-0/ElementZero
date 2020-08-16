@@ -21,6 +21,8 @@ JsValueRef PlayerBinding::GetVanillaObject() const {
   return handle.ref;
 }
 
+JsValueRef PlayerBinding::GetEntity() const { return ToJs(entry.player->getUniqueID()); }
+
 JsValueRef PlayerBinding::InitProto() {
   static LeakedHolder proto = IIFE([] {
     JsObjectWrapper PlayerProto;
@@ -31,6 +33,7 @@ JsValueRef PlayerBinding::InitProto() {
     PlayerProto["alive"]      = JsObjectWrapper::PropertyDesc{&PlayerBinding::alive};
     PlayerProto["aux"]        = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetAuxData};
     PlayerProto["vanilla"]    = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetVanillaObject};
+    PlayerProto["entity"]     = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetEntity};
     PlayerProto["getOffline"] = &PlayerBinding::ToOffline;
     PlayerProto["toString"]   = &PlayerBinding::ToString;
     return PlayerProto.ref;

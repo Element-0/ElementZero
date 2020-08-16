@@ -93,6 +93,7 @@ struct PlayerBinding {
     return *Mod::PlayerDatabase::GetInstance().GetAuxAuto<ScriptAuxData>(entry.player).holder;
   }
   SCRIPTAPI JsValueRef GetVanillaObject() const;
+  SCRIPTAPI JsValueRef GetEntity() const;
 
   inline Mod::OfflinePlayerEntry ToOffline() { return Mod::OfflinePlayerEntry{entry.name, entry.xuid, entry.uuid}; }
   inline bool alive() const { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid).has_value(); }
