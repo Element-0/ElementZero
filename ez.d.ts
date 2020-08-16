@@ -1,3 +1,15 @@
+declare interface Long {
+  "64bit_low": number,
+  "64bit_high": number,
+}
+
+declare interface VanillaEntity {
+  __type__: "entity";
+  id: number;
+  __unique_id__: Long;
+  __identifier__: string;
+}
+
 declare interface PlayerEntry {
   readonly xuid: string;
   readonly uuid: string;
@@ -8,6 +20,8 @@ declare interface PlayerEntry {
   readonly alive: boolean;
   /** A object shared between all instances */
   readonly aux: object;
+  /** Get vanilla entity object */
+  readonly vanilla: VanillaEntity;
   /** Get offline player entry */
   getOffline(): OfflinePlayerEntry;
   toString(): string;
@@ -26,6 +40,7 @@ declare module "ez:player" {
   export function getPlayerByXUID(xuid: string): PlayerEntry;
   export function getPlayerByUUID(uuid: string): PlayerEntry;
   export function getPlayerByNAME(name: string): PlayerEntry;
+  export function getPlayerFromVanilla(vanilla: VanillaEntity): PlayerEntry;
 
   export function getOfflinePlayerByXUID(xuid: string): OfflinePlayerEntry;
   export function getOfflinePlayerByUUID(uuid: string): OfflinePlayerEntry;
@@ -70,6 +85,23 @@ declare module "ez:chat" {
   export function sendBroadcast(sender: string, content: string): void;
 }
 
+declare interface ScriptPosition {
+  x: number;
+  y: number;
+  z: number;
+}
+
+declare interface CommandOrigin {
+  type: number;
+  player?: PlayerEntry;
+  name: string;
+  dimension: number;
+  permission: number;
+  worldBuilder: number;
+  blockpos: ScriptPosition;
+  worldpos: ScriptPosition;
+}
+
 declare module "ez:command" {
   /**
    * Execute server command
@@ -83,7 +115,7 @@ declare module "ez:command" {
    * Set command handler for special `//` command
    * @param handler handler function
    */
-  export function setSlashCommandHandler(handler: (input: string) => string): void;
+  export function setSlashCommandHandler(handler: (this: CommandOrigin, input: string) => string): void;
 }
 
 declare interface ItemStack {

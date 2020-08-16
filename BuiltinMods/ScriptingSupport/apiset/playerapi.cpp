@@ -139,6 +139,7 @@ static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string
     export const getPlayerByXUID = import.meta.native.getPlayerByXUID;
     export const getPlayerByUUID = import.meta.native.getPlayerByUUID;
     export const getPlayerByNAME = import.meta.native.getPlayerByNAME;
+    export const getPlayerFromVanilla = import.meta.native.getPlayerFromVanilla;
 
     export const getOfflinePlayerByXUID = import.meta.native.getOfflinePlayerByXUID;
     export const getOfflinePlayerByUUID = import.meta.native.getOfflinePlayerByUUID;

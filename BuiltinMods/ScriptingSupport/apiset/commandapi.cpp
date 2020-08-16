@@ -43,7 +43,7 @@ static JsValueRef DumpCommandOrigin(CommandOrigin const &orig) {
   }
   obj["name"]         = orig.getName();
   obj["dimension"]    = orig.getDimension()->DimensionId.value;
-  obj["permissiono"]  = (int) orig.getPermissionsLevel();
+  obj["permission"]   = (int) orig.getPermissionsLevel();
   obj["worldBuilder"] = orig.isWorldBuilder();
   obj["blockpos"]     = VecToJs(orig.getBlockPosition());
   obj["worldpos"]     = VecToJs(orig.getWorldPosition());
