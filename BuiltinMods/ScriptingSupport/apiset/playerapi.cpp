@@ -3,6 +3,10 @@
 #include <Core/mce.h>
 #include <boost/lexical_cast.hpp>
 
+#include <Script/ScriptObjectHandle.h>
+#include <Script/ScriptObjectBinder.h>
+#include <Script/MinecraftServerScriptEngine.h>
+
 #include <modutils.h>
 
 #include <base/log.h>
@@ -10,6 +14,12 @@
 #include <mods/ScriptSupport/scriptapi.h>
 
 using namespace Mod::Scripting;
+
+JsValueRef PlayerBinding::GetVanillaObject() const {
+  ScriptApi::ScriptObjectHandle handle;
+  LocateService<MinecraftServerScriptEngine>()->helpDefineActor(*entry.player, handle);
+  return handle.ref;
+}
 
 JsValueRef PlayerBinding::InitProto() {
   static ValueHolder proto = IIFE([] {
@@ -20,6 +30,7 @@ JsValueRef PlayerBinding::InitProto() {
     PlayerProto["address"]    = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetADDRESS};
     PlayerProto["alive"]      = JsObjectWrapper::PropertyDesc{&PlayerBinding::alive};
     PlayerProto["aux"]        = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetAuxData};
+    PlayerProto["vanilla"]    = JsObjectWrapper::PropertyDesc{&PlayerBinding::GetVanillaObject};
     PlayerProto["getOffline"] = &PlayerBinding::ToOffline;
     PlayerProto["toString"]   = &PlayerBinding::ToString;
     return PlayerProto.ref;
@@ -56,6 +67,18 @@ static ModuleRegister reg("ez:player", [](JsObjectWrapper native) -> std::string
   native["getPlayerByNAME"] = +[](std::string const &name) {
     auto &db = Mod::PlayerDatabase::GetInstance();
     if (auto it = db.Find(name); it) return ToJs(*it);
+    return GetUndefined();
+  };
+  native["getPlayerFromVanilla"] = +[](std::string const &name) {
+    auto &engine = *LocateService<MinecraftServerScriptEngine>();
+    ScriptApi::ScriptObjectHandle obj;
+    auto binder = ScriptObjectBinder::extract(engine, obj);
+    if (!binder) return GetUndefined();
+    Actor *ret{};
+    engine.helpGetActor(*binder, &ret);
+    if (!ret) return GetUndefined();
+    auto &db = Mod::PlayerDatabase::GetInstance();
+    if (auto it = db.Find((Player *) ret); it) return ToJs(*it);
     return GetUndefined();
   };
 

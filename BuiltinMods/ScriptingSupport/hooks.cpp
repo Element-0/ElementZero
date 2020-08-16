@@ -1,4 +1,4 @@
-#include <Script/ScriptEngine.h>
+#include <Script/MinecraftServerScriptEngine.h>
 
 #include <hook.h>
 
@@ -11,11 +11,11 @@ DEF_LOGGER("Scripting");
 
 THook(bool, "?isScriptingEnabled@ScriptEngine@@SA_NXZ") { return true; }
 
-static ScriptEngine *engine;
+static MinecraftServerScriptEngine *engine;
 
-template <> ScriptEngine *LocateService<ScriptEngine>() { return engine; }
+template <> MinecraftServerScriptEngine *LocateService<MinecraftServerScriptEngine>() { return engine; }
 
-TInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ", ScriptEngine) {
+TInstanceHook(void, "?initialize@ScriptEngine@@UEAA_NXZ", MinecraftServerScriptEngine) {
   DEF_LOGGER("ScriptEngine");
   LOGV("initialize");
   original(this);

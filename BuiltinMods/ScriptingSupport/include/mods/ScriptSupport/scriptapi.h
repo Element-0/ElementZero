@@ -21,9 +21,9 @@
 #  define SCRIPTAPI __declspec(dllimport)
 #endif
 
-class ScriptEngine;
+class MinecraftServerScriptEngine;
 
-template <> SCRIPTAPI ScriptEngine *LocateService<ScriptEngine>();
+template <> SCRIPTAPI MinecraftServerScriptEngine *LocateService<MinecraftServerScriptEngine>();
 
 namespace Mod::Scripting {
 
@@ -64,6 +64,7 @@ struct PlayerBinding {
   inline JsValueRef GetAuxData() const {
     return *Mod::PlayerDatabase::GetInstance().GetAuxAuto<ScriptAuxData>(entry.player).holder;
   }
+  SCRIPTAPI JsValueRef GetVanillaObject() const;
 
   inline Mod::OfflinePlayerEntry ToOffline() { return Mod::OfflinePlayerEntry{entry.name, entry.xuid, entry.uuid}; }
   inline bool alive() const { return Mod::PlayerDatabase::GetInstance().Find(entry.xuid).has_value(); }
