@@ -10,6 +10,15 @@ declare interface VanillaEntity {
   __identifier__: string;
 }
 
+declare interface Entity {
+  readonly entityName: string;
+  nameTag: string;
+  pos: ScriptPosition;
+  readonly valid: boolean;
+  readonly vanilla: VanillaEntity;
+  kill(): void;
+}
+
 declare interface PlayerEntry {
   readonly xuid: string;
   readonly uuid: string;
@@ -22,6 +31,7 @@ declare interface PlayerEntry {
   readonly aux: object;
   /** Get vanilla entity object */
   readonly vanilla: VanillaEntity;
+  readonly entity: Entity;
   /** Get offline player entry */
   getOffline(): OfflinePlayerEntry;
   toString(): string;
@@ -36,15 +46,19 @@ declare interface OfflinePlayerEntry {
   toString(): string;
 }
 
-declare module "ez:player" {
-  export function getPlayerByXUID(xuid: string): PlayerEntry;
-  export function getPlayerByUUID(uuid: string): PlayerEntry;
-  export function getPlayerByNAME(name: string): PlayerEntry;
-  export function getPlayerFromVanilla(vanilla: VanillaEntity): PlayerEntry;
+declare module "ez:entity" {
+  export function fromVanilla(vanilla: VanillaEntity): PlayerEntry | null;
+}
 
-  export function getOfflinePlayerByXUID(xuid: string): OfflinePlayerEntry;
-  export function getOfflinePlayerByUUID(uuid: string): OfflinePlayerEntry;
-  export function getOfflinePlayerByNAME(name: string): OfflinePlayerEntry;
+declare module "ez:player" {
+  export function getPlayerByXUID(xuid: string): PlayerEntry | null;
+  export function getPlayerByUUID(uuid: string): PlayerEntry | null;
+  export function getPlayerByNAME(name: string): PlayerEntry | null;
+  export function getPlayerFromVanilla(vanilla: VanillaEntity): PlayerEntry | null;
+
+  export function getOfflinePlayerByXUID(xuid: string): OfflinePlayerEntry | null;
+  export function getOfflinePlayerByUUID(uuid: string): OfflinePlayerEntry | null;
+  export function getOfflinePlayerByNAME(name: string): OfflinePlayerEntry | null;
 
   export function getPlayerList(): PlayerEntry[];
 
