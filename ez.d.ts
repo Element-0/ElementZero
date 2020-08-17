@@ -333,6 +333,16 @@ declare module "ez:network-stats" {
   };
 }
 
+declare module "ez:formui" {
+  /**
+   * Send form to player
+   * @param player target player
+   * @param request form content
+   * @param resp callback
+   */
+  export function send(player: PlayerEntry, request: object, resp: (fn: object) => void): void;
+}
+
 /// Encode text in utf-8
 declare interface TextEncoder {
   new();
@@ -352,4 +362,9 @@ declare interface HttpResponse {
   data: ArrayBuffer;
 }
 
-declare function HttpRequest(method: "GET" | "POST" | "HEAD" | "PUT" | "PATCH" | "DELETE", url: string, init: { headers: Record<string, string>, body: ArrayBuffer }): Promise<HttpResponse>;
+declare function HttpRequest(
+  method: "GET" | "POST" | "HEAD" | "PUT" | "PATCH" | "DELETE",
+  url: string,
+  init: { headers: Record<string, string>, body: ArrayBuffer }
+): Promise<HttpResponse>;
+
