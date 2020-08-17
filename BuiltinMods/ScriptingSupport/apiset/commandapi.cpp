@@ -27,11 +27,17 @@ static CommandOutputParameter ToCommandOutputParameter(JsValueRef val) {
 }
 
 static JsValueRef DumpCommandOrigin(CommandOrigin const &orig) {
+  DEF_LOGGER("dump");
   auto &db = Mod::PlayerDatabase::GetInstance();
   JsObjectWrapper obj;
   obj["type"] = (int) orig.getOriginType();
   if (auto entity = orig.getEntity(); entity) {
-    if (auto player = db.Find((Player *) entity); player) { obj["player"] = *player; }
+    LOGV("entity: %p") % entity;
+    obj["entity"] = entity->getUniqueID();
+    if (auto player = db.Find((Player *) entity); player) {
+      LOGV("got player");
+      obj["player"] = *player;
+    }
   }
   obj["name"] = orig.getName();
   if (auto dim = orig.getDimension(); dim) obj["dimension"] = dim->DimensionId.value;
@@ -65,6 +71,29 @@ static void WriteToCommandOutput(CommandOutput &outp, JsValueRef data) {
   default: outp.success(JsToString(data)); return;
   }
 }
+static void WriteToCommandError(CommandOutput &outp, JsValueRef data) {
+  switch (GetJsType(data)) {
+  case JsUndefined:
+  case JsNull: outp.error("unknown error"); return;
+  case JsArray: {
+    JsObjectWrapper arr{data};
+    auto len = arr["length"].get<int>();
+    switch (len) {
+    case 0: outp.error("unknown error"); return;
+    case 1: outp.error(JsToString(*arr[0])); return;
+    default: {
+      std::vector<CommandOutputParameter> params;
+      for (int i = 1; i < len; i++) { params.emplace_back(ToCommandOutputParameter(*arr[i])); }
+      outp.error(JsToString(*arr[0]), std::move(params));
+      return;
+    }
+    }
+    return;
+  }
+  case JsString: outp.error(FromJs<std::string>(data)); return;
+  default: outp.error(JsToString(data)); return;
+  }
+}
 
 static CommandRegistry *mCommandRegistry;
 
@@ -81,7 +110,9 @@ struct SlashCommand : Command {
       JsValueRef ret;
       ThrowError(JsCallFunction(*holder, arr, 2, &ret));
       WriteToCommandOutput(outp, ret);
-    } catch (std::exception const &ex) { outp.error(ex.what()); }
+    } catch (std::exception const &ex) { outp.error(ex.what()); } catch (Exception ref) {
+      WriteToCommandError(outp, ref.raw);
+    }
   }
 
   static void setup(CommandRegistry *registry) {
@@ -203,7 +234,9 @@ struct CustomCommand : Command {
     try {
       auto ret = holder->callFunction((char *) this + sizeof(CustomCommand), DumpCommandOrigin(orig));
       WriteToCommandOutput(outp, ret);
-    } catch (std::exception const &ex) { outp.error(ex.what()); }
+    } catch (std::exception const &ex) { outp.error(ex.what()); } catch (Exception ref) {
+      WriteToCommandError(outp, ref.raw);
+    }
   }
 };
 

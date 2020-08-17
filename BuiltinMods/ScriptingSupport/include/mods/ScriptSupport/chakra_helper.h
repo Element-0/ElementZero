@@ -19,18 +19,67 @@
 #include <modutils.h>
 #include <type_traits>
 
-#define ThrowError(fnret)                                                                                              \
-  if (JsErrorCode ec = fnret; ec != JsNoError) throw ec;
 #define ReturnError(fnret)                                                                                             \
   if (JsErrorCode ec = fnret; ec != JsNoError) return ec;
 
 namespace Mod::Scripting {
 
+void ThrowError(JsErrorCode ec);
+
+class Exception {
+  static JsPropertyIdRef GetProperty(wchar_t const *name) {
+    JsPropertyIdRef ret{};
+    JsGetPropertyIdFromName(name, &ret);
+    return ret;
+  }
+
+  static std::string GetString(JsValueRef ref) {
+    wchar_t const *buffer;
+    size_t length;
+    JsStringToPointer(ref, &buffer, &length);
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+    return myconv.to_bytes(buffer, buffer + length);
+  }
+
+  friend void ThrowError(JsErrorCode ec);
+
+  Exception() {
+    JsGetAndClearExceptionWithMetadata(&meta);
+    static auto _exception = GetProperty(L"exception");
+    static auto _url       = GetProperty(L"url");
+    static auto _line      = GetProperty(L"line");
+    static auto _column    = GetProperty(L"column");
+    JsValueRef ref_url, ref_line, ref_column;
+    JsGetProperty(meta, _exception, &raw);
+    JsGetProperty(meta, _url, &ref_url);
+    JsGetProperty(meta, _line, &ref_line);
+    JsGetProperty(meta, _column, &ref_column);
+    url = GetString(ref_url);
+    JsNumberToInt(ref_line, &line);
+    JsNumberToInt(ref_column, &column);
+  }
+
+public:
+  JsValueRef meta, raw;
+  std::string url;
+  int line, column;
+};
+
+inline void ThrowError(JsErrorCode ec) {
+  switch (ec) {
+  case JsNoError: return;
+  case JsErrorScriptException: {
+    throw Exception{};
+  }
+  default: throw std::runtime_error{"js error: " + std::to_string(ec)};
+  }
+}
+
 inline JsValueRef operator""_js(char const *str, size_t length) {
   JsValueRef ref;
   ThrowError(JsCreateString(str, length, &ref));
   return ref;
-} // namespace Mod::ScriptinginlineJsValueRefoperator""_js(charconst*str,size_tlength)
+}
 
 inline JsValueRef operator""_js(const wchar_t *str, size_t length) {
   JsValueRef ref;
@@ -329,8 +378,8 @@ struct JsConvertible {
           FnType &rfn = *(FnType *) state;
           try {
             return rfn(callee, {arguments, argumentCount, info});
-          } catch (JsValueRef ref) {
-            JsSetException(ref);
+          } catch (Exception const &ex) {
+            JsSetException(ex.raw);
             return GetUndefined();
           } catch (std::exception const &ex) {
             JsSetException(JsWrapError(JsCreateError, ex.what()));
@@ -360,8 +409,8 @@ struct JsConvertible {
             } else {
               return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
             }
-          } catch (JsValueRef ref) {
-            JsSetException(ref);
+          } catch (Exception const &ex) {
+            JsSetException(ex.raw);
             return GetUndefined();
           } catch (std::exception const &ex) {
             JsSetException(JsWrapError(JsCreateError, ex.what()));
@@ -401,8 +450,8 @@ struct JsConvertible {
             } else {
               return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
             }
-          } catch (JsValueRef ref) {
-            JsSetException(ref);
+          } catch (Exception const &ex) {
+            JsSetException(ex.raw);
             return GetUndefined();
           } catch (std::exception const &ex) {
             JsSetException(JsWrapError(JsCreateError, ex.what()));
@@ -441,8 +490,8 @@ struct JsConvertible {
             } else {
               return ToJs(lfn(std::make_index_sequence<sizeof...(PS)>{}));
             }
-          } catch (JsValueRef ref) {
-            JsSetException(ref);
+          } catch (Exception const &ex) {
+            JsSetException(ex.raw);
             return GetUndefined();
           } catch (std::exception const &ex) {
             JsSetException(JsWrapError(JsCreateError, ex.what()));
