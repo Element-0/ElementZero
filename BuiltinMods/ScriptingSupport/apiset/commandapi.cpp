@@ -27,15 +27,12 @@ static CommandOutputParameter ToCommandOutputParameter(JsValueRef val) {
 }
 
 static JsValueRef DumpCommandOrigin(CommandOrigin const &orig) {
-  DEF_LOGGER("dump");
   auto &db = Mod::PlayerDatabase::GetInstance();
   JsObjectWrapper obj;
   obj["type"] = (int) orig.getOriginType();
   if (auto entity = orig.getEntity(); entity) {
-    LOGV("entity: %p") % entity;
     obj["entity"] = entity->getUniqueID();
     if (auto player = db.Find((Player *) entity); player) {
-      LOGV("got player");
       obj["player"] = *player;
     }
   }
