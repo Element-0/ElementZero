@@ -28,17 +28,12 @@ void ChatHandler(
   }
 }
 
-static void updateNametag(Player *player, std::string const &tag) {
-  auto &data = player->getEntityData();
-  data.set<std::string>(ActorDataIDs::NAMETAG, tag);
-}
-
 enum class Action { Set, Clear };
 
 class SetCustomNameCommand : public Command {
 public:
   Action _sig;
-  enum class Key { Prefix, Postfix, Nametag } key;
+  enum class Key { Prefix, Postfix } key;
   CommandSelector<Player> selector;
   std::string str = "";
   SetCustomNameCommand() { selector.setIncludeDeadPlayers(true); }
@@ -73,8 +68,6 @@ public:
           stmt.exec();
           count++;
 
-          if (key == Key::Nametag) updateNametag(player, str);
-
         } catch (SQLite::Exception const &ex) {
           output.error(ex.getErrorStr());
           return;
@@ -89,7 +82,7 @@ public:
     using namespace commands;
     commands::addEnum<Action>(registry, "custom-name-set", {{"set", Action::Set}});
     commands::addEnum<Key>(
-        registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}, {"nametag", Key::Nametag}});
+        registry, "custom-name-key", {{"prefix", Key::Prefix}, {"postfix", Key::Postfix}});
     registry->registerOverload<SetCustomNameCommand>(
         "custom-name", mandatory<CommandParameterDataType::ENUM>(&SetCustomNameCommand::_sig, "set", "custom-name-set"),
         mandatory<CommandParameterDataType::ENUM>(&SetCustomNameCommand::key, "key", "custom-name-key"),
@@ -131,19 +124,6 @@ public:
   }
 };
 
-static void onPlayerInitialized(Mod::PlayerEntry const &entry) {
-  static SQLite::Statement stmt{*database, "SELECT nametag FROM custom_name WHERE uuid = ?"};
-  BOOST_SCOPE_EXIT_ALL() {
-    stmt.reset();
-    stmt.clearBindings();
-  };
-  stmt.bindNoCopy(1, entry.uuid, sizeof entry.uuid);
-  if (stmt.executeStep()) {
-    std::string nametag = stmt.getColumn("nametag");
-    if (nametag.size()) updateNametag(entry.player, nametag);
-  }
-}
-
 void registerCustomName(CommandRegistry *registry) {
   registry->registerCommand(
       "custom-name", "commands.custom-name.description", CommandPermissionLevel::GameMasters, CommandFlagCheat,
@@ -151,5 +131,4 @@ void registerCustomName(CommandRegistry *registry) {
   SetCustomNameCommand::setup(registry);
   ClearCustomNameCommand::setup(registry);
   Mod::Chat::GetInstance().AddListener(SIG("chat"), {Mod::RecursiveEventHandlerAdaptor(ChatHandler)});
-  Mod::PlayerDatabase::GetInstance().AddListener(SIG("initialized"), onPlayerInitialized);
 }
