@@ -29,8 +29,8 @@ public:
     FactoryFn factory;                        // 8
     std::vector<CommandParameterData> params; // 16
     char unk;                                 // 40
-    inline Overload(CommandVersion version, FactoryFn factory, std::initializer_list<CommandParameterData> args)
-        : version(version), factory(factory), params(args), unk(0xFF) {}
+    inline Overload(CommandVersion version, FactoryFn factory, std::vector<CommandParameterData> &&args)
+        : version(version), factory(factory), params(std::move(args)), unk(0xFF) {}
   };
   struct Signature {
     std::string name;                                 // 0
@@ -130,9 +130,9 @@ public:
 
   template <typename T> inline static std::unique_ptr<Command> allocateCommand() { return std::make_unique<T>(); }
   inline void registerOverload(
-      std::string const &name, Overload::FactoryFn factory, std::initializer_list<CommandParameterData> args) {
+      std::string const &name, Overload::FactoryFn factory, std::vector<CommandParameterData> &&args) {
     Signature *signature = const_cast<Signature *>(findCommand(name));
-    auto &overload       = signature->overloads.emplace_back(CommandVersion{}, factory, args);
+    auto &overload       = signature->overloads.emplace_back(CommandVersion{}, factory, std::move(args));
     registerOverloadInternal(*signature, overload);
   }
   template <typename T, typename... Params> inline void registerOverload(std::string const &name, Params... params) {
