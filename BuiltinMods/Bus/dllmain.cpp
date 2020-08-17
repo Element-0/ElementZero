@@ -21,27 +21,22 @@ struct MiniBusConnectionInfo : ConnectionInfo {
       LOGV("try connecting");
       ip::tcp::socket ret{service};
       ret.connect(ip::tcp::endpoint{ip::address::from_string(settings.host), settings.port});
+      LOGV("connected, handshaking");
       return {std::move(ret)};
     } catch (...) { return std::nullopt; }
   }
   void connected(MiniBusClient *) override {
     LOGV("connected, load extensions");
-    {
-      auto temp = std::move(RegisterAPI::GetPreloadList());
-      for (auto [name, fn] : temp) {
-        LOGV("Load extension for %s") % name;
-        fn();
-      }
+    for (auto [name, fn] : RegisterAPI::GetPreloadList()) {
+      LOGV("Load extension for %s") % name;
+      fn();
     }
-    {
-      auto temp = std::move(RegisterAPI::GetMap());
-      for (auto [name, fn] : temp) {
-        if (GetLoadedMod(name.data())) {
-          LOGV("Load builtin extension for %s") % name;
-          fn();
-        } else {
-          LOGV("Skip builtin extension for %s: Target mod not enabled") % name;
-        }
+    for (auto [name, fn] : RegisterAPI::GetMap()) {
+      if (GetLoadedMod(name.data())) {
+        LOGV("Load builtin extension for %s") % name;
+        fn();
+      } else {
+        LOGV("Skip builtin extension for %s: Target mod not enabled") % name;
       }
     }
     client->set("registry", settings.name, "");
