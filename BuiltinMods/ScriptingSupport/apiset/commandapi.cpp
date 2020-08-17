@@ -303,6 +303,8 @@ static ModuleRegister reg("ez:command", [](JsObjectWrapper native) -> std::strin
     mCommandRegistry->registerCommand(
         name, desc.c_str(), (CommandPermissionLevel) permission, CommandFlagCheat, CommandFlagNone);
   };
+  native["registerAlias"] =
+      +[](std::string const &name, std::string const &altname) { mCommandRegistry->registerAlias(name, altname); };
   native["registerOverride"] = +[](std::string const &name, JsValueRef arr, JsValueRef func) {
     auto holder = GenCommandDataHolder(arr, func);
     mCommandRegistry->registerOverload(
@@ -311,6 +313,7 @@ static ModuleRegister reg("ez:command", [](JsObjectWrapper native) -> std::strin
   return R"js(
     export const executeCommand = import.meta.native.executeCommand;
     export const setSlashCommandHandler = import.meta.native.setSlashCommandHandler;
+    export const registerAlias = import.meta.native.registerAlias;
     export const registerCommand = import.meta.native.registerCommand;
     export const registerOverride = import.meta.native.registerOverride;
   )js";
