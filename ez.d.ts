@@ -107,6 +107,7 @@ declare interface ScriptPosition {
 
 declare interface CommandOrigin {
   type: number;
+  entity: Entity;
   player?: PlayerEntry;
   name: string;
   dimension: number;
@@ -115,6 +116,35 @@ declare interface CommandOrigin {
   blockpos: ScriptPosition;
   worldpos: ScriptPosition;
 }
+
+type CommandParameterTypeName = |
+  "bool" |
+  "int" |
+  "float" |
+  "string" |
+  "json";
+
+type CommandParameterTypeMap<Name extends CommandParameterTypeName> =
+  Name extends "bool" ? boolean :
+  Name extends "int" ? number :
+  Name extends "float" ? number :
+  Name extends "string" ? string :
+  Name extends "json" ? Record<string, any> :
+  never;
+
+declare interface CommandParameterDefinition {
+  name: string;
+  type: CommandParameterTypeName;
+  optional: boolean;
+}
+
+type CommandParameterMap<Defs extends CommandParameterDefinition[]> = {
+  [key in keyof Defs]: Defs[key] extends CommandParameterDefinition
+  ? CommandParameterTypeMap<Defs[key]["type"]>
+  : never;
+};
+
+type CommandHandlerResult = string | string[] | undefined;
 
 declare module "ez:command" {
   /**
@@ -130,6 +160,33 @@ declare module "ez:command" {
    * @param handler handler function
    */
   export function setSlashCommandHandler(handler: (this: CommandOrigin, input: string) => string): void;
+
+  /**
+   * Register custom command
+   * @param name command name
+   * @param desc command description
+   * @param permission permission level 0 = everyone 1 = op/commandblock 2 = op 4 = console
+   */
+  export function registerCommand(name: string, desc: string, permission: 0 | 1 | 2 | 3 | 4 | 5 | 6): void;
+
+  /**
+   * Register custom alias for command (max aliases per command: 1)
+   * @param name original command name
+   * @param altname new command name
+   */
+  export function registerAlias(name: string, altname: string): void
+
+  /**
+   * Register custom command handler
+   * @param name command name
+   * @param defs command parameter definitions
+   * @param handler command handler
+   */
+  export function registerOverride<Defs extends CommandParameterDefinition[]>(
+    name: string,
+    defs: Defs,
+    handler: (this: CommandOrigin, ...args: CommandParameterMap<Defs>) => CommandHandlerResult
+  ): void;
 }
 
 declare interface ItemStack {
