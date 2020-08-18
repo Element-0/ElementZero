@@ -121,7 +121,7 @@ public:
   template <typename Type, typename IDConverter = CommandRegistry::DefaultIdConverter<Type>>
   unsigned addEnumValues(
       std::string const &name, typeid_t<CommandRegistry> tid,
-      std::initializer_list<std::pair<std::string, Type>> const &values) {
+      std::vector<std::pair<std::string, Type>> const &values) {
     std::vector<std::pair<std::string, uint64_t>> converted;
     IDConverter converter;
     for (auto &value : values) converted.emplace_back(value.first, converter(value.second));

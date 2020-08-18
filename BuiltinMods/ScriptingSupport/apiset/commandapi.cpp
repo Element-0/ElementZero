@@ -32,9 +32,7 @@ static JsValueRef DumpCommandOrigin(CommandOrigin const &orig) {
   obj["type"] = (int) orig.getOriginType();
   if (auto entity = orig.getEntity(); entity) {
     obj["entity"] = entity->getUniqueID();
-    if (auto player = db.Find((Player *) entity); player) {
-      obj["player"] = *player;
-    }
+    if (auto player = db.Find((Player *) entity); player) { obj["player"] = *player; }
   }
   obj["name"] = orig.getName();
   if (auto dim = orig.getDimension(); dim) obj["dimension"] = dim->DimensionId.value;
@@ -174,6 +172,33 @@ template <typename T> struct BaseCommandDataDefinition : CommandDataDefinition {
   }
 };
 
+struct EnumCommandDataDefinition : BaseCommandDataDefinition<int> {
+  inline static std::map<std::string, typeid_t<CommandRegistry>> tidmap;
+
+  std::string enumname;
+  typeid_t<CommandRegistry> id{0};
+
+  EnumCommandDataDefinition(std::string const &name, std::string const &enumname, bool optional)
+      : BaseCommandDataDefinition(name, optional), enumname(enumname) {
+    if (auto it = tidmap.find(enumname); it != tidmap.end())
+      id = it->second;
+    else
+      throw std::runtime_error{"enum not found"};
+  }
+  CommandParameterData generate(size_t offset) override {
+    return {
+        id,
+        &CommandRegistry::fakeparse<int>,
+        name,
+        CommandParameterDataType::NORMAL,
+        enumname.c_str(),
+        (int) offset,
+        optional,
+        optional ? (int) (offset + sizeof(int)) : -1,
+    };
+  }
+};
+
 struct CommandDataHolder {
   JsValueRef func;
   std::vector<std::unique_ptr<CommandDataDefinition>> defs;
@@ -284,6 +309,9 @@ static CommandDataHolder *GenCommandDataHolder(JsValueRef arr, JsValueRef func) 
       holder->add(std::make_unique<BaseCommandDataDefinition<std::string>>(name, opt));
     } else if (type == "json") {
       holder->add(std::make_unique<BaseCommandDataDefinition<Json::Value>>(name, opt));
+    } else if (type == "enum") {
+      auto enumname = arg["enum"].get<std::string>();
+      holder->add(std::make_unique<EnumCommandDataDefinition>(name, enumname, opt));
     } else
       throw std::runtime_error{"unsupported type: " + type};
   }
@@ -307,11 +335,23 @@ static ModuleRegister reg("ez:command", [](JsObjectWrapper native) -> std::strin
     mCommandRegistry->registerOverload(
         name, FuncPack::create(holder), holder->getCommandParameterData(sizeof(CustomCommand)));
   };
+  native["addEnum"] = +[](std::string const &name, Json::Value arr) {
+    if (!arr.isArray()) throw std::runtime_error{"require array as argument"};
+    std::vector<std::pair<std::string, int>> parsed;
+    int i = 0;
+    for (auto &item : arr) {
+      if (!item.isString()) throw std::runtime_error{"require string[]"};
+      parsed.emplace_back(item.asString("unk"), i++);
+    }
+    auto id = commands::addCustomEnum(mCommandRegistry, name.c_str(), parsed);
+    EnumCommandDataDefinition::tidmap.emplace(name, id);
+  };
   return R"js(
     export const executeCommand = import.meta.native.executeCommand;
     export const setSlashCommandHandler = import.meta.native.setSlashCommandHandler;
     export const registerAlias = import.meta.native.registerAlias;
     export const registerCommand = import.meta.native.registerCommand;
     export const registerOverride = import.meta.native.registerOverride;
+    export const addEnum = import.meta.native.addEnum;
   )js";
 });

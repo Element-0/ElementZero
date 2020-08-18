@@ -55,6 +55,7 @@ public:
     static auto value = type_id_count()++;
     return typeid_t<CommandRegistry>{value};
   }
+  static typeid_t<CommandRegistry> GetCustomParameterTypeId() { return typeid_t<CommandRegistry>{type_id_count()++}; }
 };
 
 template <> COMMANDAPI typeid_t<CommandRegistry> CommandSupport::GetParameterTypeId<bool>();
@@ -115,10 +116,16 @@ public:
 namespace commands {
 
 template <typename T>
-char const *
-addEnum(CommandRegistry *registry, char const *name, std::initializer_list<std::pair<std::string, T>> const &values) {
+char const *addEnum(CommandRegistry *registry, char const *name, std::vector<std::pair<std::string, T>> const &values) {
   registry->addEnumValues<T>(name, Mod::CommandSupport::GetParameterTypeId<T>(), values);
   return name;
+}
+
+inline typeid_t<class CommandRegistry>
+addCustomEnum(CommandRegistry *registry, char const *name, std::vector<std::pair<std::string, int>> const &values) {
+  auto id = Mod::CommandSupport::GetCustomParameterTypeId();
+  registry->addEnumValues<int>(name, id, values);
+  return id;
 }
 
 template <typename Command, typename Type> int getOffset(Type Command::*src) {
