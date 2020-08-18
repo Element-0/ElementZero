@@ -117,12 +117,15 @@ declare interface CommandOrigin {
   worldpos: ScriptPosition;
 }
 
-type CommandParameterTypeName = |
-  "bool" |
-  "int" |
-  "float" |
-  "string" |
-  "json";
+type CommandParameterTypeName =
+  | "bool"
+  | "int"
+  | "float"
+  | "string"
+  | "json"
+  | "enum"
+  | "players"
+  | "entities";
 
 type CommandParameterTypeMap<Name extends CommandParameterTypeName> =
   Name extends "bool" ? boolean :
@@ -130,12 +133,16 @@ type CommandParameterTypeMap<Name extends CommandParameterTypeName> =
   Name extends "float" ? number :
   Name extends "string" ? string :
   Name extends "json" ? Record<string, any> :
+  Name extends "enum" ? number :
+  Name extends "entities" ? Entity[] :
+  Name extends "players" ? PlayerEntry[] :
   never;
 
 declare interface CommandParameterDefinition {
   name: string;
   type: CommandParameterTypeName;
   optional: boolean;
+  enum?: string;
 }
 
 type CommandParameterMap<Defs extends CommandParameterDefinition[]> = {
@@ -187,6 +194,13 @@ declare module "ez:command" {
     defs: Defs,
     handler: (this: CommandOrigin, ...args: CommandParameterMap<Defs>) => CommandHandlerResult
   ): void;
+
+  /**
+   * Add command enum
+   * @param name enum name
+   * @param value enum values
+   */
+  export function addEnum(name: string, value: string[]): void
 }
 
 declare interface ItemStack {
