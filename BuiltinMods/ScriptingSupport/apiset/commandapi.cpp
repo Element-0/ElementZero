@@ -137,11 +137,11 @@ struct CommandDataDefinition {
   std::string name;
   size_t size{};
   CommandDataDefinition(std::string const &name, size_t size) : name(name), size(size) {}
-  virtual ~CommandDataDefinition()                     = default;
-  virtual void init(void *)                            = 0;
-  virtual void deinit(void *)                          = 0;
-  virtual JsValueRef fetch(void *)                     = 0;
-  virtual CommandParameterData generate(size_t offset) = 0;
+  virtual ~CommandDataDefinition()                        = default;
+  virtual void init(void *)                               = 0;
+  virtual void deinit(void *)                             = 0;
+  virtual JsValueRef fetch(void *, CommandOrigin const &) = 0;
+  virtual CommandParameterData generate(size_t offset)    = 0;
 };
 
 template <typename T> struct BaseCommandDataDefinition : CommandDataDefinition {
@@ -151,7 +151,7 @@ template <typename T> struct BaseCommandDataDefinition : CommandDataDefinition {
       : CommandDataDefinition(name, optional ? sizeof(T) + sizeof(bool) : sizeof(T)), optional(optional) {}
   void init(void *x) override { new (x) T{}; }
   void deinit(void *x) override { std::destroy_at((T *) x); }
-  JsValueRef fetch(void *x) override {
+  JsValueRef fetch(void *x, CommandOrigin const &) override {
     if (optional) {
       auto is_set = *(bool *) ((char *) x + sizeof(T));
       if (!is_set) return GetUndefined();
@@ -199,6 +199,47 @@ struct EnumCommandDataDefinition : BaseCommandDataDefinition<int> {
   }
 };
 
+template <typename T> struct SelectorCommandDataDefinition : CommandDataDefinition {
+  using Type = CommandSelector<T>;
+  bool optional;
+
+  SelectorCommandDataDefinition(std::string const &name, bool optional)
+      : CommandDataDefinition(name, optional ? sizeof(Type) + sizeof(bool) : sizeof(Type)), optional(optional) {}
+
+  void init(void *x) override { new (x) Type{}; }
+  void deinit(void *x) override { std::destroy_at((Type *) x); }
+  JsValueRef fetch(void *x, CommandOrigin const &orig) override {
+    if (optional) {
+      auto is_set = *(bool *) ((char *) x + sizeof(Type));
+      if (!is_set) return GetUndefined();
+    }
+    Type &ref    = *(Type *) x;
+    auto results = ref.results(orig);
+    std::vector<JsValueRef> rets;
+    auto &db = Mod::PlayerDatabase::GetInstance();
+    for (auto &item : results) {
+      if constexpr (std::is_same_v<T, Player>) {
+        if (auto player = db.Find(item)) rets.emplace_back(ToJs(*player));
+      } else {
+        rets.emplace_back(ToJs(item->getUniqueID()));
+      }
+    }
+    return ToJsArray(rets);
+  }
+  CommandParameterData generate(size_t offset) override {
+    return {
+        Mod::CommandSupport::GetParameterTypeId<Type>(),
+        CommandRegistry::getParseFn<Type>(),
+        name,
+        CommandParameterDataType::NORMAL,
+        nullptr,
+        (int) offset,
+        optional,
+        optional ? (int) (offset + sizeof(T)) : -1,
+    };
+  }
+};
+
 struct CommandDataHolder {
   JsValueRef func;
   std::vector<std::unique_ptr<CommandDataDefinition>> defs;
@@ -232,13 +273,13 @@ struct CommandDataHolder {
       offset += def->size;
     }
   }
-  JsValueRef callFunction(void *start, JsValueRef self) {
+  JsValueRef callFunction(void *start, JsValueRef self, CommandOrigin const &orig) {
     std::vector<JsValueRef> parr;
     parr.reserve(1 + defs.size());
     parr.emplace_back(self);
     auto offset = (std::byte *) start;
     for (auto &def : defs) {
-      parr.emplace_back(def->fetch(offset));
+      parr.emplace_back(def->fetch(offset, orig));
       offset += def->size;
     }
     JsValueRef result;
@@ -254,7 +295,7 @@ struct CustomCommand : Command {
 
   void execute(const CommandOrigin &orig, CommandOutput &outp) override {
     try {
-      auto ret = holder->callFunction((char *) this + sizeof(CustomCommand), DumpCommandOrigin(orig));
+      auto ret = holder->callFunction((char *) this + sizeof(CustomCommand), DumpCommandOrigin(orig), orig);
       WriteToCommandOutput(outp, ret);
     } catch (std::exception const &ex) { outp.error(ex.what()); } catch (Exception ref) {
       WriteToCommandError(outp, ref.raw);
@@ -312,6 +353,10 @@ static CommandDataHolder *GenCommandDataHolder(JsValueRef arr, JsValueRef func) 
     } else if (type == "enum") {
       auto enumname = arg["enum"].get<std::string>();
       holder->add(std::make_unique<EnumCommandDataDefinition>(name, enumname, opt));
+    } else if (type == "players") {
+      holder->add(std::make_unique<SelectorCommandDataDefinition<Player>>(name, opt));
+    } else if (type == "entities") {
+      holder->add(std::make_unique<SelectorCommandDataDefinition<Actor>>(name, opt));
     } else
       throw std::runtime_error{"unsupported type: " + type};
   }
