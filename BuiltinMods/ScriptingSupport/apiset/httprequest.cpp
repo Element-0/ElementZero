@@ -1,5 +1,6 @@
 #include "ChakraCommon.h"
 #include "ChakraCore.h"
+#include "modutils.h"
 #include <MsXml6.h>
 #include <cstdint>
 #include <cstdlib>
@@ -312,6 +313,21 @@ struct HttpOption {
 
 } // namespace
 
+using pDllGetClassObject = HRESULT (*)(REFCLSID rclsid, REFIID riid, LPVOID ppv);
+
+IXMLHTTPRequest2 *CreateXHR() {
+  static auto DLL          = LoadLibrary(L"msxml6.dll");
+  static auto GetClassObj  = (pDllGetClassObject) GetProcAddress(DLL, "DllGetClassObject");
+  static auto ClassFactory = IIFE([] {
+    IClassFactory *ret;
+    HR{"create com factory"} = GetClassObj(CLSID_FreeThreadedXMLHTTP60, IID_IClassFactory, &ret);
+    return ret;
+  });
+  IXMLHTTPRequest2 *ret;
+  ClassFactory->CreateInstance(0, IID_IXMLHTTPRequest2, (void **) &ret);
+  return ret;
+}
+
 static RegisterQueue queue("HttpRequest", [](JsObjectWrapper global) {
   global["HttpRequest"] = [](JsValueRef callee, Arguments args) -> JsValueRef {
     if (args.size() == 2 || args.size() == 3) {
@@ -324,14 +340,12 @@ static RegisterQueue queue("HttpRequest", [](JsObjectWrapper global) {
       auto urlc    = FromJs<std::string>(args[1]);
       JsValueRef promise, resolve, reject;
       ThrowError(JsCreatePromise(&promise, &resolve, &reject));
-      IXMLHTTPRequest2 *spXHR;
+      IXMLHTTPRequest2 *spXHR = CreateXHR();
       HttpRequestCallback *spXhrCallback;
 
       HttpOption opt;
       if (args.size() == 3 && GetJsType(args[2]) == JsObject) { opt.readFromJs(JsObjectWrapper{args[2]}); }
 
-      HR{"create com object"} =
-          CoCreateInstance(CLSID_FreeThreadedXMLHTTP60, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&spXHR));
       HR{"create callback object"} = MakeAndInitialize<HttpRequestCallback>(&spXhrCallback);
 
       spXhrCallback->resolve = std::make_shared<ValueHolder>(resolve);
