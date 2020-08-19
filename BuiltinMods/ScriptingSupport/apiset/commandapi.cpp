@@ -241,7 +241,7 @@ template <typename T> struct SelectorCommandDataDefinition : CommandDataDefiniti
 };
 
 struct CommandDataHolder {
-  JsValueRef func;
+  LeakedHolder func;
   std::vector<std::unique_ptr<CommandDataDefinition>> defs;
 
   CommandDataHolder(JsValueRef func) : func(func) {}
@@ -283,7 +283,7 @@ struct CommandDataHolder {
       offset += def->size;
     }
     JsValueRef result;
-    ThrowError(JsCallFunction(func, &parr[0], parr.size(), &result));
+    ThrowError(JsCallFunction(*func, &parr[0], parr.size(), &result));
     return result;
   }
 };
