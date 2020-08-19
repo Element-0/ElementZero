@@ -28,11 +28,12 @@ Mod::FormUI &Mod::FormUI::GetInstance() {
 }
 
 struct FormAuxData : Mod::AuxHolder {
-  std::map<int, std::function<void(Json::Value const &)>> map;
+  int lastid;
+  std::optional<std::function<void(Json::Value const &)>> callback;
 
   int alloc() {
     auto ret = rand();
-    if (map.find(ret) != map.end()) return alloc();
+    if (ret == lastid) return alloc();
     return ret;
   }
 };
@@ -44,9 +45,10 @@ void Mod::FormUI::SendModalForm(
   auto &aux = Mod::PlayerDatabase::GetInstance().GetAuxAuto<FormAuxData>(target.player);
   auto id   = aux.alloc();
   ModalFormRequestPacket pkt;
-  pkt.id      = id;
-  pkt.content = data;
-  aux.map.emplace(id, resp);
+  pkt.id       = id;
+  pkt.content  = data;
+  aux.lastid   = id;
+  aux.callback = resp;
   target.player->sendNetworkPacket(pkt);
 }
 
@@ -57,15 +59,14 @@ TClasslessInstanceHook(
     NetworkIdentifier const &netid, void *cb, std::shared_ptr<ModalFormResponsePacket> &pkt) {
   auto &db = Mod::PlayerDatabase::GetInstance();
   if (auto entry = db.Find(netid)) {
-    auto &map = db.GetAuxAuto<FormAuxData>(entry->player).map;
-    if (auto it = map.find(pkt->id); it != map.end()) {
-      Json::Reader reader;
-      Json::Value root;
-      std::istringstream iss{pkt->content};
-      reader.parse(iss, root);
-      it->second(root);
-      if (root.isNull()) { map.erase(it); }
-    }
+    auto &data = db.GetAuxAuto<FormAuxData>(entry->player);
+    if (data.lastid != pkt->id || !data.callback) return;
+    Json::Reader reader;
+    Json::Value root;
+    std::istringstream iss{pkt->content};
+    reader.parse(iss, root);
+    (*data.callback)(root);
+    if (root.isNull()) { data.callback.reset(); }
   }
 }
 
@@ -84,11 +85,14 @@ TClasslessInstanceHook(
         Json::FastWriter writer;
         auto data = writer.write(json);
         auto &aux = Mod::PlayerDatabase::GetInstance().GetAuxAuto<FormAuxData>(entry->player);
-        auto id   = aux.alloc();
+        auto id   = 0;
         ServerSettingsResponsePacket pkt;
-        pkt.id      = id;
-        pkt.content = data;
-        aux.map.emplace(id, cb);
+        pkt.id       = id;
+        pkt.content  = data;
+        aux.lastid   = id;
+        aux.callback = token->second;
+        DEF_LOGGER("server");
+        LOGV("data: %s") % data;
         entry->player->sendNetworkPacket(pkt);
       }
     }
