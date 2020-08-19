@@ -62,10 +62,11 @@ std::optional<Mod::Essentials::WarpInfo> Mod::Essentials::WarpSystem::GetGlobalW
 }
 
 void Mod::Essentials::WarpSystem::SetGlobalWarp(Mod::Essentials::WarpInfo info) {
-  static SQLite::Statement stmt{*world_database,
-                                "INSERT OR REPLACE INTO global_warp "
-                                "(name, dim, x, y, z) "
-                                "VALUES (?, ?, ?, ?, ?)"};
+  static SQLite::Statement stmt{
+      *world_database,
+      "INSERT OR REPLACE INTO global_warp "
+      "(name, dim, x, y, z) "
+      "VALUES (?, ?, ?, ?, ?)"};
   BOOST_SCOPE_EXIT_ALL() {
     stmt.clearBindings();
     stmt.reset();
@@ -143,10 +144,11 @@ Mod::Essentials::WarpSystem::GetWarp(mce::UUID const &uuid, std::string const &n
 
 std::optional<std::string> Mod::Essentials::WarpSystem::SetWarp(mce::UUID const &uuid, Mod::Essentials::WarpInfo info) {
   SQLite::Transaction trans{*world_database};
-  static SQLite::Statement stmt{*world_database,
-                                "INSERT OR REPLACE INTO warp "
-                                "(uuid, name, dim, x, y, z) "
-                                "VALUES (?, ?, ?, ?, ?, ?)"};
+  static SQLite::Statement stmt{
+      *world_database,
+      "INSERT OR REPLACE INTO warp "
+      "(uuid, name, dim, x, y, z) "
+      "VALUES (?, ?, ?, ?, ?, ?)"};
   BOOST_SCOPE_EXIT_ALL() {
     stmt.clearBindings();
     stmt.tryReset();
@@ -168,9 +170,10 @@ std::optional<std::string> Mod::Essentials::WarpSystem::SetWarp(mce::UUID const 
 }
 
 void Mod::Essentials::WarpSystem::DelWarp(mce::UUID const &uuid, std::string const &name) {
-  static SQLite::Statement stmt{*world_database,
-                                "DELETE FROM warp "
-                                "WHERE uuid = ? AND name = ?"};
+  static SQLite::Statement stmt{
+      *world_database,
+      "DELETE FROM warp "
+      "WHERE uuid = ? AND name = ?"};
   BOOST_SCOPE_EXIT_ALL() {
     stmt.clearBindings();
     stmt.tryReset();
@@ -276,12 +279,12 @@ public:
   }
 
   void execute(CommandOrigin const &origin, CommandOutput &output) {
-    if (action == Action::List) {
-      printGlobalList(origin, output);
-      return;
-    }
     auto pent = Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
     if (!pent) {
+      if (action == Action::List) {
+        printGlobalList(origin, output);
+        return;
+      }
       output.error("commands.generic.error.invalidPlayer", {"/global-warp"});
       return;
     }
