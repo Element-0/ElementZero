@@ -20,8 +20,6 @@ add_subdirectory ("CustomMods")
 install (FILES Lib/addition_symbols.db DESTINATION .)
 install (FILES Lib/bedrock_server_mod.lib DESTINATION Lib)
 install (FILES Lib/bedrock_server_mod.exe DESTINATION .)
-install (DIRECTORY MinecraftHeaders/ DESTINATION Include)
-install (DIRECTORY Public/ DESTINATION Include)
 
 set (CPACK_PACKAGE_VERSION ${git_version})
 set (CPACK_PACKAGE_DIRECTORY ${PROJECT_SOURCE_DIR}/pack)
