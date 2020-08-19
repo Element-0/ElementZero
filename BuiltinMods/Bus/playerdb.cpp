@@ -10,14 +10,21 @@
 #include "global.h"
 
 static RegisterAPI reg("ChatAPI", false, [] {
-  auto &playerdb = Mod::PlayerDatabase::GetInstance();
-  playerdb.AddListener(SIG("joined"), [](Mod::PlayerEntry const &player) {
-    auto res = boost::format("%s\n%s\n%s") % player.name % player.xuid % player.uuid;
-    client->notify("player-join", res.str());
-  });
-  playerdb.AddListener(SIG("left"), [](Mod::PlayerEntry const &player) {
-    auto res = boost::format("%s\n%s\n%s") % player.name % player.xuid % player.uuid;
-    client->notify("player-left", res.str());
+  static auto _ [[gnu::unused]] = IIFE([] {
+    auto &playerdb = Mod::PlayerDatabase::GetInstance();
+    playerdb.AddListener(SIG("joined"), [](Mod::PlayerEntry const &player) {
+      auto res = boost::format("%s\n%s\n%s") % player.name % player.xuid % player.uuid;
+      try {
+        client->notify("player-join", res.str());
+      } catch (...) {}
+    });
+    playerdb.AddListener(SIG("left"), [](Mod::PlayerEntry const &player) {
+      auto res = boost::format("%s\n%s\n%s") % player.name % player.xuid % player.uuid;
+      try {
+        client->notify("player-join", res.str());
+      } catch (...) {}
+    });
+    return 0;
   });
   client->register_handler("find-player", [](std::string_view content) -> std::string {
     auto &playerdb = Mod::PlayerDatabase::GetInstance();
