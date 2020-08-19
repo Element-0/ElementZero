@@ -38,3 +38,4 @@
 #include <base/scheduler.h>
 #include <mods/CommandSupport.h>
 #include <mods/Essentials.h>
+#include <mods/FormUI.h>

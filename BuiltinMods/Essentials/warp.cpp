@@ -204,7 +204,7 @@ static auto &sys = Mod::Essentials::WarpSystem::GetInstance();
 class WarpCommand : public Command {
 public:
 #pragma region detail
-  enum class Action { To, List, Set, Del } action;
+  enum class Action { Ui, To, List, Set, Del } action{};
 
   std::string name;
 #pragma endregion
@@ -278,6 +278,74 @@ public:
     }
   }
 
+  static void showUi(Mod::PlayerEntry const &ent, bool local = false) {
+    auto &form = Mod::FormUI::GetInstance();
+    if (local) {
+      auto list = sys.GetWarpList(ent.uuid);
+      Json::Value root{Json::objectValue};
+      root["type"]    = "form";
+      root["title"]   = "ui.warp.title";
+      root["content"] = "ui.warp.content.local";
+      Json::Value contents{Json::arrayValue};
+      auto idx = 0;
+      for (auto &item : list) {
+        Json::Value desc{Json::objectValue};
+        desc["text"]    = item.Name.c_str();
+        contents[idx++] = desc;
+      }
+      root["buttons"] = contents;
+      form.SendModalForm(ent, root, [=](Json::Value const &json) {
+        Json::FastWriter writer;
+        if (json.isIntegral()) {
+          auto ret = json.asUInt(0);
+          if (ret < list.size()) sys.Warp(ent.player, list[ret]);
+        }
+      });
+    } else {
+      auto list = sys.GetGlobalWarpList();
+      if (list.size() == 0) {
+        if (sys.GetWarpCount(ent.uuid) == 0) {
+          Json::Value root{Json::objectValue};
+          root["type"]    = "modal";
+          root["title"]   = "ui.warp.title";
+          root["content"] = "ui.warp.content.empty.both";
+          root["button1"] = "ui.warp.modal.button1";
+          root["button2"] = "ui.warp.modal.button2";
+          form.SendModalForm(ent, root, [](auto) {});
+        } else {
+          showUi(ent, true);
+        }
+        return;
+      }
+      Json::Value root{Json::objectValue};
+      root["type"]    = "form";
+      root["title"]   = "ui.warp.title";
+      root["content"] = "ui.warp.content";
+      Json::Value contents{Json::arrayValue};
+      auto idx = 0;
+      {
+        Json::Value jump{Json::objectValue};
+        jump["text"]    = "ui.warp.jump";
+        contents[idx++] = jump;
+      }
+      for (auto &item : list) {
+        Json::Value desc{Json::objectValue};
+        desc["text"]    = item.Name.c_str();
+        contents[idx++] = desc;
+      }
+      root["buttons"] = contents;
+      form.SendModalForm(ent, root, [=](Json::Value const &json) {
+        if (json.isIntegral()) {
+          auto ret = json.asUInt(0);
+          if (ret == 0)
+            showUi(ent, true);
+          else if (ret <= list.size())
+            sys.Warp(ent.player, list[ret - 1]);
+        }
+      });
+    }
+  }
+
   void execute(CommandOrigin const &origin, CommandOutput &output) {
     auto pent = Mod::PlayerDatabase::GetInstance().Find((Player *) origin.getEntity());
     if (!pent) {
@@ -290,6 +358,10 @@ public:
     }
     auto ent = *pent;
     switch (action) {
+    case Action::Ui:
+      showUi(ent);
+      output.success();
+      break;
     case Action::To: handleTo(ent, origin, output); break;
     case Action::List:
       printGlobalList(origin, output);
@@ -308,6 +380,7 @@ public:
     addEnum<Action>(registry, "warp-list", {{"list", Action::List}});
     addEnum<Action>(registry, "warp-set", {{"set", Action::Set}});
     addEnum<Action>(registry, "warp-del", {{"del", Action::Del}});
+    registry->registerOverload<WarpCommand>("warp"); // So the action will be default 0 (Ui)
     registry->registerOverload<WarpCommand>(
         "warp", mandatory<CommandParameterDataType::ENUM>(&WarpCommand::action, "to", "warp-to"),
         mandatory(&WarpCommand::name, "name"));
