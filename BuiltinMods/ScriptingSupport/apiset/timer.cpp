@@ -30,9 +30,9 @@ static RegisterQueue queue("timer", [](JsObjectWrapper global) {
     if (args.size() != 1 && args.size() != 2) throw std::runtime_error{"Require 1 or 2 arguments"};
     auto fn = args[0];
     if (GetJsType(fn) != JsFunction) throw std::runtime_error{"The first argument require to be function"};
-    auto delay = args.size() == 2 ? FromJs<int>(args[1]) : 0;
-    auto token =
-        Mod::Scheduler::SetInterval(Mod::Scheduler::GameTick(delay), [holder{ValueHolder{fn}}](unsigned long long) {
+    auto delay = args.size() == 2 ? FromJs<int>(args[1]) : 1;
+    auto token = Mod::Scheduler::SetInterval(
+        Mod::Scheduler::GameTick(delay <= 0 ? 1 : delay), [holder{ValueHolder{fn}}](unsigned long long) {
           JsValueRef ref{GetUndefined()};
           JsCallFunction(*holder, &ref, 1, nullptr);
         });
