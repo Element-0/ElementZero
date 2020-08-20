@@ -97,6 +97,8 @@ declare module "ez:blacklist" {
 declare module "ez:chat" {
   export function onChat(cb: (sender: string, content: string) => void): void;
   export function sendBroadcast(sender: string, content: string): void;
+  export function sendAnnounce(content: string): void;
+  export function send(target: PlayerEntry, content: string): void;
 }
 
 declare interface ScriptPosition {

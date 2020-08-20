@@ -26,8 +26,18 @@ static LazyModuleRegister reg("ez:chat", "ChatAPI", [](JsObjectWrapper native) -
     Mod::Chat::GetInstance().SendBroadcast(sender, content);
     return GetUndefined();
   };
+  native["sendAnnounce"] = +[](std::string const &content) {
+    Mod::Chat::GetInstance().SendAnnounce(content);
+    return GetUndefined();
+  };
+  native["send"] = +[](Mod::PlayerEntry const &target, std::string const &content) {
+    Mod::Chat::GetInstance().Send(target, content);
+    return GetUndefined();
+  };
   return R"script(
     export const onChat = import.meta.native.onChat;
     export const sendBroadcast = import.meta.native.sendBroadcast;
+    export const sendAnnounce = import.meta.native.sendAnnounce;
+    export const send = import.meta.native.send;
   )script";
 });

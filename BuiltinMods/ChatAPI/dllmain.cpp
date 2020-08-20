@@ -53,6 +53,16 @@ void Chat::SendAnnounce(const std::string &content, std::initializer_list<std::s
   });
 }
 
+void Chat::Send(const Mod::PlayerEntry &entry, const std::string &content) {
+  auto packet = TextPacket::createTextPacket<TextPacketType::Announcement>(content);
+  entry.player->sendNetworkPacket(packet);
+}
+
+void Chat::Send(const Mod::PlayerEntry &entry, const std::string &content, std::initializer_list<std::string> args) {
+  auto packet = TextPacket::createTranslatedMessageWithParams(content, args);
+  entry.player->sendNetworkPacket(packet);
+}
+
 Chat &Chat::GetInstance() {
   static Chat instance;
   return instance;
