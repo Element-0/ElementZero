@@ -27,15 +27,25 @@ Mod::FormUI &Mod::FormUI::GetInstance() {
   return instance;
 }
 
-struct FormAuxData : Mod::AuxHolder {
-  int lastid;
-  std::optional<std::function<void(Json::Value const &)>> callback;
+class FormAuxData : public Mod::AuxHolder {
+public:
+  using callback_type = std::function<void(Json::Value const &)>;
 
+private:
+  std::map<int, callback_type> data;
+
+public:
   int alloc() {
     auto ret = rand();
-    if (ret == lastid) return alloc();
+    if (data.find(ret) != data.end()) return alloc();
     return ret;
   }
+  template <typename T> void insert(int k, T &&fn) { data.emplace(k, std::forward<T &&>(fn)); }
+  std::optional<callback_type> find(int k) {
+    if (auto it = data.find(k); it != data.end()) return {it->second};
+    return std::nullopt;
+  }
+  void erase(int k) { data.erase(k); }
 };
 
 void Mod::FormUI::SendModalForm(
@@ -45,10 +55,9 @@ void Mod::FormUI::SendModalForm(
   auto &aux = Mod::PlayerDatabase::GetInstance().GetAuxAuto<FormAuxData>(target.player);
   auto id   = aux.alloc();
   ModalFormRequestPacket pkt;
-  pkt.id       = id;
-  pkt.content  = data;
-  aux.lastid   = id;
-  aux.callback = resp;
+  pkt.id      = id;
+  pkt.content = data;
+  aux.insert(id, std::move(resp));
   target.player->sendNetworkPacket(pkt);
 }
 
@@ -59,14 +68,17 @@ TClasslessInstanceHook(
     NetworkIdentifier const &netid, void *cb, std::shared_ptr<ModalFormResponsePacket> &pkt) {
   auto &db = Mod::PlayerDatabase::GetInstance();
   if (auto entry = db.Find(netid)) {
-    auto &data = db.GetAuxAuto<FormAuxData>(entry->player);
-    if (data.lastid != pkt->id || !data.callback) return;
+    auto &data    = db.GetAuxAuto<FormAuxData>(entry->player);
+    auto callback = data.find(pkt->id);
+    if (!callback) return;
     Json::Reader reader;
     Json::Value root;
     std::istringstream iss{pkt->content};
     reader.parse(iss, root);
-    (*data.callback)(root);
-    if (root.isNull()) { data.callback.reset(); }
+    try {
+      (*callback)(root);
+      if (root.isNull() || root.isIntegral()) { data.erase(pkt->id); }
+    } catch (...) { data.erase(pkt->id); }
   }
 }
 
@@ -87,12 +99,9 @@ TClasslessInstanceHook(
         auto &aux = Mod::PlayerDatabase::GetInstance().GetAuxAuto<FormAuxData>(entry->player);
         auto id   = 0;
         ServerSettingsResponsePacket pkt;
-        pkt.id       = id;
-        pkt.content  = data;
-        aux.lastid   = id;
-        aux.callback = token->second;
-        DEF_LOGGER("server");
-        LOGV("data: %s") % data;
+        pkt.id      = id;
+        pkt.content = data;
+        aux.insert(id, cb);
         entry->player->sendNetworkPacket(pkt);
       }
     }
