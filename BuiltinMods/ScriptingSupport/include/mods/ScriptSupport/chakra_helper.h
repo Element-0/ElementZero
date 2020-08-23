@@ -734,9 +734,10 @@ struct JsObjectWrapper {
 
 inline JsValueRef ToJs(JsObjectWrapper const &wrapper) { return *wrapper; }
 
-struct ValueHolder {
+class ValueHolder {
   JsValueRef ref;
 
+public:
   ValueHolder() {}
   ValueHolder(JsValueRef ref) : ref(ref) {
     if (ref) JsAddRef(ref, nullptr);
@@ -745,6 +746,28 @@ struct ValueHolder {
     if (ref) JsAddRef(ref, nullptr);
   }
   ValueHolder(ValueHolder &&rhs) : ref(rhs.ref) { rhs.ref = nullptr; }
+
+  ValueHolder &operator=(ValueHolder &&rhs) {
+    if (ref) JsRelease(ref, nullptr);
+    ref = rhs.ref;
+    if (ref) JsAddRef(ref, nullptr);
+    rhs.ref = nullptr;
+    return *this;
+  }
+
+  ValueHolder &operator=(ValueHolder const &rhs) {
+    if (ref) JsRelease(ref, nullptr);
+    ref = rhs.ref;
+    if (ref) JsAddRef(ref, nullptr);
+    return *this;
+  }
+
+  ValueHolder &operator=(JsValueRef rhs) {
+    if (ref) JsRelease(ref, nullptr);
+    ref = rhs;
+    if (ref) JsAddRef(ref, nullptr);
+    return *this;
+  }
 
   JsValueRef operator*() const { return ref; }
 

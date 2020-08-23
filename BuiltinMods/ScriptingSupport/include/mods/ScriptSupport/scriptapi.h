@@ -46,7 +46,7 @@ struct ScriptAuxData : Mod::AuxHolder {
   ValueHolder holder;
   ScriptAuxData() {
     JsObjectWrapper wrapper;
-    holder.ref = *wrapper;
+    holder = *wrapper;
   }
 };
 

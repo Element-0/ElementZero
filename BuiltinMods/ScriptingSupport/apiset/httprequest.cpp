@@ -194,18 +194,17 @@ public:
     LocateService<ServerInstance>()->queueForServerThread([&]() {
       stage =
           std::make_shared<ValueHolder>(HttpResponse::Create(status, std::move(statusText), std::move(headers)).ref);
-      JsObjectWrapper obj{stage->ref};
+      JsObjectWrapper obj{**stage};
       ThrowError(JsCreatePromise(&_promise, &_resolve, &_reject));
+      *resolve          = _resolve;
+      *reject           = _reject;
       obj["data"]       = _promise;
-      JsValueRef arg[2] = {GetUndefined(), stage->ref};
+      JsValueRef arg[2] = {GetUndefined(), **stage};
       JsCallFunction(**resolve, arg, 2, NULL);
       token.notify(true);
     });
 
     token.wait();
-
-    resolve->ref = _resolve;
-    reject->ref  = _reject;
     return S_OK;
   }
 
