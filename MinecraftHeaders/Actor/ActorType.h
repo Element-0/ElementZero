@@ -3,7 +3,7 @@
 #include "../dll.h"
 #include <functional>
 
-enum ActorType : int {
+enum class ActorType {
   Undefined_2          = 0x1,
   TypeMask             = 0xFF,
   Mob                  = 0x100,
