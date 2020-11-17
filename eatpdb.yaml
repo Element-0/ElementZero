@@ -7,6 +7,7 @@ filter: !blacklist
   - prefix: "??_"
   - prefix: "??@"
   - prefix: "?$TSS"
+  - prefix: "VanillaNames::"
   - regex: "std@@U"
   - name: atexit
   - name: "??2@YAPEAX_K@Z"
@@ -16,4 +17,9 @@ filter: !blacklist
   - regex: ".*printf$"
   - regex: "JsonSchemaChildOption"
   - regex: "JsonSchemaNode"
-  - regex: "std___Func_impl"
+  - regex: "no_alloc"
+  - regex: "rapidjson"
+  - regex: "ASN1"
+  - regex: "asn1"
+  - regex: "type_id"
+  - regex: "internal@entt"
