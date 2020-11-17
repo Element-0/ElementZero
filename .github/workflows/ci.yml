@@ -31,6 +31,8 @@ jobs:
         echo "::set-env name=CC::clang-cl"
         echo "::set-env name=CXX::clang-cl"
         echo "::set-env name=PATH::C:/LLVM/bin;$env:PATH"
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
     - name: Install vcpkg
       uses: lukka/run-vcpkg@v2
