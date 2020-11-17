@@ -33,7 +33,7 @@ jobs:
         echo "PATH=C:/LLVM/bin;$env:PATH" >> $GITHUB_ENV
 
     - name: Install vcpkg
-      uses: lukka/run-vcpkg@v2
+      uses: lukka/run-vcpkg@v5
       with:
         vcpkgDirectory: '${{ github.workspace }}/vcpkg'
         vcpkgArguments: '@${{ github.workspace }}/vcpkg.txt'
