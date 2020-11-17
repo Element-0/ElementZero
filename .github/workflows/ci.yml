@@ -4,7 +4,7 @@ on: [push]
 
 env:
   eatpdb_version: v0.0.5
-  bds_version: 1.16.40.02
+  bds_version: 1.16.100.04
 
 jobs:
   build:
