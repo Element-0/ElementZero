@@ -16,3 +16,4 @@ filter: !blacklist
   - regex: ".*printf$"
   - regex: "JsonSchemaChildOption"
   - regex: "JsonSchemaNode"
+  - regex: "std___Func_impl"
