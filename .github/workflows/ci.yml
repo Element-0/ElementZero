@@ -71,7 +71,6 @@ jobs:
         mkdir Lib Dist
         cd BDS
         D:/rcedit.exe bedrock_server.exe --set-icon ../index.ico
-        cat ../eatpdb.yaml
         D:/eatpdb/eatpdb exec ../eatpdb.yaml
         lib /def:bedrock_server_mod.def /machine:x64
         cp addition_symbols.db ../Lib
