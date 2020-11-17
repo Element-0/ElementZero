@@ -21,4 +21,4 @@ filter: !blacklist
   - regex: "rapidjson"
   - regex: "ASN1"
   - regex: "asn1"
-  
+  - regex: "CxxThrowException"
