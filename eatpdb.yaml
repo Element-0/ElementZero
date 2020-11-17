@@ -18,3 +18,4 @@ filter: !blacklist
   - regex: "JsonSchemaChildOption"
   - regex: "JsonSchemaNode"
   - regex: "no_alloc"
+  - regex: "rapidjson"
