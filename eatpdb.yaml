@@ -7,7 +7,7 @@ filter: !blacklist
   - prefix: "??_"
   - prefix: "??@"
   - prefix: "?$TSS"
-  - prefix: "VanillaNames__"
+  - prefix: "VanillaNames::"
   - regex: "std@@U"
   - name: atexit
   - name: "??2@YAPEAX_K@Z"
