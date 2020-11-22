@@ -67,7 +67,9 @@ public:
   MCAPI bool isHorseArmorItem(void) const;
   MCAPI bool isStackable(class ItemStackBase const &) const;
 
-  MCAPI std::string toString(void) const;
+  inline std::string toString() {
+    return CallServerClassMethod<std::string>("?toString@ItemStackBase@@UEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ", this);
+  }
 
   MCAPI short getId(void) const;
   MCAPI int getIdAux(void) const;
