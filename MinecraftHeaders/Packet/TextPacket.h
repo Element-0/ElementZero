@@ -61,7 +61,8 @@ public:
   createTranslatedMessageWithParams(std::string const &text, std::initializer_list<std::string> args = {}) {
     TextObjectRoot root;
     root.addChild(TextObjectLocalizedTextWithParams::build(text, args));
-    return createTextObjectMessage(root);
+    TextPacket pkt;
+    return /*createTextObjectMessage(root)*/ pkt;
   }
   inline TextPacket() {}
   inline ~TextPacket() {}

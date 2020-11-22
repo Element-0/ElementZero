@@ -1,6 +1,5 @@
 #include <Net/NetworkIdentifier.h>
 #include <Packet/MobEquipmentPacket.h>
-#include <Packet/ActorFallPacket.h>
 #include <Packet/TextPacket.h>
 #include <Item/ItemStack.h>
 #include <Item/Potion.h>
@@ -48,20 +47,6 @@ TClasslessInstanceHook(
       (mAntiCheat.*EmitDetected)(SIG("detected"), "edit_block", *it);
     }
   }
-}
-
-TClasslessInstanceHook(
-    void, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVActorFallPacket@@@Z", NetworkIdentifier *netid,
-    ActorFallPacket *packet) {
-  if (packet->fallDistance < 0.1) {
-    auto &db = Mod::PlayerDatabase::GetInstance();
-    auto it  = db.Find(*netid);
-    if (!it) return;
-    LOGI("\"%s\"(%d) has been detected using: No fall") % it->name % it->xuid;
-    (mAntiCheat.*EmitDetected)(SIG("detected"), "nofall", *it);
-    packet->inVoid = true;
-  }
-  original(this, netid, packet);
 }
 
 TClasslessInstanceHook(

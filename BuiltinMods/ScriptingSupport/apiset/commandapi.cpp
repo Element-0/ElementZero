@@ -121,7 +121,7 @@ struct SlashCommand : Command {
 };
 
 TClasslessInstanceHook(
-    void *, "?parse@Parser@CommandRegistry@@QEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
+    void *, "?_parse@Parser@CommandRegistry@@AEAA_NAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z",
     std::string &input) {
   if (input._Starts_with("/!")) { input.replace(0, 2, "/slash "); }
   return original(this, input);

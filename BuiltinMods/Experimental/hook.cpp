@@ -27,14 +27,7 @@ TClasslessInstanceHook(bool, "?isEnabled@FeatureToggles@@QEBA_NW4FeatureOptionID
   if (settings.force_experimental_gameplay) return true;
   return original(this, id);
 }
-TClasslessInstanceHook(bool, "?hasExperimentalGameplayEnabled@LevelData@@QEBA_NXZ", int id) {
-  if (settings.force_experimental_gameplay) return true;
-  return original(this, id);
-}
-TClasslessInstanceHook(bool, "?hasExperimentalGameplayEnabled@Level@@QEBA_NXZ", int id) {
-  if (settings.force_experimental_gameplay) return true;
-  return original(this, id);
-}
+
 TClasslessInstanceHook(
     LevelData,
     "?getLevelData@ExternalFileLevelStorageSource@@UEBA?AVLevelData@@AEBV?$basic_string@DU?$char_traits@D@std@@V?$"
