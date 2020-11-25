@@ -24,8 +24,8 @@ jobs:
     - name: Download BDS
       run: |
         Invoke-WebRequest -Uri "https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip" -OutFile "D:\BDS.zip"
-        mkdir bds
-        cd bds
+        mkdir D:\bds
+        cd D:\bds
         unzip D:\bds.zip
 
     - name: Install and Run eatpdb
@@ -38,5 +38,11 @@ jobs:
         cd D:\bds
         copy "${{ github.workspace}}\eatpdb.yaml" eatpdb.yaml
         D:\eatpdb\eatpdb.exe eatpdb.yaml
+        lib /def:bedrock_server_mod.def /machine:x64
+        mkdir "${{ github.workspace}}\Lib"
+        copy bedrock_server_mod.lib "${{ github.workspace }}\Lib\bedrock_server_mod.lib"
+        copy bedrock_server_mod.exe "${{ github.workspace }}\Lib\bedrock_server_mod.exe"
+        copy addition_symbols.db "${{ github.workspace }}\Lib\addition_symbols.db"
+        
         
         
