@@ -35,6 +35,11 @@ jobs:
         echo "CC=clang-cl" >> $GITHUB_ENV
         echo "CXX=clang-cl" >> $GITHUB_ENV
         echo "PATH=D:\LLVM\bin;$env:PATH" >> $GITHUB_ENV
+    
+    - name: Setup Visual Studio Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
 
     - name: Install and Run eatpdb
       run: |
