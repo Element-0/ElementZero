@@ -16,11 +16,9 @@ if (NO_INLINE)
 endif ()
 
 add_compile_options (
-    -Wno-microsoft-enum-forward-reference
-    -Wno-c++2a-extensions
-    -Wno-invalid-offsetof
     -Wno-deprecated-declarations
     -Wno-gnu-string-literal-operator-template)
+
 add_compile_options (/EHsc /utf-8)
 add_definitions (-DWIN32_LEAN_AND_MEAN=1 -DNOMINMAX -D_WIN32_WINNT=0x0A00)
 

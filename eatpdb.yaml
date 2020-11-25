@@ -16,3 +16,6 @@ filter: !blacklist
   - regex: ".*printf$"
   - regex: "JsonSchemaChildOption"
   - regex: "JsonSchemaNode"
+  - regex: "rapidjson"
+  - regex: "internal@entt"
+  - regex: "no_alloc"
