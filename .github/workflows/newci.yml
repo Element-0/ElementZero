@@ -50,7 +50,7 @@ jobs:
         unzip D:\eatpdb.zip
         cd D:\bds
         copy "${{ github.workspace}}\eatpdb.yaml" eatpdb.yaml
-        D:\eatpdb\eatpdb.exe eatpdb.yaml
+        D:\eatpdb\eatpdb.exe exec eatpdb.yaml
         lib /def:bedrock_server_mod.def /machine:x64
         mkdir "${{ github.workspace}}\Lib"
         copy bedrock_server_mod.lib "${{ github.workspace }}\Lib\bedrock_server_mod.lib"
