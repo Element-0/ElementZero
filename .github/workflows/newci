@@ -1,0 +1,42 @@
+name: CMake
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+  eatpdb_version: v0.0.5
+  bds_version: 1.16.101.01
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.  You can convert this to a matrix build if you need
+    # cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+   
+    - name: Download BDS
+      run: |
+        Invoke-WebRequest -Uri "https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.bds_version }}.zip" -OutFile "D:\BDS.zip"
+        mkdir bds
+        cd bds
+        unzip D:\bds.zip
+
+    - name: Install and Run eatpdb
+      run: |
+        cd D:\
+        Invoke-WebRequest -Uri "https://github.com/codehz/EatPdb/releases/download/${{ env.eatpdb_version }}/win-x64.zip" -OutFile "D:\eatpdb.zip"
+        mkdir eatpdb
+        cd eatpdb
+        unzip D:\eatpdb.zip
+        cd D:\bds
+        copy "${{ github.workspace}}\eatpdb.yaml" eatpdb.yaml
+        D:\eatpdb\eatpdb.exe eatpdb.yaml
+        
+        
