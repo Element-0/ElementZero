@@ -60,9 +60,9 @@ jobs:
     - name: Install vcpkg and deps
       run: |
         cd "${{ github.workspace }}\vcpkg"
-        bootstrap-vcpkg.bat
+        Start-Process bootstrap-vcpkg.bat -Wait
         cd ..
-        vcpkg\vcpkg.exe install @vcpkg.txt
+        vcpkg\vcpkg.exe install "@vcpkg.txt"
         
     - name: Build ElementZero
       run: cmake .
