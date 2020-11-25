@@ -27,6 +27,14 @@ jobs:
         mkdir D:\bds
         cd D:\bds
         unzip D:\bds.zip
+        
+    - name: Install llvm
+      run: |
+        Invoke-WebRequest -Uri "https://prereleases.llvm.org/win-snapshots/LLVM-11.0.0-2663a25f-win64.exe" -OutFile "D:\LLVM.exe"
+        Start-Process D:\LLVM.exe -Wait -ArgumentList @('/S', '/D=D:\LLVM')
+        echo "CC=clang-cl" >> $GITHUB_ENV
+        echo "CXX=clang-cl" >> $GITHUB_ENV
+        echo "PATH=D:\LLVM\bin;$env:PATH" >> $GITHUB_ENV
 
     - name: Install and Run eatpdb
       run: |
@@ -43,6 +51,17 @@ jobs:
         copy bedrock_server_mod.lib "${{ github.workspace }}\Lib\bedrock_server_mod.lib"
         copy bedrock_server_mod.exe "${{ github.workspace }}\Lib\bedrock_server_mod.exe"
         copy addition_symbols.db "${{ github.workspace }}\Lib\addition_symbols.db"
+        
+    - name: Install vcpkg and deps
+      run: |
+        cd "${{ github.workspace }}\vcpkg"
+        bootstrap-vcpkg.bat
+        cd ..
+        vcpkg\vcpkg.exe install @vcpkg.txt
+        
+    - name: Build ElementZero
+      run: cmake .
+        
         
         
         
