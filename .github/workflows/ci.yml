@@ -28,10 +28,9 @@ jobs:
         Write-Host ('Installing LLVM')
         Start-Process C:\LLVM.exe -Wait -ArgumentList @('/S', '/D=C:\LLVM')
         Write-Host ('Installed LLVM')
-        set ACTIONS_ALLOW_UNSECURE_COMMANDS=true
-        echo "::set-env name=CC::clang-cl"
-        echo "::set-env name=CXX::clang-cl"
-        echo "::set-env name=PATH::C:/LLVM/bin;$env:PATH"
+        echo "CC=clang-cl" >> $GITHUB_ENV
+        echo "CXX=clang-cl" >> $GITHUB_ENV
+        echo "PATH=C:/LLVM/bin;$env:PATH" >> $GITHUB_ENV
 
     - name: Install vcpkg
       uses: lukka/run-vcpkg@v2
