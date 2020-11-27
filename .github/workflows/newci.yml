@@ -61,11 +61,13 @@ jobs:
       run: |
         cd "${{ github.workspace }}\vcpkg"
         Start-Process bootstrap-vcpkg.bat -Wait
-        cd ..
-        vcpkg\vcpkg.exe install "@vcpkg.txt"
+        Import-Module vcpkg
         
     - name: Build ElementZero
-      run: cmake .
+      run: |
+        cd "${{ github.workspace }}"
+        mkdir bin
+        cmake .
         
         
         
